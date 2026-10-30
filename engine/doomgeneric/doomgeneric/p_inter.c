@@ -1,3 +1,5 @@
+/* TREMOR: engine hooks; see engine/PATCHES.md. */
+#include "tremor.h"
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
@@ -69,6 +71,8 @@ P_GiveAmmo
   int		num )
 {
     int		oldammo;
+    /* TREMOR: all pickups grant zero rounds. */
+    return false;
 	
     if (ammo == am_noammo)
 	return false;
@@ -670,6 +674,10 @@ P_KillMobj
     mobjtype_t	item;
     mobj_t*	mo;
 	
+    /* TREMOR: reward, trauma and gore before original death processing. */
+    TR_Kill(source,target);
+    if (TR_Gib(source,target) && target->info->xdeathstate)
+        target->health = -target->info->spawnhealth-1;
     target->flags &= ~(MF_SHOOTABLE|MF_FLOAT|MF_SKULLFLY);
 
     if (target->type != MT_SKULL)
@@ -788,6 +796,14 @@ P_DamageMobj
     fixed_t	thrust;
     int		temp;
 	
+    /* TREMOR: crew can never deal damage, including retaliation. */
+    if (TR_BlockDamage(source)) return;
+    /* TREMOR: classify the actual inflictor, not a later weapon switch. */
+    target->tr_melee_hit = source && source==inflictor && source->player &&
+        (source->player->readyweapon==wp_fist || source->player->readyweapon==wp_chainsaw);
+    target->tr_shotgun_hit = source && source==inflictor && source->player &&
+        (source->player->readyweapon==wp_shotgun || source->player->readyweapon==wp_supershotgun);
+    if (target->health > 0 && (target->flags & MF_SHOOTABLE)) TR_Damaged(target);
     if ( !(target->flags & MF_SHOOTABLE) )
 	return;	// shouldn't happen...
 		

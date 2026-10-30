@@ -1,3 +1,4 @@
+#include "tremor.h" /* TREMOR: HUD shows shared rounds even with fists. */
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
@@ -859,16 +860,12 @@ void ST_updateFaceWidget(void)
 
 void ST_updateWidgets(void)
 {
-    static int	largeammo = 1994; // means "n/a"
     int		i;
 
     // must redirect the pointer if the ready weapon has changed.
     //  if (w_ready.data != plyr->readyweapon)
     //  {
-    if (weaponinfo[plyr->readyweapon].ammo == am_noammo)
-	w_ready.num = &largeammo;
-    else
-	w_ready.num = &plyr->ammo[weaponinfo[plyr->readyweapon].ammo];
+    w_ready.num = &tr_rounds; /* TREMOR: shared firearm budget. */
     //{
     // static int tic=0;
     // static int dir=-1;
@@ -1234,7 +1231,7 @@ void ST_createWidgets(void)
 		  ST_AMMOX,
 		  ST_AMMOY,
 		  tallnum,
-		  &plyr->ammo[weaponinfo[plyr->readyweapon].ammo],
+		  &tr_rounds, /* TREMOR: also valid when fists are selected. */
 		  &st_statusbaron,
 		  ST_AMMOWIDTH );
 

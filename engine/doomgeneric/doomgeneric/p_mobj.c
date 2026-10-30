@@ -1,3 +1,5 @@
+/* TREMOR: engine hooks; see engine/PATCHES.md. */
+#include "tremor.h"
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
@@ -68,7 +70,7 @@ P_SetMobjState
 
 	// Modified handling.
 	// Call action functions when the state is set
-	if (st->action.acp1)		
+	if (st->action.acp1 && !(mobj->tr_crew && mobj->health>0)) /* TREMOR: no living crew attack actions. */
 	    st->action.acp1(mobj);	
 	
 	state = st->nextstate;
@@ -440,6 +442,8 @@ P_NightmareRespawn (mobj_t* mobj)
 //
 void P_MobjThinker (mobj_t* mobj)
 {
+    /* TREMOR: survivors and stunned humans bypass hostile state actions. */
+    if (TR_Think(mobj)) return;
     // momentum movement
     if (mobj->momx
 	|| mobj->momy
@@ -822,6 +826,8 @@ void P_SpawnMapThing (mapthing_t* mthing)
     
     mobj = P_SpawnMobj (x,y,z, i);
     mobj->spawnpoint = *mthing;
+    /* TREMOR: classify before counting monsters. */
+    TR_MapSpawn(mobj);
 
     if (mobj->tics > 0)
 	mobj->tics = 1 + (P_Random () % mobj->tics);
@@ -883,6 +889,8 @@ P_SpawnBlood
 {
     mobj_t*	th;
 	
+    /* TREMOR: off suppresses blood particles; normal retains vanilla blood. */
+    if (!tr_gore) return;
     z += ((P_Random()-P_Random())<<10);
     th = P_SpawnMobj (x,y,z, MT_BLOOD);
     th->momz = FRACUNIT*2;
@@ -1006,7 +1014,7 @@ P_SpawnPlayerMissile
     fixed_t	slope;
     
     // see which target is to be aimed at
-    an = source->angle;
+    an = source->angle + TR_Aim(); /* TREMOR: projectile aim error. */
     slope = P_AimLineAttack (source, an, 16*64*FRACUNIT);
     
     if (!linetarget)
@@ -1022,7 +1030,7 @@ P_SpawnPlayerMissile
 
 	if (!linetarget)
 	{
-	    an = source->angle;
+	    an = source->angle + TR_Aim(); /* TREMOR: projectile aim error. */
 	    slope = 0;
 	}
     }

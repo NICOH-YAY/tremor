@@ -1,3 +1,5 @@
+#include "tremor.h" /* TREMOR: original sprite namespace insertion. */
+#include <string.h>
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
@@ -179,7 +181,7 @@ boolean W_ParseCommandLine(void)
     {
 	// the parms after p are wadfile/lump names,
 	// until end of parms or another - preceded parm
-	modifiedgame = true;            // homebrew levels
+	/* TREMOR: the bundled sprite-only PWAD does not replace levels. */
 	while (++p != myargc && myargv[p][0] != '-')
         {
             char *filename;
@@ -187,7 +189,14 @@ boolean W_ParseCommandLine(void)
             filename = D_TryFindWADByName(myargv[p]);
 
             printf(" adding %s\n", filename);
-	    W_AddFile(filename);
+            /* TREMOR: recognize only the bundled mod filename. */
+            { unsigned int first=numlumps;
+              const char *base=strrchr(filename,'/');
+              base=base?base+1:filename;
+              W_AddFile(filename);
+              if(!strcmp(base,"tremor.wad")) TR_MergeCrewSprites(first);
+              else modifiedgame=true;
+            }
         }
     }
 

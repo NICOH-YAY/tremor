@@ -6,3 +6,5 @@ dist/
 eval/traces/
 
 engine/build/*.log
+
+engine/build/test-engine.*

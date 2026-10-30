@@ -1,3 +1,5 @@
+/* TREMOR: engine hooks; see engine/PATCHES.md. */
+#include "tremor.h"
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
@@ -151,83 +153,8 @@ void P_BringUpWeapon (player_t* player)
 //
 boolean P_CheckAmmo (player_t* player)
 {
-    ammotype_t		ammo;
-    int			count;
-
-    ammo = weaponinfo[player->readyweapon].ammo;
-
-    // Minimal amount for one shot varies.
-    if (player->readyweapon == wp_bfg)
-	count = deh_bfg_cells_per_shot;
-    else if (player->readyweapon == wp_supershotgun)
-	count = 2;	// Double barrel.
-    else
-	count = 1;	// Regular.
-
-    // Some do not need ammunition anyway.
-    // Return if current ammunition sufficient.
-    if (ammo == am_noammo || player->ammo[ammo] >= count)
-	return true;
-		
-    // Out of ammo, pick a weapon to change to.
-    // Preferences are set here.
-    do
-    {
-	if (player->weaponowned[wp_plasma]
-	    && player->ammo[am_cell]
-	    && (gamemode != shareware) )
-	{
-	    player->pendingweapon = wp_plasma;
-	}
-	else if (player->weaponowned[wp_supershotgun] 
-		 && player->ammo[am_shell]>2
-		 && (gamemode == commercial) )
-	{
-	    player->pendingweapon = wp_supershotgun;
-	}
-	else if (player->weaponowned[wp_chaingun]
-		 && player->ammo[am_clip])
-	{
-	    player->pendingweapon = wp_chaingun;
-	}
-	else if (player->weaponowned[wp_shotgun]
-		 && player->ammo[am_shell])
-	{
-	    player->pendingweapon = wp_shotgun;
-	}
-	else if (player->ammo[am_clip])
-	{
-	    player->pendingweapon = wp_pistol;
-	}
-	else if (player->weaponowned[wp_chainsaw])
-	{
-	    player->pendingweapon = wp_chainsaw;
-	}
-	else if (player->weaponowned[wp_missile]
-		 && player->ammo[am_misl])
-	{
-	    player->pendingweapon = wp_missile;
-	}
-	else if (player->weaponowned[wp_bfg]
-		 && player->ammo[am_cell]>40
-		 && (gamemode != shareware) )
-	{
-	    player->pendingweapon = wp_bfg;
-	}
-	else
-	{
-	    // If everything fails.
-	    player->pendingweapon = wp_fist;
-	}
-	
-    } while (player->pendingweapon == wp_nochange);
-
-    // Now set appropriate weapon overlay.
-    P_SetPsprite (player,
-		  ps_weapon,
-		  weaponinfo[player->readyweapon].downstate);
-
-    return false;	
+    /* TREMOR: one shared round for any firearm discharge. */
+    return TR_CheckAmmo(player);
 }
 
 
@@ -244,6 +171,7 @@ void P_FireWeapon (player_t* player)
     P_SetMobjState (player->mo, S_PLAY_ATK1);
     newstate = weaponinfo[player->readyweapon].atkstate;
     P_SetPsprite (player, ps_weapon, newstate);
+    TR_Noise(player->mo); /* TREMOR: survivors flinch at nearby fire. */
     P_NoiseAlert (player->mo, player->mo);
 }
 
@@ -466,8 +394,8 @@ A_Punch
 	
     damage = (P_Random ()%10+1)<<1;
 
-    if (player->powers[pw_strength])	
-	damage *= 10;
+    /* TREMOR: brutal fists always use berserk strength. */
+    damage *= TR_MELEE_MULTIPLIER; /* TREMOR */
 
     angle = player->mo->angle;
     angle += (P_Random()-P_Random())<<18;
@@ -477,6 +405,8 @@ A_Punch
     // turn to face target
     if (linetarget)
     {
+	/* TREMOR: impact shake; web layer adds a low body thud. */
+        TR_Impact();
 	S_StartSound (player->mo, sfx_punch);
 	player->mo->angle = R_PointToAngle2 (player->mo->x,
 					     player->mo->y,
@@ -541,14 +471,8 @@ A_Saw
 
 static void DecreaseAmmo(player_t *player, int ammonum, int amount)
 {
-    if (ammonum < NUMAMMO)
-    {
-        player->ammo[ammonum] -= amount;
-    }
-    else
-    {
-        player->maxammo[ammonum - NUMAMMO] -= amount;
-    }
+    /* TREMOR: weapon-specific costs become one shared round. */
+    TR_SpendRound(player);
 }
 
 
@@ -640,7 +564,7 @@ P_GunShot
     int		damage;
 	
     damage = 5*(P_Random ()%3+1);
-    angle = mo->angle;
+    angle = mo->angle + TR_Aim(); /* TREMOR: trauma on each bullet. */
 
     if (!accurate)
 	angle += (P_Random()-P_Random())<<18;
@@ -725,7 +649,7 @@ A_FireShotgun2
     for (i=0 ; i<20 ; i++)
     {
 	damage = 5*(P_Random ()%3+1);
-	angle = player->mo->angle;
+	angle = player->mo->angle + TR_Aim(); /* TREMOR: trauma. */
 	angle += (P_Random()-P_Random())<<19;
 	P_LineAttack (player->mo,
 		      angle,

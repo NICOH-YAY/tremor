@@ -1,3 +1,4 @@
+#include "tremor.h" /* TREMOR: versioned mod save data. */
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
@@ -416,6 +417,9 @@ static void saveg_read_mobj_t(mobj_t *str)
 
     // struct mobj_s* tracer;
     str->tracer = saveg_readp();
+    /* TREMOR: actor identity and stun/fear timers. */
+    str->tr_crew=saveg_read32(); str->tr_revealed=saveg_read32();
+    str->tr_stun=saveg_read32(); str->tr_cower=saveg_read32();
 }
 
 static void saveg_write_mobj_t(mobj_t *str)
@@ -531,6 +535,9 @@ static void saveg_write_mobj_t(mobj_t *str)
 
     // struct mobj_s* tracer;
     saveg_writep(str->tracer);
+    /* TREMOR: actor identity and stun/fear timers. */
+    saveg_write32(str->tr_crew); saveg_write32(str->tr_revealed);
+    saveg_write32(str->tr_stun); saveg_write32(str->tr_cower);
 }
 
 
@@ -1355,7 +1362,7 @@ void P_WriteSaveGameHeader(char *description)
         saveg_write8(0);
 
     memset(name, 0, sizeof(name));
-    M_snprintf(name, sizeof(name), "version %i", G_VanillaVersionCode());
+    M_snprintf(name, sizeof(name), "Tremor %i", 1);
 
     for (i=0; i<VERSIONSIZE; ++i)
         saveg_write8(name[i]);
@@ -1392,7 +1399,7 @@ boolean P_ReadSaveGameHeader(void)
         read_vcheck[i] = saveg_read8();
 
     memset(vcheck, 0, sizeof(vcheck));
-    M_snprintf(vcheck, sizeof(vcheck), "version %i", G_VanillaVersionCode());
+    M_snprintf(vcheck, sizeof(vcheck), "Tremor %i", 1);
     if (strcmp(read_vcheck, vcheck) != 0)
 	return false;				// bad version 
 
@@ -1439,7 +1446,10 @@ void P_WriteSaveGameEOF(void)
 //
 void P_ArchivePlayers (void)
 {
-    int		i;
+    int i;
+    /* TREMOR: episode trauma and level resources. */
+    saveg_write32(tr_trauma); saveg_write32(tr_rounds);
+    saveg_write32(tr_charges); saveg_write32(tr_saved);
 		
     for (i=0 ; i<MAXPLAYERS ; i++)
     {
@@ -1459,7 +1469,10 @@ void P_ArchivePlayers (void)
 //
 void P_UnArchivePlayers (void)
 {
-    int		i;
+    int i;
+    /* TREMOR: episode trauma and level resources. */
+    tr_trauma=saveg_read32(); tr_rounds=saveg_read32();
+    tr_charges=saveg_read32(); tr_saved=saveg_read32();
 	
     for (i=0 ; i<MAXPLAYERS ; i++)
     {

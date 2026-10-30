@@ -13,6 +13,8 @@
     "typecheck": "tsc --noEmit",
     "eval": "tsx scripts/eval.ts",
     "eval:live": "tsx scripts/eval.ts --live",
+    "engine:test": "node engine/build/test.mjs",
+    "engine:wad": "python scripts/build-tremor-wad.py",
     "engine:build": "python engine/build/build.py"
   },
   "devDependencies": {

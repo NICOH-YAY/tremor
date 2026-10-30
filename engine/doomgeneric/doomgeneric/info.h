@@ -164,6 +164,7 @@ typedef enum
     SPR_BRS1,
     SPR_TLMP,
     SPR_TLP2,
+    SPR_CREW, /* TREMOR: revealed survivor A/B frames. */
     NUMSPRITES
 
 } spritenum_t;

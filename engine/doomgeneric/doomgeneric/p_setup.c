@@ -1,3 +1,5 @@
+/* TREMOR: engine hooks; see engine/PATCHES.md. */
+#include "tremor.h"
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
@@ -809,6 +811,8 @@ P_SetupLevel
     bodyqueslot = 0;
     deathmatch_p = deathmatchstarts;
     P_LoadThings (lumpnum+ML_THINGS);
+    /* TREMOR: exact level budget after every map thing has spawned. */
+    TR_LevelStart();
     
     // if deathmatch, randomly spawn the active players
     if (deathmatch)

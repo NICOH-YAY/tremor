@@ -1,5 +1,7 @@
 # Tremor: design brief
 
+The browser entry point now runs the real vendored Doom engine with original Tremor patches. `engine/PATCHES.md` and `engine/tremor/tremor.h` describe the active implementation and constants. The TypeScript prototype below is retained for agent experiments; its custom levels, enemies, collar mechanic and timing adaptations are not used by the browser Doom mod. The loaded IWAD supplies browser maps, enemies, weapons, sounds and episode finales.
+
 Creative Director: Nicoh. A reconstruction of **Doom (id Software, 1993)**, rebuilt from scratch in TypeScript as a 2D-canvas raycaster. No id code, art, sound, music or level layouts are shipped. Doom's rules (35 Hz tic rate, hitscan vs projectile enemies, keycards, monster infighting, pain chance, sound propagation) are reconstructed and each one is mapped to the original source in `docs/rule-source-map.md` (linuxdoom-1.10, GPL release; cited, not copied).
 
 ## Pillar

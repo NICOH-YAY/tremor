@@ -1,7 +1,7 @@
 {
-  "frames": 433,
+  "frames": 424,
   "nonzero": true,
-  "elapsedMs": 10035.9656,
-  "meanIntervalMs": 23.063632870370377,
-  "p95IntervalMs": 32.03640000000087
+  "elapsedMs": 10040.6696,
+  "meanIntervalMs": 23.53426761229314,
+  "p95IntervalMs": 32.16260000000011
 }

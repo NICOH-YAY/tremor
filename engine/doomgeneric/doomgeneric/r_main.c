@@ -1,3 +1,5 @@
+/* TREMOR: engine hooks; see engine/PATCHES.md. */
+#include "tremor.h"
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
@@ -830,7 +832,7 @@ void R_SetupFrame (player_t* player)
     viewangle = player->mo->angle + viewangleoffset;
     extralight = player->extralight;
 
-    viewz = player->viewz;
+    viewz = player->viewz + TR_Sway()/2; /* TREMOR: render-only sway/kick. */
     
     viewsin = finesine[viewangle>>ANGLETOFINESHIFT];
     viewcos = finecosine[viewangle>>ANGLETOFINESHIFT];

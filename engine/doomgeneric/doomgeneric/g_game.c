@@ -1,3 +1,5 @@
+/* TREMOR: engine hooks; see engine/PATCHES.md. */
+#include "tremor.h"
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
@@ -133,6 +135,8 @@ boolean         longtics;               // cph's doom 1.91 longtics hack
 boolean         lowres_turn;            // low resolution turning for longtics
 boolean         demoplayback; 
 boolean		netdemo; 
+/* TREMOR: v112 demos add an action byte after buttons and use longtics. */
+static boolean tremor_demo;
 byte*		demobuffer;
 byte*		demo_p;
 byte*		demoend; 
@@ -426,7 +430,9 @@ void G_BuildTiccmd (ticcmd_t* cmd, int maketic)
     }
 
     // buttons
-    cmd->chatchar = HU_dequeueChatChar(); 
+    cmd->chatchar = HU_dequeueChatChar();
+    /* TREMOR: sampled into the tic command, never read live by simulation. */
+    cmd->buttons2 = (gamekeydown[tr_keys[0]]?TR_READ:0) | (gamekeydown[tr_keys[1]]?TR_STUN:0) | (gamekeydown[tr_keys[2]]?TR_PURGE:0) | (tr_gore<<4) | 64;
  
     if (gamekeydown[key_fire] || mousebuttons[mousebfire] 
 	|| joybuttons[joybfire]) 
@@ -1730,6 +1736,7 @@ G_InitNew
   int		map )
 {
     char *skytexturename;
+    TR_NewGame(); /* TREMOR: trauma lasts until a new episode/game. */
     int             i;
 
     if (paused)
@@ -1918,7 +1925,8 @@ void G_ReadDemoTiccmd (ticcmd_t* cmd)
         cmd->angleturn = ((unsigned char) *demo_p++)<<8; 
     }
 
-    cmd->buttons = (unsigned char)*demo_p++; 
+    cmd->buttons = (unsigned char)*demo_p++;
+    cmd->buttons2 = tremor_demo ? *demo_p++ : 0; /* TREMOR */
 } 
 
 // Increase the size of the demo buffer to allow unlimited demos
@@ -1957,7 +1965,7 @@ void G_WriteDemoTiccmd (ticcmd_t* cmd)
 { 
     byte *demo_start;
 
-    if (gamekeydown[key_demo_quit])           // press q to end demo recording 
+    if (gamekeydown[key_demo_quit] && key_demo_quit != tr_keys[2]) /* TREMOR */           // press q to end demo recording
 	G_CheckDemoStatus (); 
 
     demo_start = demo_p;
@@ -1977,7 +1985,8 @@ void G_WriteDemoTiccmd (ticcmd_t* cmd)
         *demo_p++ = cmd->angleturn >> 8; 
     }
 
-    *demo_p++ = cmd->buttons; 
+    *demo_p++ = cmd->buttons;
+    *demo_p++ = cmd->buttons2; /* TREMOR: recorded mercy/recognition. */
 
     // reset demo pointer back
     demo_p = demo_start;
@@ -2065,7 +2074,7 @@ void G_BeginRecording (void)
     // Record a high resolution "Doom 1.91" demo.
     //
 
-    longtics = M_CheckParm("-longtics") != 0;
+    longtics = true; tremor_demo = true; /* TREMOR: v112. */
 
     // If not recording a longtics demo, record in low res
 
@@ -2077,7 +2086,7 @@ void G_BeginRecording (void)
  
     if (longtics)
     {
-        *demo_p++ = DOOM_191_VERSION;
+        *demo_p++ = 112; /* TREMOR: distinct from vanilla demos. */
     }
     else
     {
@@ -2092,6 +2101,7 @@ void G_BeginRecording (void)
     *demo_p++ = fastparm;
     *demo_p++ = nomonsters;
     *demo_p++ = consoleplayer;
+    *demo_p++ = tr_gore; /* TREMOR: capture setting affecting RNG/gibs. */
 	 
     for (i=0 ; i<MAXPLAYERS ; i++) 
 	*demo_p++ = playeringame[i]; 		 
@@ -2160,7 +2170,9 @@ void G_DoPlayDemo (void)
 
     demoversion = *demo_p++;
 
-    if (demoversion == G_VanillaVersionCode())
+    tremor_demo = demoversion == 112; /* TREMOR */
+    if (tremor_demo) { longtics = true; }
+    else if (demoversion == G_VanillaVersionCode())
     {
         longtics = false;
     }
@@ -2193,6 +2205,7 @@ void G_DoPlayDemo (void)
     fastparm = *demo_p++;
     nomonsters = *demo_p++;
     consoleplayer = *demo_p++;
+    if(tremor_demo) tr_gore=*demo_p++; /* TREMOR */
 	
     for (i=0 ; i<MAXPLAYERS ; i++) 
 	playeringame[i] = *demo_p++; 

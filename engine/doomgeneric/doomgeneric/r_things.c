@@ -1,3 +1,5 @@
+/* TREMOR: engine hooks; see engine/PATCHES.md. */
+#include "tremor.h"
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
@@ -500,13 +502,14 @@ void R_ProjectSprite (mobj_t* thing)
 	I_Error ("R_ProjectSprite: invalid sprite number %i ",
 		 thing->sprite);
 #endif
-    sprdef = &sprites[thing->sprite];
+    /* TREMOR: recognition affects rendering, never the hostile sprite states. */
+    sprdef = &sprites[(thing->tr_crew && thing->tr_revealed && thing->health>0) ? SPR_CREW : thing->sprite];
 #ifdef RANGECHECK
     if ( (thing->frame&FF_FRAMEMASK) >= sprdef->numframes )
 	I_Error ("R_ProjectSprite: invalid sprite frame %i : %i ",
 		 thing->sprite, thing->frame);
 #endif
-    sprframe = &sprdef->spriteframes[ thing->frame & FF_FRAMEMASK];
+    sprframe = &sprdef->spriteframes[(thing->tr_crew && thing->tr_revealed && thing->health>0) ? ((thing->tr_cower || thing->tr_stun)?1:0) : (thing->frame & FF_FRAMEMASK)];
 
     if (sprframe->rotate)
     {
@@ -592,6 +595,9 @@ void R_ProjectSprite (mobj_t* thing)
 	    index = MAXLIGHTSCALE-1;
 
 	vis->colormap = spritelights[index];
+        /* TREMOR: faint intermittent red on identified possessed humans. */
+        if (thing->tr_revealed && !thing->tr_crew && TR_Human(thing) && thing->health>0 && (leveltime&8))
+            vis->colormap = TR_RedMap(vis->colormap);
     }	
 }
 
@@ -665,7 +671,7 @@ void R_DrawPSprite (pspdef_t* psp)
     flip = (boolean)sprframe->flip[0];
     
     // calculate edges of the shape
-    tx = psp->sx-160*FRACUNIT;
+    tx = psp->sx-160*FRACUNIT + TR_Sway(); /* TREMOR: render-only weapon sway. */
 	
     tx -= spriteoffset[lump];	
     x1 = (centerxfrac + FixedMul (tx,pspritescale) ) >>FRACBITS;

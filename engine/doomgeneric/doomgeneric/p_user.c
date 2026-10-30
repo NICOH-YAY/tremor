@@ -1,3 +1,5 @@
+/* TREMOR: engine hooks; see engine/PATCHES.md. */
+#include "tremor.h"
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
@@ -231,6 +233,8 @@ void P_PlayerThink (player_t* player)
     ticcmd_t*		cmd;
     weapontype_t	newweapon;
 	
+    /* TREMOR: process mercy/recognition at simulation tic rate. */
+    TR_PlayerThink(player);
     // fixme: do this in the cheat code
     if (player->cheats & CF_NOCLIP)
 	player->mo->flags |= MF_NOCLIP;

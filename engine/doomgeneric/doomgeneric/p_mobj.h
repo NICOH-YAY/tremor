@@ -271,6 +271,10 @@ typedef struct mobj_s
     // Player number last looked for.
     int			lastlook;	
 
+    /* TREMOR: identity and mercy state, stored with each actor. */
+    int tr_crew, tr_revealed, tr_stun, tr_cower;
+    int tr_melee_hit, tr_shotgun_hit; /* TREMOR: immediate damage classification. */
+
     // For nightmare respawn.
     mapthing_t		spawnpoint;	
 
