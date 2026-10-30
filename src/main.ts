@@ -3,16 +3,38 @@ import { idleCmd, tick, TICRATE } from './sim/world';
 import { Raycaster } from './render/raycaster';
 import { audio } from './audio';
 import { levels } from './levels';
-import type { PlayerPose, RenderView, GameEvent } from './sim/types';
+import type { PlayerPose, RenderView, GameEvent, World } from './sim/types';
 document.body.style.cssText = 'margin:0;background:#090909;color:#eee;font-family:monospace;overflow:hidden';
 const screen = document.createElement('canvas'), overlay = document.createElement('canvas'), card = document.createElement('section'), status = document.createElement('div'), subtitle = document.createElement('div');
 screen.style.cssText = overlay.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated';
 overlay.style.pointerEvents = 'none';
 card.style.cssText = 'position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#101012;text-align:center;padding:24px;gap:16px;z-index:3;box-sizing:border-box;overflow:auto';
-status.style.cssText = 'position:absolute;bottom:20px;left:20px;font-size:clamp(12px,2vw,20px);text-shadow:2px 2px #000;pointer-events:none';
-subtitle.style.cssText = 'position:absolute;bottom:65px;left:10%;width:80%;text-align:center;text-shadow:2px 2px #000;pointer-events:none';
-document.body.append(screen, overlay, status, subtitle, card);
+status.style.cssText = 'position:absolute;bottom:0;left:0;right:0;height:10%;min-height:48px;display:flex;align-items:center;justify-content:space-evenly;background:repeating-linear-gradient(0deg,#252a2f 0px,#252a2f 2px,#292e33 2px,#292e33 4px);border-top:3px solid #677079;box-sizing:border-box;font:bold clamp(16px,3.9vh,40px) monospace;text-shadow:2px 2px #000;pointer-events:none';
+subtitle.style.cssText = 'position:absolute;bottom:12%;left:10%;width:80%;text-align:center;font:bold max(18px,2.8vh) monospace;line-height:1.5;background:#080d12dd;box-sizing:border-box;padding:8px 16px;text-shadow:2px 2px #000;pointer-events:none';
+document.body.append(screen, status, subtitle, overlay, card);
+const style = document.createElement('style');
+style.textContent = `@keyframes tremor-title { 0%,92%,100% { transform:translate(0);text-shadow:3px 0 #6b1818,-2px 0 #31505c } 93%,96% { transform:translate(-2px,1px);text-shadow:5px 0 #6b1818,-4px 0 #31505c } 94%,98% { transform:translate(2px,-1px) } }
+.tremor-title { font-size:clamp(64px,10vw,144px)!important;animation:tremor-title 4s steps(1,end) infinite }
+@media (prefers-reduced-motion:reduce) { .tremor-title { animation:none } }`;
+document.head.append(style);
 let world = reset(1, 'hangar'), renderer: Raycaster | undefined, mode: 'title' | 'play' | 'pause' | 'end' | 'dead' = 'title';
+declare global {
+    interface Window { __tremor?: { readonly world: World; teleport(x: number, y: number, angle: number): void } }
+    interface ImportMeta { readonly env: { readonly DEV: boolean } }
+}
+if (import.meta.env.DEV) {
+    window.__tremor = {
+        get world() { return world; },
+        teleport(x, y, angle) {
+            if (![x, y, angle].every(Number.isFinite)) throw new Error('Teleport requires finite coordinates and angle');
+            world.player.pos.x = prev.pos.x = x;
+            world.player.pos.y = prev.pos.y = y;
+            world.player.angle = prev.angle = angle;
+            world.player.vel.x = world.player.vel.y = 0;
+            acc = 0;
+        },
+    };
+}
 const prev: PlayerPose = { pos: { ...world.player.pos }, angle: 0 }, view: RenderView = { shake: 0, flash: 0, recoil: 0, weaponSway: 0, bob: 0 }, cmd = idleCmd(), keys = new Set<string>();
 let entryTremor = 0;
 let oldCrossX = 0, oldCrossY = 0, fullOverlay = true;
@@ -30,8 +52,8 @@ function resume() { mode = 'play'; card.style.display = 'none'; clearInput(); tr
     screen.requestPointerLock?.()?.catch(() => { });
 }
 catch { /* keyboard fallback */ } }
-function start(id: string, tremor = 0) { entryTremor = tremor; world = reset(1, id); world.player.tremor = entryTremor; prev.pos.x = world.player.pos.x; prev.pos.y = world.player.pos.y; prev.angle = world.player.angle; view.flash = view.recoil = view.shake = hurt = pickup = death = 0; lastStep = 0; lastStatus = ''; updateStatus(); subtitle.textContent = ''; renderer ??= new Raycaster(screen); resize(); resume(); }
-function title() { mode = 'title'; release(); card.replaceChildren(); card.style.display = 'flex'; card.style.background = 'linear-gradient(#0004,#000b),url("art/title.jpg") center/cover'; heading('TREMOR'); const p = document.createElement('p'); p.textContent = 'The gun works perfectly.'; p.style.fontSize = '22px'; card.append(p); button('Click to begin', () => start(demo && levels[demo] ? demo : 'hangar')); const help = document.createElement('p'); help.style.cssText = 'line-height:1.9;background:#0009;padding:16px;white-space:pre-line'; help.textContent = 'WASD move | Mouse / arrow keys turn | Left click / Ctrl fire | Right click / R read\nF stun | Q purge (hold nearby) | E use / seal | Esc pause'; card.append(help); }
+function start(id: string, tremor = 0) { entryTremor = tremor; world = reset(1, id); world.player.tremor = entryTremor; prev.pos.x = world.player.pos.x; prev.pos.y = world.player.pos.y; prev.angle = world.player.angle; view.flash = view.recoil = view.shake = hurt = pickup = death = 0; lastStep = 0; lastStatus = ''; updateStatus(); subtitle.textContent = ''; radioTime = 0; renderer ??= new Raycaster(screen); resize(); resume(); }
+function title() { mode = 'title'; release(); card.replaceChildren(); card.style.display = 'flex'; card.style.background = 'linear-gradient(#0004,#000b),url("art/title.jpg") center/cover'; heading('TREMOR'); card.querySelector('h1')?.classList.add('tremor-title'); const p = document.createElement('p'); p.textContent = 'The gun works perfectly.'; p.style.fontSize = '22px'; card.append(p); button('Click to begin', () => start(demo && levels[demo] ? demo : 'hangar')); const help = document.createElement('p'); help.style.cssText = 'line-height:1.9;background:#0009;padding:16px;white-space:pre-line'; help.textContent = 'WASD move | Mouse / arrow keys turn | Left click / Ctrl fire | Right click / R read\nF stun | Q purge (hold nearby) | E use / seal | Esc pause'; card.append(help); }
 function pause() { if (mode !== 'play')
     return; mode = 'pause'; release(); card.replaceChildren(); card.style.display = 'flex'; card.style.background = '#101012ee'; heading('Paused'); button('Resume', resume); const label = document.createElement('label'); label.textContent = 'Mouse sensitivity '; const slider = document.createElement('input'); slider.type = 'range'; slider.min = '.0005'; slider.max = '.006'; slider.step = '.0001'; slider.value = String(sensitivity); slider.oninput = () => { sensitivity = Number(slider.value); try {
     localStorage.setItem('tremor.sensitivity', slider.value);
@@ -106,7 +128,7 @@ function event(e: GameEvent) {
     }
     if (e.type === 'radio') {
         subtitle.textContent = e.text;
-        radioTime = 6;
+        radioTime = 4;
     }
     if (e.type === 'read') {
         const figure = world.entities.find(x => x.id === e.id);
@@ -158,6 +180,7 @@ function frame(now: number) {
     pickup = Math.max(0, pickup - dt * 3);
     labelTime = Math.max(0, labelTime - dt);
     radioTime = Math.max(0, radioTime - dt);
+    subtitle.style.opacity = String(Math.min(1, radioTime / .6));
     if (!radioTime && subtitle.textContent)
         subtitle.textContent = '';
     if (renderer && mode !== 'title') {
@@ -179,13 +202,16 @@ function frame(now: number) {
                 ctx.fillRect(0, 0, overlay.width, overlay.height);
             }
             const t = now / 1000, amplitude = world.player.tremor * 5, x = overlay.width / 2 + amplitude * (Math.sin(t * 2.7) + .4 * Math.sin(t * 6.1)), y = overlay.height / 2 + amplitude * .7 * Math.sin(t * 3.3);
-            ctx.strokeStyle = '#ddd';
-            ctx.lineWidth = 1;
+            ctx.strokeStyle = '#000';
+            ctx.lineWidth = 4;
             ctx.beginPath();
             ctx.moveTo(x - 6, y);
             ctx.lineTo(x + 6, y);
             ctx.moveTo(x, y - 6);
             ctx.lineTo(x, y + 6);
+            ctx.stroke();
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 2;
             ctx.stroke();
             oldCrossX = x;
             oldCrossY = y;
@@ -210,10 +236,30 @@ function frame(now: number) {
     }
     requestAnimationFrame(frame);
 }
-function updateStatus() { const text = `HEALTH ${world.player.health}   AMMO ${world.player.ammo}   PURGE ${world.player.purgeCharges}   KEYS ${world.player.keys.join(' ') || '-'}`; if (text !== lastStatus) {
-    status.textContent = text;
+function updateStatus() {
+    const p = world.player, text = `${p.health}/${p.ammo}/${p.purgeCharges}/${p.keys.join(',')}`;
+    if (text === lastStatus) return;
+    status.replaceChildren();
+    for (const [label, value, color] of [['HEALTH', p.health, '#ec7467'], ['AMMO', p.ammo, '#ebca77'], ['PURGE', p.purgeCharges, '#83d9c7']] as const) {
+        const field = document.createElement('span');
+        field.textContent = `${label} ${value}`;
+        field.style.color = color;
+        status.append(field);
+    }
+    const keyField = document.createElement('span');
+    keyField.textContent = 'KEYS ';
+    for (const color of ['red', 'blue'] as const) {
+        const icon = document.createElement('span');
+        icon.setAttribute('aria-label', `${color} key${p.keys.includes(color) ? '' : ' missing'}`);
+        icon.title = icon.getAttribute('aria-label')!;
+        const ink = p.keys.includes(color) ? (color === 'red' ? '#ff655b' : '#65baff') : '#535960';
+        icon.style.cssText = `display:inline-block;width:.7em;height:.45em;margin:0 .2em;border:2px solid ${ink};background:linear-gradient(90deg,${ink} 30%,transparent 30%);vertical-align:middle;box-shadow:2px 2px #000`;
+        keyField.append(icon);
+    }
+    status.append(keyField);
     lastStatus = text;
-} }
+}
+
 resize();
 title();
 requestAnimationFrame(frame);

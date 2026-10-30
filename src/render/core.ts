@@ -131,7 +131,8 @@ export function renderToBuffer(buf: Uint32Array, w: number, h: number, world: Wo
   // ---- lighting -----------------------------------------------------------
   const flashN = view.flash > 0 ? Math.min(1, view.flash) : 0;
   const flashAdd256 = (flashN * 0.6 * 256) | 0;
-  const fogK = 0.07 * (1 - 0.55 * flashN);
+  const fog = (distance: number): number => Math.max(0.03, 1 - Math.max(0, distance - 4) / 14);
+  const ambient = (light: number): number => 115 + light * 141 / 256;
   const baseLight = (x: number, y: number): number => {
     if (!lut || x < 0 || y < 0 || x >= mw || y >= mh) return 256;
     return lut[y * mw + x];
@@ -140,27 +141,24 @@ export function renderToBuffer(buf: Uint32Array, w: number, h: number, world: Wo
   // ---- ceiling and floor --------------------------------------------------
   const floorTex = tex.floor, fw = floorTex.w, fh = floorTex.h, fdata = floorTex.data;
   const fwMask = fw - 1, fhMask = fh - 1;
-  const ceilC = 28 | (30 << 8) | (40 << 16);
   const startPlX = dirX - plX, startPlY = dirY - plY;
   for (let y = 0; y < h; y++) {
-    const rowOff = y + 0.5 - hz;
+    const rowOff = y + 0.5 - hz, ceiling = rowOff < 0;
     const dist = 0.5 * focal / Math.max(0.001, Math.abs(rowOff));
-    let atten = 1 / (1 + fogK * dist * dist); if (atten < 0.03) atten = 0.03;
-    const rowA = (atten * 256) | 0, o = y * w;
-    if (rowOff < 0) {
-      buf.fill(shade(ceilC, Math.min(256, (rowA * (256 + flashAdd256)) >> 8)), o, o + w);
-    } else {
-      let wx = px + startPlX * dist, wy = py + startPlY * dist;
-      const sx = plX * 2 * dist / w, sy = plY * 2 * dist / w;
-      for (let x = 0; x < w; x++, wx += sx, wy += sy) {
-        const cx = Math.floor(wx), cy = Math.floor(wy);
-        const u = ((wx - cx) * fw) & fwMask, v = ((wy - cy) * fh) & fhMask;
-        let cl = 256;
-        if (lut && cx >= 0 && cy >= 0 && cx < mw && cy < mh) cl = lut[cy * mw + cx];
-        let b = (rowA * (cl + flashAdd256)) >> 8; if (b > 256) b = 256;
-        const c = fdata[v * fw + u];
-        buf[o + x] = (ALPHA | (((((c & 0xff00ff) * b) >>> 8) & 0xff00ff) | ((((c & 0xff00) * b) >>> 8) & 0xff00))) >>> 0;
-      }
+    const rowA = (fog(dist) * 256) | 0, o = y * w;
+    let wx = px + startPlX * dist, wy = py + startPlY * dist;
+    const sx = plX * 2 * dist / w, sy = plY * 2 * dist / w;
+    for (let x = 0; x < w; x++, wx += sx, wy += sy) {
+      const cx = Math.floor(wx), cy = Math.floor(wy);
+      const u = ((wx - cx) * fw) & fwMask, v = ((wy - cy) * fh) & fhMask;
+      const cl = ambient(baseLight(cx, cy));
+      let b = Math.min(256, (rowA * (cl + flashAdd256)) >> 8);
+      if (ceiling) b = (b * 90) >> 8;
+      const c = fdata[v * fw + u];
+      // Slight blue-grey tint on the textured ceiling; no extra texture allocation.
+      buf[o + x] = ceiling
+        ? (ALPHA | (((((c >>> 16) & 255) * b) >> 8) << 16) | (((((c >>> 8) & 255) * b * .94) >> 8) << 8) | (((c & 255) * b * .84) >> 8)) >>> 0
+        : shade(c, b);
     }
   }
 
@@ -205,8 +203,8 @@ export function renderToBuffer(buf: Uint32Array, w: number, h: number, world: Wo
     if (y0 >= yEnd) continue;
     const step = th / lineH;
     let tp = (y0 - top + off) * step;
-    const L = baseLight(lastCi % mw, (lastCi / mw) | 0);
-    let atten = 1 / (1 + fogK * perp * perp); if (atten < 0.03) atten = 0.03;
+    const L = ambient(baseLight(lastCi % mw, (lastCi / mw) | 0));
+    const atten = fog(perp);
     let b = (atten * (L + flashAdd256)) | 0; if (side === 1) b = (b * 200) >> 8; if (b > 256) b = 256;
     const tdata = t.data, thMask = th - 1;
     for (let y = y0; y < yEnd; y++, tp += step) {
@@ -270,8 +268,8 @@ export function renderToBuffer(buf: Uint32Array, w: number, h: number, world: Wo
     const x0 = Math.max(0, Math.floor(left)), x1 = Math.min(w, Math.ceil(left + widthPx));
     const y0 = Math.max(0, Math.ceil(top)), y1 = Math.min(h, Math.ceil(bottom));
     if (x0 >= x1 || y0 >= y1) continue;
-    let atten = 1 / (1 + fogK * it.depth * it.depth); if (atten < 0.03) atten = 0.03;
-    let b = (atten * (it.light * 256 + flashAdd256)) | 0;
+    const atten = fog(it.depth);
+    let b = (atten * (ambient(it.light * 256) + flashAdd256)) | 0;
     if (it.mode === 2) b = (b * 140) >> 8;
     if (b > 256) b = 256;
     const mode = it.mode, vstep = th / heightPx, ustep = tw / widthPx;
@@ -304,10 +302,10 @@ export function renderToBuffer(buf: Uint32Array, w: number, h: number, world: Wo
 
   // ---- first-person weapon ------------------------------------------------
   const wt = tex.weapon;
-  const dh = h * 0.62, dw = dh * wt.w / wt.h;
+  const dh = h * 0.33, dw = dh * wt.w / wt.h;
   const recoil = Math.max(0, view.recoil);
-  const wx0 = w - dw * 1.04 + view.weaponSway * 14 + Math.sin(bobPh) * 5 * spd - recoil * 6;
-  const wy0 = h - dh * 0.97 + Math.abs(Math.cos(bobPh)) * 4 * spd + recoil * 14;
+  const wx0 = w * 0.60 - dw / 2 + view.weaponSway * 7 + Math.sin(bobPh) * 5 * spd - recoil * 6;
+  const wy0 = h * .90 - dh - 2 + -Math.abs(Math.cos(bobPh)) * 3 * spd - recoil * 8;
   {
     const lw = baseLight(Math.floor(px), Math.floor(py));
     const gb = Math.min(256, Math.max(70, lw + 60 + flashAdd256));

@@ -17,9 +17,16 @@ it('plays title, pause, restart, story intermission, death retry, ending and tit
     expect(document.querySelectorAll('canvas')).toHaveLength(2);
     click('Click to begin');
     expect(capture.world?.levelId).toBe('hangar');
+    expect(window.__tremor?.world).toBe(capture.world);
+    window.__tremor!.teleport(3.5, 4.5, .7);
+    expect(capture.world!.player.pos).toEqual({ x: 3.5, y: 4.5 });
+    expect(capture.world!.player.angle).toBe(.7);
+    expect(capture.world!.player.vel).toEqual({ x: 0, y: 0 });
+    expect(() => window.__tremor!.teleport(NaN, 0, 0)).toThrow();
     document.dispatchEvent(new Event('pointerlockchange'));
     click('Restart level');
     expect(capture.world?.tic).toBe(0);
+    expect(window.__tremor?.world).toBe(capture.world);
     let time = 100;
     frame(time);
     const finish = (reason: 'exit' | 'dead') => { capture.world!.done = true; capture.world!.outcome = reason; time += 40; frame(time); };
