@@ -2,3 +2,5 @@ node_modules/
 dist/
 .npm-cache/
 .npm-cache/
+
+eval/traces/
