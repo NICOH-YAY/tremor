@@ -230,6 +230,7 @@ void P_DeathThink (player_t* player)
 //
 void P_PlayerThink (player_t* player)
 {
+    player->mo->tr_oldx=player->mo->x;player->mo->tr_oldy=player->mo->y;player->mo->tr_oldz=player->mo->z;player->mo->tr_oldtic=leveltime; /* TREMOR */
     ticcmd_t*		cmd;
     weapontype_t	newweapon;
 	

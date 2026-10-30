@@ -1,3 +1,4 @@
+#include "doomstat.h" /* TREMOR: presentation tic. */
 /* TREMOR: engine hooks; see engine/PATCHES.md. */
 #include "tremor.h"
 //
@@ -445,6 +446,7 @@ R_DrawVisSprite
 //
 void R_ProjectSprite (mobj_t* thing)
 {
+    fixed_t rx=thing->x,ry=thing->y,rz=thing->z;
     fixed_t		tr_x;
     fixed_t		tr_y;
     
@@ -473,9 +475,12 @@ void R_ProjectSprite (mobj_t* thing)
     angle_t		ang;
     fixed_t		iscale;
     
+    /* TREMOR: never change actor coordinates or consume gameplay RNG. */
+    if(thing->tr_oldtic==leveltime-1) {rx=TR_Interpolate(thing->tr_oldx,rx);ry=TR_Interpolate(thing->tr_oldy,ry);rz=TR_Interpolate(thing->tr_oldz,rz);}
+    if(tr_terror>=80 && thing->health>0 && (thing->flags&MF_COUNTKILL) && !(leveltime&15)) rx+=FRACUNIT;
     // transform the origin point
-    tr_x = thing->x - viewx;
-    tr_y = thing->y - viewy;
+    tr_x = rx - viewx;
+    tr_y = ry - viewy;
 	
     gxt = FixedMul(tr_x,viewcos); 
     gyt = -FixedMul(tr_y,viewsin);
@@ -514,7 +519,7 @@ void R_ProjectSprite (mobj_t* thing)
     if (sprframe->rotate)
     {
 	// choose a different rotation based on player view
-	ang = R_PointToAngle (thing->x, thing->y);
+	ang = R_PointToAngle (rx, ry);
 	rot = (ang-thing->angle+(unsigned)(ANG45/2)*9)>>29;
 	lump = sprframe->lump[rot];
 	flip = (boolean)sprframe->flip[rot];
@@ -545,10 +550,10 @@ void R_ProjectSprite (mobj_t* thing)
     vis = R_NewVisSprite ();
     vis->mobjflags = thing->flags;
     vis->scale = xscale<<detailshift;
-    vis->gx = thing->x;
-    vis->gy = thing->y;
-    vis->gz = thing->z;
-    vis->gzt = thing->z + spritetopoffset[lump];
+    vis->gx = rx;
+    vis->gy = ry;
+    vis->gz = rz;
+    vis->gzt = rz + spritetopoffset[lump];
     vis->texturemid = vis->gzt - viewz;
     vis->x1 = x1 < 0 ? 0 : x1;
     vis->x2 = x2 >= viewwidth ? viewwidth-1 : x2;	
@@ -623,7 +628,7 @@ void R_AddSprites (sector_t* sec)
     // Well, now it will be done.
     sec->validcount = validcount;
 	
-    lightnum = (sec->lightlevel >> LIGHTSEGSHIFT)+extralight;
+    lightnum = (TR_Light(sec) >> LIGHTSEGSHIFT)+extralight;
 
     if (lightnum < 0)		
 	spritelights = scalelight[0];
@@ -671,7 +676,7 @@ void R_DrawPSprite (pspdef_t* psp)
     flip = (boolean)sprframe->flip[0];
     
     // calculate edges of the shape
-    tx = psp->sx-160*FRACUNIT + TR_Sway(); /* TREMOR: render-only weapon sway. */
+    tx = psp->sx-160*FRACUNIT + TR_ArmX(); /* TREMOR: render-only weapon sway. */
 	
     tx -= spriteoffset[lump];	
     x1 = (centerxfrac + FixedMul (tx,pspritescale) ) >>FRACBITS;
@@ -690,7 +695,7 @@ void R_DrawPSprite (pspdef_t* psp)
     // store information in a vissprite
     vis = &avis;
     vis->mobjflags = 0;
-    vis->texturemid = (BASEYCENTER<<FRACBITS)+FRACUNIT/2-(psp->sy-spritetopoffset[lump]);
+    vis->texturemid = (BASEYCENTER<<FRACBITS)+FRACUNIT/2-(psp->sy+TR_ArmY()-spritetopoffset[lump]);
     vis->x1 = x1 < 0 ? 0 : x1;
     vis->x2 = x2 >= viewwidth ? viewwidth-1 : x2;	
     vis->scale = pspritescale<<detailshift;

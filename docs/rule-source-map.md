@@ -38,3 +38,19 @@ rules. Locators are file + function, not unstable line numbers. The original
 
 Rationale for original rules: [active design](DESIGN.md), [decisions amendment](DECISIONS.md).
 Upstream attribution and license locators: [engine provenance](../engine/UPSTREAM.md).
+
+
+## Horror adaptation rule locators (2026-10-30)
+
+| Rule | Origin | Locator |
+| --- | --- | --- |
+| Corpse-sight terror, once per body, slow decay, carryover | design + original code | engine/tremor/tremor.h TR_TERROR_*; tremor.c corpses / TR_LevelStart |
+| Fear hit threshold and damage scaling | design + original code | tremor.c TR_Hit / TR_Damage / TR_Aim; p_pspr.c A_Punch; p_inter.c P_DamageMobj |
+| Rare map ammo, death drops, mercy rounds | design + original code | tremor.c TR_LevelStart / TR_Kill / TR_PlayerThink / TR_Ammo; p_inter.c P_GiveAmmo |
+| Map-derived objectives and public bearing | design + original code | tremor.c TR_StoryTick / key_color / exit_special; agent_api.c tremor_agent_observe |
+| Episode radio, ninety-second cooldown | design + original code | tremor.c TR_Radio / TR_QueueRadio; public/radio/lines.json; public/horror.js speak |
+| Paused objective preview | design + original code | tremor.c tremor_preview / TR_PreviewView; r_main.c R_RenderPlayerView; public/horror.js preview |
+| Y-shear freelook and recorded pitch | design + original code | g_game.c G_BuildTiccmd and demo read/write; r_main.c R_SetupFrame; p_map.c P_LineAttack; p_mobj.c P_SpawnPlayerMissile |
+| Interpolation, suit light, cosmetic flicker | design + original code | tremor.c TR_Interpolate / TR_Light; r_things.c R_ProjectSprite; r_plane.c R_MapPlane |
+| Horror sprite transform | design + original code with Freedoom-derived assets | scripts/build-tremor-wad.py build; tremor.c TR_MergeCrewSprites |
+| Public felt state, no exact terror / hidden identity | design + original code | agent_api.c tremor_agent_observe; src/player_interface.ts Observation |

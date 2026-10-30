@@ -25,7 +25,7 @@ export function reset(seed:number,levelId='E1M1'):EngineState {
  m._tremor_agent_reset(seed,1,Number(levelId.slice(3)),2);
  const state=Object.freeze({seed,levelId});modules.set(state,m);return state;
 }
-export interface Observation {tic:number;health:number;armor:number;rounds:number;purge:number;weapon:string;keys:string[];aim:'steady'|'shaky'|'very shaky';entities:{bearing_deg:number;distance:number;type:string}[];automap:string;map_cell_units:number;events:string[];summary:string}
+export interface Observation {objective:string;objective_bearing:number;objective_distance:'near'|'nearby'|'far';terror:'steady'|'shaken'|'terrified'|'breaking';radio_log:string;tic:number;health:number;armor:number;rounds:number;purge:number;weapon:string;keys:string[];aim:'steady'|'shaky'|'very shaky';entities:{bearing_deg:number;distance:number;type:string}[];automap:string;map_cell_units:number;events:string[];summary:string}
 export function observe(state:EngineState,player_id='player'):Observation {
  if(player_id!=='player')throw Error('Unknown player');const m=moduleOf(state);
  const raw=JSON.parse(m.UTF8ToString(m._tremor_agent_observe())) as Omit<Observation,'summary'>;

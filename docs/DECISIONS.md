@@ -89,3 +89,31 @@
 
 The decisions and success claims above this amendment describe the superseded
 TypeScript prototype and must not be read as current engine evidence.
+
+
+## Horror choices, 2026-10-30
+
+- Corpse-sight terror beats time-based fear: movement and attention affect exposure;
+  waiting in an empty room cannot manufacture fear. Per-body saved flags prevent
+  farming it by looking away. Decay is intentionally slow; half carries forward.
+- Rare drops and sparse map ammo beat zero resupply: exploration and mercy offer
+  small recoveries without restoring a shooter economy. Enemy death drops exclude
+  crew. Purging awards three rounds from the survivor, not a radio reward.
+- An original procedural score beats OPL as the default horror bed: a bounded
+  oscillator graph can respond to fear and nearby alert monsters without shipping
+  music assets. OPL remains selectable, preserving IWAD music.
+- Y-shearing beats true 3D look: it preserves the software renderer's geometry and
+  tic simulation with inexpensive plane-slope updates. It distorts at extremes,
+  so pitch is clamped. Tic-command recording beats live simulation input because
+  demos and agents must remain reproducible.
+- Cached low-resolution Canvas overlays beat JavaScript full-frame pixel filters.
+  A short mono reverb impulse beats long convolution tails on the target CPU.
+- A map-order key/door/exit heuristic beats hard-coded Freedoom coordinates for
+  compatibility with user IWADs, at the cost of imperfect route ordering. A future
+  sector reachability solver should replace it before claiming universal routing.
+- Retaining the native 320x200 renderer beats an unverified high-resolution change
+  in this patch. SCREENWIDTH, patches, HUD and view tables need coordinated work;
+  640x400 is explicitly unfinished, not represented by an upscaled placebo.
+
+See the implementation/verification limits in DESIGN.md. Save format Tremor 2 and
+mod demo v113 intentionally replace the incompatible prior layouts.

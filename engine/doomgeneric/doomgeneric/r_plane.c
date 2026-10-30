@@ -1,3 +1,4 @@
+#include "tremor.h" /* TREMOR: dim near-floor suit light. */
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
@@ -159,7 +160,7 @@ R_MapPlane
 	if (index >= MAXLIGHTZ )
 	    index = MAXLIGHTZ-1;
 
-	ds_colormap = planezlight[index];
+	ds_colormap = distance<96*FRACUNIT ? colormaps+12*256 : planezlight[index]; /* TREMOR */
     }
 	
     ds_y = y;

@@ -71,8 +71,8 @@ P_GiveAmmo
   int		num )
 {
     int		oldammo;
-    /* TREMOR: all pickups grant zero rounds. */
-    return false;
+    /* TREMOR: scarce shared rounds. */
+    return TR_Ammo(player, num==0?1:num>=5?4:2);
 	
     if (ammo == am_noammo)
 	return false;
@@ -194,9 +194,9 @@ P_GiveWeapon
 		// give one clip with a dropped weapon,
 		// two clips with a found weapon
 		if (dropped)
-			gaveammo = P_GiveAmmo (player, weaponinfo[weapon].ammo, 1);
+			gaveammo = false; /* TREMOR: weapons give no rounds. */
 		else
-			gaveammo = P_GiveAmmo (player, weaponinfo[weapon].ammo, 2);
+			gaveammo = false; /* TREMOR */
     }
     else
     {
@@ -657,6 +657,8 @@ P_TouchSpecialThing
     if (special->flags & MF_COUNTITEM)
 	player->itemcount++;
     P_RemoveMobj (special);
+    if(special->sprite==SPR_CLIP || special->sprite==SPR_SHEL) player->message=(special->flags&MF_DROPPED)?"+1 round":"+2 rounds";
+    if(special->sprite==SPR_AMMO || special->sprite==SPR_SBOX) player->message="+4 rounds";
     player->bonuscount += BONUSADD;
     if (player == &players[consoleplayer])
 	S_StartSound (NULL, sound);
@@ -765,6 +767,7 @@ P_KillMobj
 	return;
     }
 
+    return; /* TREMOR: rare drops are handled by TR_Kill. */
     mo = P_SpawnMobj (target->x,target->y,ONFLOORZ, item);
     mo->flags |= MF_DROPPED;	// special versions of items
 }
@@ -798,6 +801,7 @@ P_DamageMobj
 	
     /* TREMOR: crew can never deal damage, including retaliation. */
     if (TR_BlockDamage(source)) return;
+    if(target->player) damage=TR_Damage(damage); /* TREMOR */
     /* TREMOR: classify the actual inflictor, not a later weapon switch. */
     target->tr_melee_hit = source && source==inflictor && source->player &&
         (source->player->readyweapon==wp_fist || source->player->readyweapon==wp_chainsaw);

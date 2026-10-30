@@ -397,6 +397,7 @@ A_Punch
     /* TREMOR: brutal fists always use berserk strength. */
     damage *= TR_MELEE_MULTIPLIER; /* TREMOR */
 
+    if(!TR_Hit()) { S_StartSound(player->mo,sfx_punch); return; } /* TREMOR */
     angle = player->mo->angle;
     angle += (P_Random()-P_Random())<<18;
     slope = P_AimLineAttack (player->mo, angle, MELEERANGE);

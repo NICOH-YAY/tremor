@@ -442,6 +442,7 @@ P_NightmareRespawn (mobj_t* mobj)
 //
 void P_MobjThinker (mobj_t* mobj)
 {
+    if(!mobj->player){mobj->tr_oldx=mobj->x;mobj->tr_oldy=mobj->y;mobj->tr_oldz=mobj->z;mobj->tr_oldtic=leveltime;} /* TREMOR */
     /* TREMOR: survivors and stunned humans bypass hostile state actions. */
     if (TR_Think(mobj)) return;
     // momentum movement
@@ -1035,6 +1036,7 @@ P_SpawnPlayerMissile
 	}
     }
 		
+    if(tr_pitch || !tr_autoaim) {an=source->angle+TR_Aim();slope=TR_PitchSlope();} /* TREMOR: manual pitch disables horizontal autoaim. */
     x = source->x;
     y = source->y;
     z = source->z + 4*8*FRACUNIT;
@@ -1050,6 +1052,7 @@ P_SpawnPlayerMissile
 			 finecosine[an>>ANGLETOFINESHIFT]);
     th->momy = FixedMul( th->info->speed,
 			 finesine[an>>ANGLETOFINESHIFT]);
+    if(tr_pitch || !tr_autoaim) slope=TR_PitchSlope(); /* TREMOR */
     th->momz = FixedMul( th->info->speed, slope);
 
     P_CheckMissileSpawn (th);

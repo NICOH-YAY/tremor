@@ -430,6 +430,7 @@ void G_BuildTiccmd (ticcmd_t* cmd, int maketic)
     }
 
     // buttons
+    cmd->lookfly=TR_LookCommand(); /* TREMOR: signed pitch delta, recorded. */
     cmd->chatchar = HU_dequeueChatChar();
     /* TREMOR: sampled into the tic command, never read live by simulation. */
     cmd->buttons2 = (gamekeydown[tr_keys[0]]?TR_READ:0) | (gamekeydown[tr_keys[1]]?TR_STUN:0) | (gamekeydown[tr_keys[2]]?TR_PURGE:0) | (tr_gore<<4) | 64;
@@ -1927,7 +1928,8 @@ void G_ReadDemoTiccmd (ticcmd_t* cmd)
     }
 
     cmd->buttons = (unsigned char)*demo_p++;
-    cmd->buttons2 = tremor_demo ? *demo_p++ : 0; /* TREMOR */
+    cmd->buttons2 = tremor_demo ? *demo_p++ : 0;
+    cmd->lookfly = tremor_demo ? *demo_p++ : 0; /* TREMOR */
 } 
 
 // Increase the size of the demo buffer to allow unlimited demos
@@ -1987,7 +1989,8 @@ void G_WriteDemoTiccmd (ticcmd_t* cmd)
     }
 
     *demo_p++ = cmd->buttons;
-    *demo_p++ = cmd->buttons2; /* TREMOR: recorded mercy/recognition. */
+    *demo_p++ = cmd->buttons2;
+    *demo_p++ = cmd->lookfly; /* TREMOR: recorded mercy/recognition. */
 
     // reset demo pointer back
     demo_p = demo_start;
@@ -2087,7 +2090,7 @@ void G_BeginRecording (void)
  
     if (longtics)
     {
-        *demo_p++ = 112; /* TREMOR: distinct from vanilla demos. */
+        *demo_p++ = 113; /* TREMOR: distinct from vanilla demos. */
     }
     else
     {
@@ -2171,7 +2174,7 @@ void G_DoPlayDemo (void)
 
     demoversion = *demo_p++;
 
-    tremor_demo = demoversion == 112; /* TREMOR */
+    tremor_demo = demoversion == 113; /* TREMOR */
     if (tremor_demo) { longtics = true; }
     else if (demoversion == G_VanillaVersionCode())
     {

@@ -272,6 +272,8 @@ typedef struct mobj_s
     int			lastlook;	
 
     /* TREMOR: identity and mercy state, stored with each actor. */
+    fixed_t tr_oldx,tr_oldy,tr_oldz; int tr_oldtic; /* TREMOR: cosmetic interpolation. */
+    int tr_seen, tr_death_tic; /* TREMOR: saved corpse exposure. */
     int tr_crew, tr_revealed, tr_stun, tr_cower;
     int tr_melee_hit, tr_shotgun_hit; /* TREMOR: immediate damage classification. */
 

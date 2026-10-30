@@ -1,0 +1,82 @@
+[
+  {
+    "id": "e1m1",
+    "text": "This is Halloran, UAC comms. I locked myself in control when the hangar crew stopped answering. Find the way out; I will stay on this frequency."
+  },
+  {
+    "id": "e1m2",
+    "text": "You are inside the containment perimeter. They sealed those doors with people still working behind them. Look for a card beside the locked routes."
+  },
+  {
+    "id": "e1m3",
+    "text": "The treatment plant is running without its operators. Something is moving against the current. Follow the access doors toward the exit."
+  },
+  {
+    "id": "e1m4",
+    "text": "That station used to report every fault to me. Now every light is green and nobody answers. Find the next passage out."
+  },
+  {
+    "id": "e1m5",
+    "text": "This is the laboratory sector. We kept the samples cold; that did not keep them quiet. The secured route should take you onward."
+  },
+  {
+    "id": "e1m6",
+    "text": "The central complex is ahead. I can hear its alarm through the wall of this room. Find the access card and keep moving."
+  },
+  {
+    "id": "e1m7",
+    "text": "You have reached the computing wing. The terminals are still accepting names from empty desks. Look for the route beyond the locks."
+  },
+  {
+    "id": "e1m8",
+    "text": "The last facility is beyond this threshold. I cannot promise what waits there. Get to the exit while this channel holds."
+  },
+  {
+    "id": "e1m9",
+    "text": "This annex was missing from the evacuation plan. There are voices on its local channel, all using the same name. Find a route back out."
+  },
+  {
+    "id": "crew-reveal",
+    "text": "That one's still human. Look before you shoot."
+  },
+  {
+    "id": "crew-death",
+    "text": "I heard that. I'll keep the channel open."
+  },
+  {
+    "id": "crew-saved",
+    "text": "They're breathing. Thank you for waiting."
+  },
+  {
+    "id": "breaking",
+    "text": "Listen to my voice. There is still a way out."
+  },
+  {
+    "id": "static-1",
+    "text": "Control to anyone. Is that someone breathing on the line?"
+  },
+  {
+    "id": "static-2",
+    "text": "There is someone outside this room. They know my name."
+  },
+  {
+    "id": "static-3",
+    "text": "Signal dropping. I can still hear you."
+  },
+  {
+    "id": "static-4",
+    "text": "Please do not answer the other channel."
+  },
+  {
+    "id": "static-5",
+    "text": "The banging stopped. That is worse."
+  },
+  {
+    "id": "static-6",
+    "text": "I thought I heard the lift. It was above me."
+  },
+  {
+    "id": "static-7",
+    "text": "Keep the receiver close. The walls carry sound here."
+  }
+]

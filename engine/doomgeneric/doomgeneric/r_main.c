@@ -1,3 +1,4 @@
+#include "doomstat.h" /* TREMOR: presentation tic. */
 /* TREMOR: engine hooks; see engine/PATCHES.md. */
 #include "tremor.h"
 //
@@ -827,13 +828,21 @@ void R_SetupFrame (player_t* player)
     int		i;
     
     viewplayer = player;
+    TR_RenderClock(); /* TREMOR */
     viewx = player->mo->x;
     viewy = player->mo->y;
-    viewangle = player->mo->angle + viewangleoffset;
-    extralight = player->extralight;
+    viewangle = player->mo->angle + viewangleoffset + (angle_t)(TR_Sway()*128);
+    extralight = player->extralight-1; /* TREMOR: lower ambient effective light. */
+    /* TREMOR: Heretic-style shear, rebuilding dependent plane slopes. */
+    centery=viewheight/2 + tr_pitch*viewheight/200 + (TR_Sway()>>FRACBITS)/2;
+    centeryfrac=centery*FRACUNIT;
+    {int y;for(y=0;y<viewheight;y++) {fixed_t dy=abs((y-centery)*FRACUNIT+FRACUNIT/2);yslope[y]=FixedDiv((viewwidth<<detailshift)/2*FRACUNIT,dy);}}
+
 
     viewz = player->viewz + TR_Sway()/2; /* TREMOR: render-only sway/kick. */
     
+    if(player->mo->tr_oldtic==leveltime-1){viewx=TR_Interpolate(player->mo->tr_oldx,viewx);viewy=TR_Interpolate(player->mo->tr_oldy,viewy);}
+    TR_PreviewView(); /* TREMOR: render-only, no world movement. */
     viewsin = finesine[viewangle>>ANGLETOFINESHIFT];
     viewcos = finecosine[viewangle>>ANGLETOFINESHIFT];
 	
@@ -864,6 +873,7 @@ void R_SetupFrame (player_t* player)
 //
 void R_RenderPlayerView (player_t* player)
 {	
+    TR_ProfileStart(); /* TREMOR: renderer CPU timing, excludes Canvas. */
     R_SetupFrame (player);
 
     // Clear buffers.
@@ -873,21 +883,22 @@ void R_RenderPlayerView (player_t* player)
     R_ClearSprites ();
     
     // check for new console commands.
-    NetUpdate ();
+    if(!TR_PreviewActive()) NetUpdate (); /* TREMOR: previews cannot queue catch-up tics. */
 
     // The head node is the last node output.
     R_RenderBSPNode (numnodes-1);
     
     // Check for new console commands.
-    NetUpdate ();
+    if(!TR_PreviewActive()) NetUpdate (); /* TREMOR: previews cannot queue catch-up tics. */
     
     R_DrawPlanes ();
     
     // Check for new console commands.
-    NetUpdate ();
+    if(!TR_PreviewActive()) NetUpdate (); /* TREMOR: previews cannot queue catch-up tics. */
     
     R_DrawMasked ();
 
     // Check for new console commands.
-    NetUpdate ();				
+    if(!TR_PreviewActive()) NetUpdate (); /* TREMOR: previews cannot queue catch-up tics. */
+    TR_ProfileEnd();
 }

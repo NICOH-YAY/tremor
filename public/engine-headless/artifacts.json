@@ -2,11 +2,15 @@
   "target": "doomgeneric-tremor-node-v2",
   "step_tics": 7,
   "sha256": {
-    "public/engine-headless/doom.cjs": "f2ea387348d58054afa2c3531f83a57ce31f9d732fa076b70aac469e862a581c",
-    "public/engine-headless/doom.wasm": "884f3352ad9d47ea6a06df1bee9da37e534671028600e5e12660a7dcddd866ee",
-    "public/engine-headless/doom-test.cjs": "ac1c06362786ec17f164ea1e5f77005e1d2a5e13fe911788d7838f1d22f010bf",
-    "public/engine-headless/doom-test.wasm": "2776e000dab19f76a55f153faf3a5af687db2454f8a9a8efcd59d0523bce1929",
+    "public/engine/doom.js": "9aae3836792a60606ecc3b958351feb94561b348d541565d9b9b23087bf40935",
+    "public/engine/doom.wasm": "b540d36089a59770f8a7f2a2e90574e0d50749333e17a6bc87eef1e470a682f6",
+    "public/engine/source.zip": "7bdbf78007c4e6e8a90ac62c3757295f8c7fa8a46c7e9c77aa0926d7b577d5e7",
+    "public/radio/lines.json": "ff1b922e55eb0fe871b39472edb601d280cfcd4dc676ccf6a7e525458f3fd9ae",
+    "public/engine-headless/doom.cjs": "376752832b8177abbe4dba96e0203c0b96da22d901cafdd2b8d50892689193d4",
+    "public/engine-headless/doom.wasm": "44611d47f932ea6176909a7dbf165ef2a580e0ae2767c8ff67209fd3683da598",
+    "public/engine-headless/doom-test.cjs": "abd607548d5b614e384b85a82817ab45c586a3ed3b055223444dd98930eaa1c7",
+    "public/engine-headless/doom-test.wasm": "e6463f581b3d600708bce9617e367b17291a76824418896486d805827d533c98",
     "public/wad/freedoom1.wad": "7323bcc168c5a45ff10749b339960e98314740a734c30d4b9f3337001f9e703d",
-    "public/wad/tremor.wad": "cb7810e142f0a686d5573c7b3cc07bf9d910bad2a86ec1c87dcc3f3139f26a11"
+    "public/wad/tremor.wad": "ed554eef927c0f19c7554230f54747dad8ba6b8b3ac84a35b2dc99afd5652031"
   }
 }

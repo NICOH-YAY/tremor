@@ -1,3 +1,4 @@
+#include "tremor.h" /* TREMOR: cosmetic sector flicker. */
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
@@ -112,7 +113,7 @@ R_RenderMaskedSegRange
     backsector = curline->backsector;
     texnum = texturetranslation[curline->sidedef->midtexture];
 	
-    lightnum = (frontsector->lightlevel >> LIGHTSEGSHIFT)+extralight;
+    lightnum = (TR_Light(frontsector) >> LIGHTSEGSHIFT)+extralight;
 
     if (curline->v1->y == curline->v2->y)
 	lightnum--;
@@ -638,7 +639,7 @@ R_StoreWallRange
 	// OPTIMIZE: get rid of LIGHTSEGSHIFT globally
 	if (!fixedcolormap)
 	{
-	    lightnum = (frontsector->lightlevel >> LIGHTSEGSHIFT)+extralight;
+	    lightnum = (TR_Light(frontsector) >> LIGHTSEGSHIFT)+extralight;
 
 	    if (curline->v1->y == curline->v2->y)
 		lightnum--;

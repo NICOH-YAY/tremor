@@ -3214,6 +3214,8 @@ var __emscripten_system = command => {
   return -52;
 };
 
+var _emscripten_get_now = () => performance.now();
+
 var getHeapMax = () => // Stay one Wasm page short of 4GB: while e.g. Chrome is able to allocate
 // full 4GB Wasm memories, the size will wrap back to 0 bytes in Wasm side
 // for any code that deals with heap sizes, which would require special
@@ -3496,18 +3498,29 @@ function TR_SettingsReady() {
 }
 
 // Imports from the Wasm binary.
-var _tremor_music_song_serial, _tremor_music_render, _tremor_music_rate, _tremor_music_active, _tremor_set_gore, _tremor_set_mouse_sensitivity, _tremor_set_volumes, _tremor_bind_key, _tremor_set_screen_shake, _tremor_agent_reset, _tremor_agent_step, _tremor_agent_observe, _tremor_agent_outcome, _tremor_agent_terminate, _tremor_agent_fixture, _tremor_agent_test_cower, _tremor_agent_test_exit_fixture, _tremor_agent_enemy_count, _tremor_agent_test_crew_damage, _tremor_agent_test_kill, _setThrew, __emscripten_stack_restore, __emscripten_stack_alloc, _emscripten_stack_get_current, memory, __indirect_function_table, wasmMemory;
+var _tremor_music_song_serial, _tremor_music_render, _tremor_music_rate, _tremor_music_active, _tremor_fear, _tremor_set_gore, _tremor_set_mouse_sensitivity, _tremor_set_volumes, _tremor_bind_key, _tremor_set_screen_shake, _tremor_radio_pop, _tremor_story, _tremor_look, _tremor_center_view, _tremor_comfort, _tremor_preview, _tremor_render_ms, _tremor_arm_turn, _tremor_pressure, _tremor_tic, _tremor_agent_reset, _tremor_agent_step, _tremor_agent_observe, _tremor_agent_outcome, _tremor_agent_terminate, _tremor_agent_fixture, _tremor_agent_test_cower, _tremor_agent_test_exit_fixture, _tremor_agent_enemy_count, _tremor_agent_test_crew_damage, _tremor_agent_test_kill, _setThrew, __emscripten_stack_restore, __emscripten_stack_alloc, _emscripten_stack_get_current, memory, __indirect_function_table, wasmMemory;
 
 function assignWasmExports(wasmExports) {
   _tremor_music_song_serial = Module["_tremor_music_song_serial"] = wasmExports["tremor_music_song_serial"];
   _tremor_music_render = Module["_tremor_music_render"] = wasmExports["tremor_music_render"];
   _tremor_music_rate = Module["_tremor_music_rate"] = wasmExports["tremor_music_rate"];
   _tremor_music_active = Module["_tremor_music_active"] = wasmExports["tremor_music_active"];
+  _tremor_fear = Module["_tremor_fear"] = wasmExports["tremor_fear"];
   _tremor_set_gore = Module["_tremor_set_gore"] = wasmExports["tremor_set_gore"];
   _tremor_set_mouse_sensitivity = Module["_tremor_set_mouse_sensitivity"] = wasmExports["tremor_set_mouse_sensitivity"];
   _tremor_set_volumes = Module["_tremor_set_volumes"] = wasmExports["tremor_set_volumes"];
   _tremor_bind_key = Module["_tremor_bind_key"] = wasmExports["tremor_bind_key"];
   _tremor_set_screen_shake = Module["_tremor_set_screen_shake"] = wasmExports["tremor_set_screen_shake"];
+  _tremor_radio_pop = Module["_tremor_radio_pop"] = wasmExports["tremor_radio_pop"];
+  _tremor_story = Module["_tremor_story"] = wasmExports["tremor_story"];
+  _tremor_look = Module["_tremor_look"] = wasmExports["tremor_look"];
+  _tremor_center_view = Module["_tremor_center_view"] = wasmExports["tremor_center_view"];
+  _tremor_comfort = Module["_tremor_comfort"] = wasmExports["tremor_comfort"];
+  _tremor_preview = Module["_tremor_preview"] = wasmExports["tremor_preview"];
+  _tremor_render_ms = Module["_tremor_render_ms"] = wasmExports["tremor_render_ms"];
+  _tremor_arm_turn = Module["_tremor_arm_turn"] = wasmExports["tremor_arm_turn"];
+  _tremor_pressure = Module["_tremor_pressure"] = wasmExports["tremor_pressure"];
+  _tremor_tic = Module["_tremor_tic"] = wasmExports["tremor_tic"];
   _tremor_agent_reset = Module["_tremor_agent_reset"] = wasmExports["tremor_agent_reset"];
   _tremor_agent_step = Module["_tremor_agent_step"] = wasmExports["tremor_agent_step"];
   _tremor_agent_observe = Module["_tremor_agent_observe"] = wasmExports["tremor_agent_observe"];
@@ -3538,6 +3551,7 @@ var wasmImports = {
   /** @export */ __syscall_rmdir: ___syscall_rmdir,
   /** @export */ __syscall_unlinkat: ___syscall_unlinkat,
   /** @export */ _emscripten_system: __emscripten_system,
+  /** @export */ emscripten_get_now: _emscripten_get_now,
   /** @export */ emscripten_resize_heap: _emscripten_resize_heap,
   /** @export */ exit: _exit,
   /** @export */ fd_close: _fd_close,

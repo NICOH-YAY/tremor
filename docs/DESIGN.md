@@ -70,3 +70,65 @@ The host alone holds World. Observations reveal a seen automap, a 120-degree vie
 ## Health invariant
 
 Player health is bounded to [0,100], including terminal states. Damage clamps at zero immediately and world completion clamps defensively after rules. Dead players cannot take more damage or consume medkits to revive during the death tic. Retry creates a fresh level. This was chosen after the merged damage path produced -2 health in the agent invariant test.
+
+
+## Horror adaptation, 2026-10-30
+
+The gun works perfectly. The person holding it does not. Corpse exposure now
+produces persistent terror: new visible bodies within 1024 units count once,
+with eight candidate checks per tic, a 90-degree forward view and P_CheckSight.
+Fresh close kills count twice; freshly witnessed crew deaths count three times.
+Map corpse and gore decorations count too. Terror is clamped to 100, loses one
+point after ten seconds without new exposure, and halves on level transition.
+There is no numeric terror HUD. The public felt states are steady (<25), shaken
+(<50), terrified (<80), breaking (>=80). These are self-perception, not knowledge
+of anyone else's identity. Gameplay rolls use P_Random. Rendering/audio do not.
+
+At full fear, each firearm ray has a 77/256 success threshold; failed shots go
+45?135 degrees wide. Fists whiff without damage. Existing trauma offsets stack.
+Incoming damage rises linearly to 1.6x, before normal armor handling. Shared rounds
+still start at enemies+1. Map ammo survives with probability 64/256; small pickups
+give two, boxes four, death clips one. Non-crew deaths drop a clip at 31/256.
+Weapons give no ammunition. A successful purge gives three rounds and a crew
+subtitle. Accessibility sway does not change hit or damage rules.
+
+The objective chooses existing locked-door keys, then their closed doors, then
+an exit special (11/51/52/124). This is a conservative map-order heuristic, not a
+reachability solver. Humans see the text and an automap-held bearing arrow;
+agents receive the same text, bearing and near/nearby/far bucket. The browser
+shows a skippable render-only glide, three seconds initially and 1.5 on changes.
+Settings-time clock exclusion pauses tics. Preview renders skip NetUpdate.
+Agents skip camera previews entirely.
+
+Halloran briefs once per level, then episode-once reveal/death/save/breaking
+beats and rare static fragments, with a ninety-second global cooldown. C owns
+the events and a bounded queue; headless observations include the latest radio
+log. public/radio/lines.json contains twenty original lines. MP3 files are
+optional: filtered audio, then low speechSynthesis, then subtitles. Speech API
+output cannot be routed through Web Audio, so its fallback has crackle but no
+bandpass. There are no recorded MP3s in this patch.
+
+Presentation uses cached Canvas vignette/grain and native Canvas brightness/desaturation blends,
+procedural drones/notes/breathing/heartbeat, monster pitch and short convolution,
+distance-derived lowpass and nonverbal idle mutters. Sector flicker is a render
+hash; floor spans within 96 units get a dim suit light. Monster sprite palette
+transforms cover all matching Freedoom frames/rotations; CREW stays original.
+
+Pitch is recorded in ticcmd.lookfly, clamped to approximately +/-32 degrees,
+with rebuilt centery/yslope and pitch-aware hitscan/projectiles. PgUp/PgDn/End
+are rebindable; mouse Y, invert Y and autoaim are settings. Render interpolation
+covers actor XYZ and player XY. Turns remain tic-based; arm inertia is cosmetic.
+Saves use Tremor 2 and demos v113; older mod formats are rejected. Do not claim
+compatibility with the previous save/demo byte layout.
+
+Limitations: native rendering remains 320x200. True 640x400, its benchmark-driven
+selection/resolution setting and sharp-bilinear output are not implemented; the
+vanilla renderer and UI assume 320x200. Full camera angle/view-height interpolation
+and immediate per-frame mouse turning are not implemented. Objective ordering is
+map order, with no dependency/reachability proof, and previews use a nearby offset
+rather than searching a collision-free vantage. Radio observations keep the latest
+line, rather than a complete episode transcript. The score approximates pads and
+piano with oscillators; no sampled piano, reversed monster layers or separately
+mixed whisper stingers. Canvas composite paint cost and audible mix remain unverified.
+No browser/apps were available from UI inventory, so Brave pointer-lock, CPU-only
+Canvas timing and an episode playthrough could not be verified.

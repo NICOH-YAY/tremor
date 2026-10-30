@@ -75,3 +75,12 @@ in `public/engine-headless/artifacts.json` after rebuilding.
 Rebuild browser output too with `npm run engine:build` so the packaged GPL source
 archive corresponds to both targets' C changes. Earlier TODO/status sections in
 this file describe bring-up history; the README and EVALUATION.md are current.
+
+
+Horror build amendment: rebuild browser, production headless and fixture headless,
+then run engine:test and npm test/typecheck/build. Generated JS and licenses are
+normalized to LF bytes on Windows before hashing. The manifest now also hashes
+browser binaries/source archive and radio text. Preview regression:
+node engine/build/preview-smoke.mjs. Renderer CPU timing is exported separately
+from scheduling intervals in smoke-result.json; it excludes Canvas/audio.
+Native resolution remains 320x200; see DESIGN.md for incomplete requirements.

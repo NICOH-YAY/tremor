@@ -55,8 +55,56 @@ void tremor_set_mouse_sensitivity(int value);
 void tremor_set_volumes(int sfx,int music);
 void tremor_bind_key(int action,int doomkey);
 void TR_MergeCrewSprites(unsigned int first);
-#endif
 
 void TR_FlushSaves(void);
 
 void TR_SettingsReady(void);
+
+/* Corpse exposure, not elapsed danger: units are map units and 35 Hz tics. */
+#define TR_TERROR_RANGE (1024*FRACUNIT)
+#define TR_TERROR_CLOSE (256*FRACUNIT)
+#define TR_TERROR_SCAN 8 /* At most eight LOS tests per player tic. */
+#define TR_TERROR_DECAY 350 /* One point after ten seconds without exposure. */
+#define TR_AMMO_KEEP 64 /* 64/256 map ammunition survives. */
+#define TR_HIT_LOSS 179 /* At terror 100: 77/256 = 30.08% successful rolls. */
+#define TR_DAMAGE_EXTRA 6 /* 0..60 percent extra incoming damage. */
+#define TR_RADIO_COOLDOWN 3150 /* Ninety seconds, episode clock. */
+#define TR_AMMO_DROP 31 /* 31/256 deaths drop one round. */
+extern int tr_terror;
+int TR_Hit(void);
+int TR_Damage(int damage);
+int TR_Ammo(player_t *p,int amount);
+const char *TR_TerrorBucket(void);
+
+void TR_StoryStart(void);
+void TR_StoryTick(player_t *p);
+void TR_Radio(int beat);
+const char *TR_Objective(void);
+const char *TR_RadioLog(void);
+int TR_ObjectiveBearing(player_t *p);
+const char *TR_ObjectiveDistance(player_t *p);
+
+extern int tr_pitch,tr_sway,tr_autoaim;
+int TR_LookCommand(void);
+fixed_t TR_PitchSlope(void);
+
+extern fixed_t tr_fraction;
+void TR_RenderClock(void);
+fixed_t TR_Interpolate(fixed_t old,fixed_t current);
+void TR_PreviewView(void);
+
+extern int tr_story_clock,tr_radio_last,tr_radio_bits;
+void TR_QueueRadio(const char *line);
+
+int TR_Light(sector_t *sector);
+fixed_t TR_ArmY(void);
+void TR_ProfileStart(void);
+void TR_ProfileEnd(void);
+
+fixed_t TR_ArmX(void);
+
+int TR_PreviewActive(void);
+extern int tr_radio_pending,tr_last_corpse;
+extern char tr_radio_log[512];
+void TR_ClearRadioQueue(void);
+#endif /* TREMOR_H */

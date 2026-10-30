@@ -1,3 +1,4 @@
+#include "tremor.h" /* TREMOR: pitch-aware attack. */
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard, Andrey Budko
@@ -1124,7 +1125,7 @@ P_LineAttack
     y2 = t1->y + (distance>>FRACBITS)*finesine[angle];
     shootz = t1->z + (t1->height>>1) + 8*FRACUNIT;
     attackrange = distance;
-    aimslope = slope;
+    aimslope = t1->player && (tr_pitch || !tr_autoaim)?TR_PitchSlope():slope; /* TREMOR: pitch-aware hitscan. */
 		
     P_PathTraverse ( t1->x, t1->y,
 		     x2, y2,

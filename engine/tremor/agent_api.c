@@ -84,7 +84,7 @@ EMSCRIPTEN_KEEPALIVE const char *tremor_agent_observe(void){
  const char *weapons[]={"fist","pistol","shotgun","chaingun","rocket launcher","plasma rifle","BFG9000","chainsaw","super shotgun"};
  add("{\"tic\":%d,\"health\":%d,\"armor\":%d,\"rounds\":%d,\"purge\":%d,\"weapon\":\"%s\",\"aim\":\"%s\",\"keys\":[",tics,p->health<0?0:p->health,p->armorpoints,tr_rounds,tr_charges,weapons[p->readyweapon],tr_trauma==0?"steady":tr_trauma<3?"shaky":"very shaky");
  const char *keys[]={"blue key","yellow key","red key","blue skull","yellow skull","red skull"};int comma=0;
- for(int i=0;i<NUMCARDS;i++)if(p->cards[i]){if(comma++)add(",");quoted(keys[i]);}add("],\"entities\":[");comma=0;
+ for(int i=0;i<NUMCARDS;i++)if(p->cards[i]){if(comma++)add(",");quoted(keys[i]);}add("],\"objective\":");quoted(TR_Objective());add(",\"objective_bearing\":%d,\"objective_distance\":",TR_ObjectiveBearing(p));quoted(TR_ObjectiveDistance(p));add(",\"radio_log\":");quoted(TR_RadioLog());add(",\"terror\":");quoted(TR_TerrorBucket());add(",\"entities\":[");comma=0;
  for(thinker_t *th=thinkercap.next;th!=&thinkercap;th=th->next){
   if(th->function.acp1!=(actionf_p1)P_MobjThinker)continue;
   mobj_t *m=(mobj_t*)th;if(m==p->mo||m->health<=0)continue;const char *name=label(m);if(!name)continue;
