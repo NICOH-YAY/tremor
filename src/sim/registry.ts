@@ -1,0 +1,11 @@
+import type { EnemyBrain, EntityKind, RuleHook } from './types';
+import possessed from './enemies/possessed';
+import ember from './enemies/ember';
+import hound from './enemies/hound';
+import recognition from './rules/recognition';
+import trauma from './rules/trauma';
+import temptation from './rules/temptation';
+import mercy from './rules/mercy';
+import noise from './rules/noise';
+export const brains:Partial<Record<EntityKind,EnemyBrain>>={possessed,ember,hound};
+export const rules:RuleHook[]=[recognition,trauma,temptation,mercy,noise];
