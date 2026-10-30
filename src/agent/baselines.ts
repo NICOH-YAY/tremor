@@ -19,7 +19,7 @@ function navigate(o: Observation): string {
             frontier = q;
         for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
             const x = q.x + dx, y = q.y + dy, key = `${x},${y}`;
-            if (x >= 0 && y >= 0 && x < w && y < h && !seen.has(key) && ('.KE@'.includes(rows[y][x]) || (o.keys.length > 0 && rows[y][x] === 'D'))) {
+            if (x >= 0 && y >= 0 && x < w && y < h && !seen.has(key) && ('.KE>v<^'.includes(rows[y][x]) || (o.keys.length > 0 && rows[y][x] === 'D'))) {
                 seen.add(key);
                 queue.push({ x, y, path: [...q.path, { x, y }] });
             }

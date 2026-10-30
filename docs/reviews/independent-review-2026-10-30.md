@@ -115,3 +115,29 @@ It says "npm test: 15 tests passed", "this branch registers only test_room", and
 - Levels: `src/levels/__tests__/levels.test.ts:65` checks that the exit is reachable and each key precedes its door. I read the Hangar and Quarantine layouts and found no dead end. Keys sit before their doors, the closet door is released by the red key, B-2 is optional and toggles, and the blue door is reachable. The five situations are small and both baselines complete them.
 - Unsupported or stale claims: M4, m3, m9, m12. The README statement "No live results are claimed" is supported: no live run exists, and `scripts/eval.ts:16` skips model players without `--live`.
 - Not verified: the live Vertex path (never run), browser pointer lock, audio and rendering (the main test mocks canvas), the 60 FPS browser claim, and the Higgsfield art terms.
+
+
+## Response to review
+
+Implementation response (2026-10-30), appended without changing the review above.
+All changes are uncommitted as requested; areas below identify the proposed fix.
+
+- B1: player_interface event whitelist and identity-neutral validation; mercy/crew generic stun and matched purge channel/charge behavior. Named failing-first regression in tests/agent.test.ts and DECISIONS Observed regressions.
+- M1: tests/agent.test.ts calls step for every action ID on paired unread worlds, compares events/feedback/observations; matched stunned behavior isolates the interface from visible enemy movement.
+- M2: player_interface summary includes exact pose, tic and compass direction; map has a facing arrow. Baselines use those same observation fields; model map legend and DECISIONS updated.
+- M3: .github/workflows/midterm-nicoh-yay.yml course-path PR template added; ci.yml/pages.yml retained.
+- M4: EVALUATION-PLAN implementation verification replaced with current facts; dated pre-tuning amendment preserves suite/hypotheses.
+- m1: both interface event paths suppress hidden activity types via whitelist.
+- m2: intended body/trauma effects retained; crew/Possessed post-kill parity covered by all-action test.
+- m3: visible pickup names/coordinates included in observation and summary.
+- m4: runner errors separated from illegal actions/fallback streak, including model parse failures; tests cover accounting.
+- m5: malformed-response usage retained; unknownUsageCalls exposes missing transport/timeout usage and EVALUATION documents partial totals.
+- m6: runner five-minute total cap, bounded by per-call timeout; deterministic timeout test. Calls remain bounded with no SDK retries.
+- m7: stun validation uses MERCY.STUN_RANGE=2.5; boundary regression covers 2.4 tiles.
+- m8: repeated purge accepted even with zero charges, without interrupting active channel.
+- m9: baseline CI assertion covers all 28 runs of both controllers.
+- m10: EVALUATION.md documents weak seed diversity with recorded examples.
+- m11: existing mechanics monotonic crew-only coverage retained; broad agent invariant remains a smoke check.
+- m12: DESIGN action names and floor keycard description corrected.
+
+Validation: npm test (105 passing), npm run typecheck and npm run build.

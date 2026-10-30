@@ -5,6 +5,7 @@ import { bearing } from '../geometry';
 /** Uninfected survivors: never attack, run from visible demons, cower when cornered. */
 const crew: EnemyBrain = (w, e) => {
   if (e.state === 'dead') return;
+  if(e.state === 'stunned'){e.data.stunT=Math.max(0,Number(e.data.stunT)-1);e.data.cower=true;if(e.data.stunT===0)e.state='idle';return;}
   let threat = null as null | { x: number; y: number };
   let best: number = C.CREW_FEAR_RADIUS;
   for (const o of w.entities) {

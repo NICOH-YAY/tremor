@@ -18,5 +18,5 @@ it('baselines traverse authored levels', async () => {
             }
     if (report)
         writeFileSync('eval/integration-baselines.json', JSON.stringify(rows, null, 2));
-    expect(rows.filter(r => r.player === 'baseline_careful').every(r => r.reachedExit)).toBe(true);
+    expect(rows.every(r => r.reachedExit)).toBe(true);
 }, 60000);

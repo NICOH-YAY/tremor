@@ -28,6 +28,7 @@ function startStun(w: World, e: Entity): void {
 }
 
 function cure(w: World, e: Entity, rng: () => number): void {
+  const wasPossessed = e.kind === 'possessed';
   e.kind = 'crew';
   e.state = 'cured';
   e.revealed = true;
@@ -38,7 +39,7 @@ function cure(w: World, e: Entity, rng: () => number): void {
   e.data.stunT = 0;
   e.data.curedAt = w.tic;
   e.data.helper = rng() < MERCY.HELPER_CHANCE;
-  w.player.saved++;
+  if(wasPossessed) w.player.saved++;
   w.events.push({ type: 'cured', id: e.id });
 }
 
@@ -48,7 +49,7 @@ const mercy: RuleHook = {
     const p = w.player, rng = worldRng(w);
     // 1. stun
     for (const e of w.entities) {
-      if (e.data.stunRequested !== true || !alive(e) || e.kind !== 'possessed' || e.state === 'stunned') continue;
+      if (e.data.stunRequested !== true || !alive(e) || e.state === 'stunned') continue;
       if (p.weaponCooldown > 0 || dist(e.pos, p.pos) > MERCY.STUN_RANGE) continue;
       startStun(w, e);
       w.events.push({type:'stun',id:e.id});
@@ -56,7 +57,7 @@ const mercy: RuleHook = {
     // 2. purge: only one at a time; charge is spent when it starts
     if (!purging(w)) {
       for (const e of w.entities) {
-        if (e.data.purgeRequested !== true || !alive(e) || e.kind !== 'possessed' || e.state !== 'stunned') continue;
+        if (e.data.purgeRequested !== true || !alive(e) || !['crew','possessed'].includes(e.kind) || e.state !== 'stunned') continue;
         if (p.purgeCharges <= 0 || dist(e.pos, p.pos) > MERCY.PURGE_RANGE) continue;
         p.purgeCharges--;
         e.data.purgeT = MERCY.PURGE_TICS;

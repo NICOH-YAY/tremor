@@ -29,14 +29,28 @@ metrics are descriptive and never contribute to score or the human HUD.
 
 ## Implementation verification (2026-10-30)
 
-npm test: 15 tests passed; npm run typecheck and npm run build passed.
-The evaluation CLI was also typechecked separately (scripts are outside the
-repository tsconfig include list). No live Vertex calls were made.
+All eight levels are registered: test_room, hangar, quarantine and the five
+unchanged declared situations. CI runs both baselines across seven authored
+levels at seeds 17/83 and asserts all 28 exits. Existing evidence is in
+eval/integration-baselines.json; it is baseline evidence, not live model results.
+The review response passes 105 tests, typecheck and build. No live Vertex calls
+or browser play/visual/audio verification are claimed. The standard evaluation
+CLI previously encountered uv_os_get_passwd ENOMEM in this Windows sandbox;
+integration tests invoke the same runner and controllers directly.
 
-Full suite execution awaits content-worker levels: this branch registers only
-test_room. A temporary compiled CLI confirmed the explicit missing-level error
-for s1_corridor. No suite result tables or invented live evidence were produced.
-The requested npm/tsx command additionally encounters this Windows sandbox's
-uv_os_get_passwd ENOMEM in tsx before entering our code. This environment issue
-must be resolved on the evaluation host; the package command remains standard.
-The skill invocation log intentionally remains empty for actual human sessions.
+## Amendment 2026-10-30 (pre-tuning)
+
+This interface correction preserves the declared suite, seeds, players and
+hypotheses. Summaries now include own exact position, angle, compass heading,
+tic, a facing arrow on the seen map and visible supplies, giving the model the
+same navigation information already used by baselines. Stun looks identical on
+unread crew and Possessed; purge attempts give identity-neutral feedback and
+channel/consume charges for either stunned kind. Event output uses an explicit
+local whitelist and suppresses hidden activity. Recognition and completed cures
+remain legitimate reveals. The paired regression was observed failing first.
+
+Errors are reported separately from illegal actions. Malformed responses retain
+known token usage; unknownUsageCalls counts failed/timed-out calls without usage,
+so reported tokens may undercount billed usage. A five-minute episode wall-clock
+cap supplements the existing limits (terminal reason timeout). No additional API
+retries are made. These amendments precede live model tuning/evaluation.
