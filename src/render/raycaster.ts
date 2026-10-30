@@ -26,6 +26,7 @@ export class Raycaster implements Renderer {
   private hurt = 0;
   private lastHurtTic = -1;
   private lastTime = 0;
+  private pose:PlayerPose={pos:{x:0,y:0},angle:0};
 
   constructor(private canvas: HTMLCanvasElement) {
     this.ctx = this.buffer.getContext('2d')!;
@@ -51,10 +52,10 @@ export class Raycaster implements Renderer {
     const a = Math.max(0, Math.min(1, alpha));
     const pp = world.player;
     const delta = Math.atan2(Math.sin(pp.angle - prevPose.angle), Math.cos(pp.angle - prevPose.angle));
-    const pose: PlayerPose = {
-      pos: { x: prevPose.pos.x + (pp.pos.x - prevPose.pos.x) * a, y: prevPose.pos.y + (pp.pos.y - prevPose.pos.y) * a },
-      angle: prevPose.angle + delta * a,
-    };
+    const pose=this.pose;
+    pose.pos.x=prevPose.pos.x+(pp.pos.x-prevPose.pos.x)*a;
+    pose.pos.y=prevPose.pos.y+(pp.pos.y-prevPose.pos.y)*a;
+    pose.angle=prevPose.angle+delta*a;
 
     // entity position history for interpolation (once per sim tic)
     if (world.tic !== this.lastTic) {

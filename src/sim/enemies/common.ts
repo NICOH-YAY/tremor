@@ -98,12 +98,12 @@ export function triangular(rng: RNG): number {
 
 /** Reduce armor then health, emit playerHurt. The world core ends the level when health <= 0. */
 export function hurtPlayer(w: World, amount: number): void {
-  if (amount <= 0 || w.done) return;
+  if (amount <= 0 || w.done || w.player.health <= 0) return;
   const p = w.player;
   const saved = Math.min(p.armor, Math.floor(amount * C.ARMOR_ABSORB)); // Doom P_DamageMobj armor split
   p.armor -= saved;
   const lost = amount - saved;
-  p.health -= lost;
+  p.health = Math.max(0, p.health - lost);
   w.events.push({ type: 'playerHurt', amount: lost });
 }
 

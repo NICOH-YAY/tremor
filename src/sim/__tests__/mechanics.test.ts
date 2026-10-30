@@ -245,7 +245,7 @@ describe('ember and fireball', () => {
     spawnFireball(w, ent(w), { x: 13, y: 4.5 });
     run(w, 80);
     expect(w.player.health).toBe(100);
-    expect(w.entities.find((e) => e.kind === 'fireball')!.state).toBe('dead');
+    expect(w.entities.some((e) => e.kind === 'fireball')).toBe(false);
   });
   it('an ember eventually fires at the player', () => {
     let fired = false;

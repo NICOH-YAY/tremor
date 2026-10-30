@@ -23,7 +23,7 @@ export function observe(state:World,player_id='player') {
    seen.set(y*m.width+x,door?'D':m.cells[y*m.width+x]>0?'#':'.');
   }
  }
- const entities=state.entities.filter(e=>e.health>0&&visible(state,e.pos)&&inView(e.pos.x,e.pos.y)).map(e=>({id:e.id,bearingDeg:bearing(Math.atan2(e.pos.y-p.pos.y,e.pos.x-p.pos.x)-p.angle)*180/Math.PI,distance:Math.hypot(e.pos.x-p.pos.x,e.pos.y-p.pos.y),kind:e.revealed?e.kind:'unknown figure',revealed:e.revealed,state:e.revealed?e.state:undefined}));
+ const entities=state.entities.filter(e=>e.health>0&&e.kind!=='pickup'&&e.kind!=='fireball'&&visible(state,e.pos)&&inView(e.pos.x,e.pos.y)).map(e=>({id:e.id,bearingDeg:bearing(Math.atan2(e.pos.y-p.pos.y,e.pos.x-p.pos.x)-p.angle)*180/Math.PI,distance:Math.hypot(e.pos.x-p.pos.x,e.pos.y-p.pos.y),kind:e.revealed?e.kind:'unknown figure',revealed:e.revealed,state:e.revealed?e.state:undefined}));
  const rows=Array.from({length:m.height},(_,y)=>Array.from({length:m.width},(_,x)=>seen.get(y*m.width+x)??'?'));
  const ex=Math.floor(m.exit.x),ey=Math.floor(m.exit.y);
  if(seen.get(ey*m.width+ex)==='.')rows[ey][ex]='E';
@@ -45,7 +45,7 @@ export function step(state:World,playerOrAction:string,action?:string):StepResul
  if(action!==undefined&&playerOrAction!=='player')reason='unknown player';
  else if(!ACTION_IDS.includes(id as ActionId))reason='unknown action';
  else if(state.done||endings.has(state))reason='episode terminal';
- const aimed=state.entities.filter(e=>e.health>0&&visible(state,e.pos)&&Math.abs(bearing(Math.atan2(e.pos.y-state.player.pos.y,e.pos.x-state.player.pos.x)-state.player.angle))<Math.atan2(e.radius,Math.hypot(e.pos.x-state.player.pos.x,e.pos.y-state.player.pos.y))).sort((a,b)=>Math.hypot(a.pos.x-state.player.pos.x,a.pos.y-state.player.pos.y)-Math.hypot(b.pos.x-state.player.pos.x,b.pos.y-state.player.pos.y))[0];
+ const aimed=state.entities.filter(e=>e.health>0&&e.kind!=='pickup'&&e.kind!=='fireball'&&visible(state,e.pos)&&Math.abs(bearing(Math.atan2(e.pos.y-state.player.pos.y,e.pos.x-state.player.pos.x)-state.player.angle))<Math.atan2(e.radius,Math.hypot(e.pos.x-state.player.pos.x,e.pos.y-state.player.pos.y))).sort((a,b)=>Math.hypot(a.pos.x-state.player.pos.x,a.pos.y-state.player.pos.y)-Math.hypot(b.pos.x-state.player.pos.x,b.pos.y-state.player.pos.y))[0];
  if(!reason&&id==='purge'&&(!aimed||aimed.kind!=='possessed'||aimed.state!=='stunned'||state.player.purgeCharges<=0||Math.hypot(aimed.pos.x-state.player.pos.x,aimed.pos.y-state.player.pos.y)>1.5))reason='purge unavailable: requires a nearby stunned target and charge';
  if(!reason&&id==='stun'&&(!aimed||Math.hypot(aimed.pos.x-state.player.pos.x,aimed.pos.y-state.player.pos.y)>2))reason='stun unavailable: no nearby aimed target';
  const events:GameEvent[]=[];

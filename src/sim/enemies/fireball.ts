@@ -19,6 +19,7 @@ export function spawnFireball(w: World, owner: Entity, aim: Vec2): Entity {
     readProgress: 0, revealed: true, data: { owner: owner.id, ownerKind: owner.kind, born: w.tic, hp: 1 },
   };
   w.entities.push(f);
+  w.events.push({type:'fireball',id:f.id});
   return f;
 }
 
@@ -26,6 +27,7 @@ function explode(w: World, f: Entity): void {
   f.health = 0;
   f.state = 'dead';
   f.data.diedAt = w.tic;
+  w.events.push({type:'explosion',id:f.id});
   w.events.push({ type: 'noise', pos: { ...f.pos } });
 }
 

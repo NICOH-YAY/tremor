@@ -13,6 +13,9 @@ export interface Textures {
   /** procedural */
   fireball: Tex;
   medkit: Tex;
+  ammo: Tex;
+  purge: Tex;
+  exit: Tex;
   keyRed: Tex;
   keyBlue: Tex;
 }
@@ -77,7 +80,15 @@ export function makeFallbackTextures(): Textures {
     hound: flatSprite(48, 40, 160, 110, 90),
     weapon: make(32, 28, (x, y) => (x + y > 20 && x < 24 ? pack(70, 70, 76) : 0)),
     fireball: glow(32, 230, 110, 20),
+    exit: make(64,32,(x,y)=>{
+      const glyphs=['11111010001001011111','10000010001001000100','11100001010001000100','10000010001001000100','11111010001001000100'];
+      if(x<2||x>61||y<2||y>29)return pack(50,240,140);
+      const gx=Math.floor((x-10)/2),gy=Math.floor((y-10)/2);
+      return gx>=0&&gx<20&&gy>=0&&gy<5&&glyphs[gy][gx]==='1'?pack(210,255,225):pack(9,50,30);
+    }),
     medkit: medkit(),
+    ammo: make(24,24,(x,y)=>x>2&&x<21&&y>5&&y<22?pack(185,140,40):0),
+    purge: make(24,24,(x,y)=>x>7&&x<17&&y>2&&y<22?pack(50,210,200):0),
     keyRed: card(200, 30, 30),
     keyBlue: card(40, 80, 220),
   };

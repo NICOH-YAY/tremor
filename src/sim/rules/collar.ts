@@ -1,3 +1,4 @@
+import { SHOT_DAMAGE } from '../types';
 import type { RuleHook } from '../types';
 import { worldRng } from '../rng';
 import { C } from '../enemies/common';
@@ -5,7 +6,7 @@ import { C } from '../enemies/common';
 /**
  * Design rule: a shot aimed at a collared hound's head centre may break the collar instead of
  * hurting it. onFire runs before core damage (40), so a break refunds that damage; the core
- * `hit` event is still emitted and a zero-amount `hit` marks the break for audio/render.
+ * `hit` event is still emitted and `collarBreak` marks the break for audio/render.
  */
 const collar: RuleHook = {
   name: 'collar',
@@ -19,10 +20,10 @@ const collar: RuleHook = {
     if (cross > e.radius * C.COLLAR_CONE) return;
     if (worldRng(w)() >= C.COLLAR_BREAK_CHANCE) return;
     e.collar = false;
-    e.health += 40; // refund the core hitscan damage applied right after this hook
+    e.health += SHOT_DAMAGE; // refund the core hitscan damage applied right after this hook
     e.data.collarBroken = true;
     e.alerted = true;
-    w.events.push({ type: 'hit', id: e.id, amount: 0 });
+    w.events.push({ type: 'collarBreak', id: e.id });
   },
 };
 export default collar;

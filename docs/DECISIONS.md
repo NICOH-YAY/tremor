@@ -1,4 +1,4 @@
-# Decisions — 2026-10-30
+# Decisions â€” 2026-10-30
 
 - Seven tics (0.2 seconds) per action beats per-tic decisions: preserves 35 Hz mechanics while bounding controller overhead. Small turns total 35 degrees; large turns 90 degrees. Movement retains simulation momentum.
 - Macro vocabulary beats continuous input: reproducible, finite decisions. ACTION_IDS in src/player_interface.ts is authoritative: turn_left_small, turn_left_large, turn_right_small, turn_right_large, forward, back, strafe_left, strafe_right, fire, read, stun, purge, use, wait.
@@ -12,3 +12,8 @@
 - Runner owns state and limits. Failed decisions count as calls; three invalid decisions cause a labelled fallback wait. Timeout ends the episode explicitly. Fallbacks never count as model moves. Replay is labelled mocked and never substitutes for live trials.
 - Regional Vertex fallback is limited to global location/model availability errors: the failed call is counted and the next budgeted call uses us-central1. SDK automatic retries are disabled so requests cannot bypass call accounting. Cost stays null until prices are verified on the run date.
 
+
+- Observed integration regression: merged mechanics damage left health at -2 and failed the agent invariant. Preserve [0,100] in terminal states rather than weakening the invariant: hurtPlayer saturates damage at zero and ignores further damage, tick clamps defensively, and dead players cannot consume medkits. tests/integration.test.ts names the genuine test "regression: player health can go negative after merge of mechanics damage": 3 damage against 1 health must produce zero and terminal death. The original agent invariant remains unchanged.
+- Baseline integration exposed reading beyond ten tiles, an aim cone wider than hit circles, blocked strafes and routes toward keyed doors before obtaining a key. Nearby engagement, perpendicular alignment, bounded attempts, blocked-strafe recovery and key-first exploration beat altering maps for a stalled controller. Both baselines finish all seven cases at seeds 17/83. This heuristic is suite-specific: it avoids optional plain doors until a key is acquired.
+- Core prunes dead fireballs after eight linger tics independently of future shots. The worker's 80-tic corpse assertion now requires removal. Player shots and read targeting skip projectiles, so projectiles cannot inflate demon kills.
+- Story transitions reset inventory but carry trauma through the story; retry restores the level entry tremor. Intermissions show authored prose without a separate score panel. Node CPU timing measures software raster plus simulation with fallback textures; it excludes browser canvas upload/DOM/audio and is not a measured browser frame guarantee.

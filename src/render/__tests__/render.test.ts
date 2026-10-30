@@ -57,6 +57,6 @@ describe('renderer core', () => {
     for (let i = 0; i < 100; i++) { w.tic = i; renderToBuffer(b, W, H, w, { pos: w.player.pos, angle: i * 0.06 }, { ...view, bob: i * 0.1 }, tex); }
     const per = (performance.now() - t0) / 100;
     console.log(`render ms/frame: ${per.toFixed(2)}`);
-    expect(per).toBeLessThan(16);
+    expect(per).toBeLessThan(6);
   });
 });

@@ -110,6 +110,7 @@ export function runMonster(w: World, e: Entity, rng: RNG, cfg: MonsterCfg): void
     if (e.alerted || sees(w, e, tgt)) {
       e.alerted = true;
       e.state = 'chase';
+      w.events.push({type:'alert',id:e.id});
       e.data.react = Math.max(num(e, 'react'), C.REACTION_TICS);
     } else {
       return;

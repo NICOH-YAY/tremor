@@ -1,0 +1,35 @@
+{
+  "size": "480x270",
+  "framesPerLevel": 240,
+  "scope": "Node software raster + 35Hz tick at 60fps; excludes browser canvas upload, DOM and audio; fallback textures",
+  "results": [
+    {
+      "level": "hangar",
+      "ms": 0.9527879166666665
+    },
+    {
+      "level": "quarantine",
+      "ms": 0.9975979166666671
+    },
+    {
+      "level": "s1_corridor",
+      "ms": 0.7622391666666668
+    },
+    {
+      "level": "s2_collar",
+      "ms": 0.7249466666666667
+    },
+    {
+      "level": "s3_triage",
+      "ms": 0.7017633333333332
+    },
+    {
+      "level": "h1_dark",
+      "ms": 0.6650899999999997
+    },
+    {
+      "level": "h2_door",
+      "ms": 0.6798591666666662
+    }
+  ]
+}

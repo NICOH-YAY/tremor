@@ -86,6 +86,8 @@ function entitySprite(e: Entity, t: Textures): { tex: Tex; worldH: number } | nu
   }
 }
 function pickupTex(e: Entity, t: Textures): Tex {
+  if(e.data.item==='ammo')return t.ammo;
+  if(e.data.item==='purge')return t.purge;
   let s = '';
   for (const k of ['name', 'type', 'item', 'pickup', 'color', 'kind']) { const v = e.data[k]; if (typeof v === 'string') s += ' ' + v; }
   s = s.toLowerCase();
@@ -236,7 +238,7 @@ export function renderToBuffer(buf: Uint32Array, w: number, h: number, world: Wo
       const pp = prevPos.get(e.id);
       if (pp && Math.abs(pp.x - ex) < 2 && Math.abs(pp.y - ey) < 2) { ex = pp.x + (ex - pp.x) * alpha; ey = pp.y + (ey - pp.y) * alpha; }
     }
-    if (e.kind === 'fireball') { if (e.health > 0 && e.state !== 'dead') addItem(tex.fireball, ex, ey, 0.3, 0.35, 1, 3, false); continue; }
+    if (e.kind === 'fireball') { if (e.health > 0 && e.state !== 'dead') addItem(tex.fireball, ex, ey, 0.3, 0.35, 1, 3, false); else if(tic-Number(e.data.diedAt??-100)<9)addItem(tex.fireball,ex,ey,.45,.2,1.4,3,false); continue; }
     if (e.kind === 'pickup') { if (e.health > 0) addItem(pickupTex(e, tex), ex, ey, 0.32, 0, 1, 4, false); continue; }
     const sp = entitySprite(e, tex);
     if (!sp) continue;
@@ -252,6 +254,7 @@ export function renderToBuffer(buf: Uint32Array, w: number, h: number, world: Wo
     const k = map.keys[i];
     if (!k.collected) addItem(k.color === 'blue' ? tex.keyBlue : tex.keyRed, k.pos.x, k.pos.y, 0.32, 0.12 + Math.sin(tic * 0.12 + i) * 0.03, 1, 4, false);
   }
+  addItem(tex.exit,map.exit.x,map.exit.y,.22,0,1,4,false);
   for (let i = 0; i < n; i++) { // insertion sort far -> near
     const it = pool[i]; let j = i - 1;
     while (j >= 0 && order[j].depth < it.depth) { order[j + 1] = order[j]; j--; }
@@ -303,7 +306,7 @@ export function renderToBuffer(buf: Uint32Array, w: number, h: number, world: Wo
   const wt = tex.weapon;
   const dh = h * 0.62, dw = dh * wt.w / wt.h;
   const recoil = Math.max(0, view.recoil);
-  const wx0 = w - dw * 0.93 + view.weaponSway * 14 + Math.sin(bobPh) * 5 * spd - recoil * 6;
+  const wx0 = w - dw * 1.04 + view.weaponSway * 14 + Math.sin(bobPh) * 5 * spd - recoil * 6;
   const wy0 = h - dh * 0.97 + Math.abs(Math.cos(bobPh)) * 4 * spd + recoil * 14;
   {
     const lw = baseLight(Math.floor(px), Math.floor(py));

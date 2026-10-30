@@ -51,6 +51,7 @@ const mercy: RuleHook = {
       if (e.data.stunRequested !== true || !alive(e) || e.kind !== 'possessed' || e.state === 'stunned') continue;
       if (p.weaponCooldown > 0 || dist(e.pos, p.pos) > MERCY.STUN_RANGE) continue;
       startStun(w, e);
+      w.events.push({type:'stun',id:e.id});
     }
     // 2. purge: only one at a time; charge is spent when it starts
     if (!purging(w)) {
