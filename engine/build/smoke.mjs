@@ -1,7 +1,7 @@
 import createDoom from '../../public/engine/doom.js';
 import {readFileSync,writeFileSync} from 'node:fs';
 const frames=[];let nonzero=false;const start=performance.now();
-const module=await createDoom({onFrame(bytes){frames.push(performance.now());if(bytes.some(x=>x!==0))nonzero=true;},print:()=>{},printErr:console.error});
+const module=await createDoom({onFrame(ptr){frames.push(performance.now());if(module.HEAPU8.subarray(ptr,ptr+320*200*4).some(x=>x!==0))nonzero=true;},print:()=>{},printErr:console.error});
 module.FS.writeFile('/game.wad',readFileSync('public/wad/freedoom1.wad'));
 module.FS.writeFile('/tremor.wad',readFileSync('public/wad/tremor.wad'));
 module.callMain(['-iwad','/game.wad','-file','/tremor.wad','-nomusic','-warp','1','1']);

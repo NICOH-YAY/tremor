@@ -24,9 +24,3 @@ static int start(sfxinfo_t *s,int c,int v,int sep) {
 static boolean active(int c) { return playing(c); }
 static snddevice_t devices[]={SNDDEVICE_SB};
 sound_module_t DG_sound_module={devices,1,init,noop,lump,noop,update,start,stop,active,NULL};
-// Music deliberately disabled until a licensed MUS synth is integrated.
-static boolean musicinit(void){return false;}
-static void volume(int v){} static void *song(void*d,int n){return NULL;}
-static void unregister(void*h){} static void playsong(void*h,boolean loop){}
-static boolean musicactive(void){return false;}
-music_module_t DG_music_module={devices,1,musicinit,noop,volume,noop,noop,song,unregister,playsong,noop,musicactive,NULL};

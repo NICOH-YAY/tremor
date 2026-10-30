@@ -759,6 +759,12 @@ void TryRunTics (void)
         }
     }
 
+#ifdef __EMSCRIPTEN__
+    /* TREMOR: rAF presents independently; do not sleep waiting for a 35 Hz tic.
+       NetUpdate above remains the authoritative clock/input scheduler. */
+    if (counts < 1 && new_sync && !net_client_connected)
+        return;
+#endif
     if (counts < 1)
 	counts = 1;
 

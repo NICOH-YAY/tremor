@@ -58,3 +58,20 @@ All gameplay randomness uses P_Random. Render sway, flicker and synthesized audi
 Gore 0 suppresses new blood particles/added decorations; 1 retains vanilla blood/deaths; 2 adds 8-16 particles, persistent IWAD floor gore and 75% close-shotgun gib selection. Original corpses and mandatory brutal melee XDeath remain in all modes. Decorations persist until level unload. Near kills cause red flash without dealing damage.
 
 Not verified here: browser pointer lock, audible mix, proprietary IWAD playthrough, full episode completion. UI tools reported no available browser. The inherited music backend is still silent; the volume export calls its API but cannot make that backend synthesize music.
+
+## Browser settings, OPL music, IDBFS and blit update
+
+This update supersedes the earlier silent-music/MEMFS-only boundaries above.
+
+* `public/settings-store.js` and `settings-ui.js`: validated versioned localStorage profile, settings dialog, keyboard/mouse capture, conflict indicators, reset, video/audio/input options; gear/F10 and pause integration.
+* `public/engine-page.js`, `index.html`: UI integration, live fine-grained mouse scaling/smoothing, engine translation table, master routing and selectable gun layering, integer/fit scaling, FPS, reusable framebuffer heap view; IDBFS hydration before startup and serialized save flush; gesture-unlocked ScriptProcessor FM PCM pull. Native title/demo startup replaces forced E1M1 and `-nomusic`.
+* `engine/platform/doomgeneric_web.c`: physical-input translation/reference counts, settings-time exclusion from 35 Hz clock, pause before callback, pointer-based framebuffer ABI, menu-state query.
+* `engine/platform/music_web.c`: original bounded MUS/SMF scheduling and GENMIDI bank/voice programming, title/level/loop/pause/volume integration via DG_music_module; KEEPALIVE PCM/rate/status exports.
+* `engine/platform/sound_web.c`: remove the silent music stub; SFX bridge retained.
+* `engine/vendor/nuked-opl3`: unmodified LGPL-2.1-or-later FM emulator, pinned revision/license in UPSTREAM.md.
+* `engine/tremor/tremor.c/.h`: screen-shake export, original settings-ready and completed-save JS hooks.
+* Upstream `d_main.c`: marked settings-ready call after config/audio initialization, before D_DoomLoop. `g_game.c`: marked flush hook after successful save rename.
+* `engine/build/build.py`: compile OPL, link/export IDBFS and heap views, include browser glue in corresponding-source archive. Production JS/WASM/source rebuilt.
+* Tests: settings store and callable production ABI; updated framebuffer smoke; MIDI/MUS production PCM smoke and song-transition checks. See BUILD.md for commands, verification boundaries and remaining MIDI-controller/ScriptProcessor limitations.
+
+The browser build also marks `d_loop.c` with a single-player Emscripten-only early return when no simulation tic is due. It avoids Asyncify sleep/poll cycles inside TryRunTics, permitting rAF-rate presentation of the current state while NetUpdate retains the 35 Hz simulation clock. Other builds/network scheduling are unchanged. Blit swizzles packed 32-bit pixels into a reusable ImageData buffer. This does not add interpolated actor movement.

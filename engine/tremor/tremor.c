@@ -14,6 +14,7 @@
 int tr_keys[3]={'r','f','q'};
 int tr_trauma,tr_rounds,tr_charges,tr_saved,tr_gore=2;
 static mobj_t *read_target,*purge_target;
+static int screen_shake=1;
 static int read_tics,purge_tics,stun_cooldown,kick,damaged;
 extern int mouseSensitivity;
 void P_SetPsprite(player_t *, int, statenum_t);
@@ -108,7 +109,7 @@ int TR_CheckAmmo(player_t *p) {
 }
 void TR_SpendRound(player_t *p) { if(tr_rounds>0) --tr_rounds; syncammo(p); TR_Shot(p); }
 angle_t TR_Aim(void) { return tr_trauma?(angle_t)((P_Random()-P_Random())*tr_trauma*TR_AIM_UNIT):0; }
-fixed_t TR_Sway(void) { return FixedMul(tr_trauma*FRACUNIT/3,finesine[(leveltime*311)&FINEMASK])+kick*FRACUNIT/3; }
+fixed_t TR_Sway(void) { return screen_shake?(FixedMul(tr_trauma*FRACUNIT/3,finesine[(leveltime*311)&FINEMASK])+kick*FRACUNIT/3):0; }
 void TR_Impact(void) { kick=TR_IMPACT_TICS; }
 void TR_Shot(player_t *p) { kick=TR_SHOT_KICK_TICS; p->extralight=2; }
 int TR_Gib(mobj_t *s,mobj_t *t) {
@@ -185,3 +186,9 @@ void TR_Noise(mobj_t *source) {
   if(m->tr_crew && m->health>0 && P_AproxDistance(m->x-source->x,m->y-source->y)<TR_GUN_FEAR_RANGE && P_CheckSight(source,m)) m->tr_cower=TR_COWER_TICS;
  }
 }
+
+EMSCRIPTEN_KEEPALIVE void tremor_set_screen_shake(int v) { screen_shake=!!v; }
+
+EM_JS(void, TR_FlushSaves, (), { Module.flushSaves?.(); });
+
+EM_JS(void, TR_SettingsReady, (), { Module.onSettingsReady?.(); });

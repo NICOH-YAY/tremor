@@ -1680,6 +1680,7 @@ void G_DoSaveGame (void)
 
     remove(savegame_file);
     rename(temp_savegame_file, savegame_file);
+    TR_FlushSaves(); /* TREMOR: persist completed save atomically after rename. */
     
     gameaction = ga_nothing;
     M_StringCopy(savedescription, "", sizeof(savedescription));

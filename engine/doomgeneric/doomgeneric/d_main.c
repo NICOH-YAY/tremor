@@ -1,3 +1,4 @@
+#include "tremor.h" /* TREMOR settings startup hook. */
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
@@ -1840,6 +1841,7 @@ void D_DoomMain (void)
 			D_StartTitle ();                // start up intro loop
     }
 
+    TR_SettingsReady(); /* TREMOR: override loaded config with browser settings. */
     D_DoomLoop ();
 }
 

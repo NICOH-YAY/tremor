@@ -56,3 +56,7 @@ void tremor_set_volumes(int sfx,int music);
 void tremor_bind_key(int action,int doomkey);
 void TR_MergeCrewSprites(unsigned int first);
 #endif
+
+void TR_FlushSaves(void);
+
+void TR_SettingsReady(void);
