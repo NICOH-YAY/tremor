@@ -9,3 +9,6 @@ import mercy from './rules/mercy';
 import noise from './rules/noise';
 export const brains:Partial<Record<EntityKind,EnemyBrain>>={possessed,ember,hound};
 export const rules:RuleHook[]=[recognition,trauma,temptation,mercy,noise];
+import crew from './enemies/crew'; brains.crew = crew;
+import fireball from './enemies/fireball'; brains.fireball = fireball;
+import collar from './rules/collar'; rules.push(collar);
