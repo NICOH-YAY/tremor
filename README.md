@@ -1,3 +1,11 @@
+# Tremor browser engine bring-up
+
+The default page now runs the GPL Doom engine via doomgeneric, with freely redistributable Freedoom Phase 1 data. Select **Play (Freedoom)** or **Load your DOOM WAD** (local only). No proprietary id game data is shipped. Music is currently silent; DMX sound effects use Web Audio. No Tremor moral modifications have been applied to the engine yet.
+
+See [engine/BUILD.md](engine/BUILD.md) for build/deploy instructions, verification limits and TODOs; [engine/UPSTREAM.md](engine/UPSTREAM.md) and [engine/PATCHES.md](engine/PATCHES.md) for provenance and the isolated platform override. Source and license must accompany GPL binary distribution. The earlier design below describes the retained TypeScript evaluation sim, not the new default player.
+
+---
+
 # TREMOR
 
 **The gun works perfectly. The person holding it doesn't.** Tremor is an original browser shooter built around Doom's aim, shoot, survive loop. Unknown figures can be read before firing, infected crew can be stunned and purged, and shooting crew leaves permanent aim drift. Violence restores health; mercy costs time. There is no morality meter or judgement screen.
