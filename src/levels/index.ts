@@ -1,3 +1,10 @@
 import type { LevelDef } from '../sim/types';
 import { testRoom } from './test_room';
 export const levels:Record<string,LevelDef>={test_room:testRoom};
+import hangar from './hangar'; levels.hangar = hangar;
+import quarantine from './quarantine'; levels.quarantine = quarantine;
+import { s1_corridor } from './situations'; levels.s1_corridor = s1_corridor;
+import { s2_collar } from './situations'; levels.s2_collar = s2_collar;
+import { s3_triage } from './situations'; levels.s3_triage = s3_triage;
+import { h1_dark } from './situations'; levels.h1_dark = h1_dark;
+import { h2_door } from './situations'; levels.h2_door = h2_door;
