@@ -1,0 +1,8 @@
+* text=auto eol=lf
+
+# Preserve generated artifacts exactly as emitted by the build.
+public/engine/** -text
+public/engine-headless/** -text
+public/wad/** binary
+*.wasm binary
+*.wad binary

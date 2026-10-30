@@ -20,4 +20,4 @@ Path('public/engine-headless/LICENSE.txt').write_bytes(Path('engine/doomgeneric/
 import hashlib,json
 paths=['public/engine-headless/doom.cjs','public/engine-headless/doom.wasm','public/engine-headless/doom-test.cjs','public/engine-headless/doom-test.wasm','public/wad/freedoom1.wad','public/wad/tremor.wad']
 manifest={'target':'doomgeneric-tremor-node-v2','step_tics':7,'sha256':{name:hashlib.sha256(Path(name).read_bytes()).hexdigest() for name in paths if Path(name).exists()}}
-Path('public/engine-headless/artifacts.json').write_text(json.dumps(manifest,indent=2)+'\n')
+Path('public/engine-headless/artifacts.json').write_bytes((json.dumps(manifest,indent=2)+'\n').encode('utf-8'))
