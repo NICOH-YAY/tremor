@@ -5,7 +5,7 @@ os.chdir(root)
 src=root/'engine/doomgeneric/doomgeneric'
 objects=re.search(r'SRC_DOOM = (.*)',(src/'Makefile').read_text()).group(1).split()
 files=[str(src/x.replace('.o','.c')) for x in objects if x not in ['i_sound.o','doomgeneric_xlib.o']]
-files += [str(x) for x in (root/'engine/platform').glob('*.c')]
+files += [str(x) for x in (root/'engine/platform').glob('*.c') if x.name!='doomgeneric_headless.c']
 files += [str(root/'engine/tremor/tremor.c'),str(root/'engine/vendor/nuked-opl3/opl3.c')]
 import sys
 testing='--test' in sys.argv
@@ -23,5 +23,5 @@ with zipfile.ZipFile('public/engine/source.zip','w',zipfile.ZIP_DEFLATED) as arc
         if path.is_file() and path.suffix not in ['.json', '.log'] and not path.name.startswith('test-engine.'):
             archive.write(path,path.as_posix())
 
-    for name in ['scripts/build-tremor-wad.py','public/art/crew.png','public/engine-page.js','public/settings-store.js','public/settings-ui.js','index.html','package.json','vite.config.ts']:
+    for name in ['scripts/build-tremor-wad.py','public/art/crew.png','public/engine-page.js','public/startup.js','public/settings-store.js','public/settings-ui.js','index.html','package.json','vite.config.ts']:
         archive.write(name,name)

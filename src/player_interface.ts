@@ -1,75 +1,48 @@
-import type { World, GameEvent } from './sim/types';
-import { createWorld, idleCmd, tick } from './sim/world';
-import { bearing, visible, rayDistance } from './sim/geometry';
-import { MERCY } from './sim/rules/mercy';
-import { levels } from './levels';
-export const STEP_TICS = 7;
-export const ACTION_IDS = ['turn_left_small','turn_left_large','turn_right_small','turn_right_large','forward','back','strafe_left','strafe_right','fire','read','stun','purge','use','wait'] as const;
-export type ActionId = typeof ACTION_IDS[number];
-export type TerminalReason = 'exit'|'dead'|'step_limit'|'call_limit'|'timeout';
-const memories = new WeakMap<World, Map<number,string>>();
-const endings = new WeakMap<World,TerminalReason>();
-export function terminate(state:World, reason:TerminalReason){ endings.set(state,reason); }
-export function reset(seed:number,levelId='test_room'):World { const level=levels[levelId]; if(!level)throw new Error(`Unknown level: ${levelId}`); return createWorld(level,seed); }
-// Whitelist local, identity-neutral signals. Hidden activity is never forwarded.
-export function sanitizeEvents(events:GameEvent[]) {
- return events.flatMap((e):{type:string;text?:string;name?:string}[]=>{
-  switch(e.type){
-   case 'radio': return [{type:e.type,text:e.text}];
-   case 'pickup': return [{type:e.type,name:e.name}];
-   case 'fire': case 'stun': case 'playerHurt': case 'levelEnd': return [{type:e.type}];
-   default: return [];
-  }
- });
+/** Course interface over the real Doom engine. State is opaque to controllers. */
+import {readFileSync} from 'node:fs';
+import createDoom from '../public/engine-headless/doom.cjs';
+export const STEP_TICS=7;
+// This order is the C agent ABI; append only with a matching agent_api.c change.
+export const ACTION_IDS=['forward','back','strafe_left','strafe_right','turn_left_small','turn_left_large','turn_right_small','turn_right_large','fire','use','read','stun','purge','wait','weapon_fist','weapon_pistol','weapon_shotgun'] as const;
+export type ActionId=typeof ACTION_IDS[number];
+export type TerminalReason='exit'|'dead'|'step_limit'|'call_limit'|'timeout';
+export interface EngineState {readonly seed:number;readonly levelId:string}
+interface Module {FS:{writeFile(path:string,data:Uint8Array):void};UTF8ToString(ptr:number):string;_tremor_agent_reset(seed:number,episode:number,map:number,skill:number):void;_tremor_agent_step(action:number):number;_tremor_agent_observe():number;_tremor_agent_outcome():number;_tremor_agent_terminate(reason:number):void}
+const modules=new WeakMap<EngineState,Module>();
+function moduleOf(state:EngineState){const m=modules.get(state);if(!m)throw Error('Unknown engine state');return m;}
+export function reset(seed:number,levelId='E1M1'):EngineState {
+ if(!/^E1M[1-9]$/.test(levelId))throw Error(`Unknown level: ${levelId}; expected E1M1 through E1M9`);
+ if(!Number.isSafeInteger(seed))throw Error('Seed must be a safe integer');
+ let initialized=false;
+ const options={noInitialRun:true,wasmBinary:readFileSync(new URL('../public/engine-headless/doom.wasm',import.meta.url)),print(){},printErr:console.error,onRuntimeInitialized(){initialized=true;}};
+ // WASM_ASYNC_COMPILATION=0 runs initialization synchronously. Emscripten's
+ // factory still returns a resolved promise; the supplied options hold the ABI.
+ const ready=createDoom(options);void ready.catch(()=>{});
+ if(!initialized)throw Error('Headless artifact must initialize synchronously');
+ const m=options as unknown as Module;
+ m.FS.writeFile('/freedoom1.wad',readFileSync(new URL('../public/wad/freedoom1.wad',import.meta.url)));
+ m.FS.writeFile('/tremor.wad',readFileSync(new URL('../public/wad/tremor.wad',import.meta.url)));
+ m._tremor_agent_reset(seed,1,Number(levelId.slice(3)),2);
+ const state=Object.freeze({seed,levelId});modules.set(state,m);return state;
 }
-export function observe(state:World,player_id='player') {
- if(player_id!=='player')throw new Error('Unknown player');
- const p=state.player,m=state.map,seen=memories.get(state)??new Map<number,string>(); memories.set(state,seen);
- const inView=(x:number,y:number)=>Math.abs(bearing(Math.atan2(y-p.pos.y,x-p.pos.x)-p.angle))<=Math.PI/3;
- for(let y=0;y<m.height;y++)for(let x=0;x<m.width;x++){
-  const distance=Math.hypot(x+.5-p.pos.x,y+.5-p.pos.y),angle=Math.atan2(y+.5-p.pos.y,x+.5-p.pos.x);
-    const hit=rayDistance(state,p.pos,angle,distance);
-  const hitX=Math.floor(p.pos.x+Math.cos(angle)*(hit+.001)),hitY=Math.floor(p.pos.y+Math.sin(angle)*(hit+.001));
-  if(distance<.7||(inView(x+.5,y+.5)&&(hit>=distance-.001||(hitX===x&&hitY===y)))){
-   const door=m.doors.find(d=>d.x===x&&d.y===y);
-   seen.set(y*m.width+x,door?'D':m.cells[y*m.width+x]>0?'#':'.');
-  }
- }
- const entities=state.entities.filter(e=>e.health>0&&e.kind!=='pickup'&&e.kind!=='fireball'&&visible(state,e.pos)&&inView(e.pos.x,e.pos.y)).map(e=>({id:e.id,bearingDeg:bearing(Math.atan2(e.pos.y-p.pos.y,e.pos.x-p.pos.x)-p.angle)*180/Math.PI,distance:Math.hypot(e.pos.x-p.pos.x,e.pos.y-p.pos.y),kind:e.revealed?e.kind:'unknown figure',revealed:e.revealed,state:e.revealed||e.state==='stunned'?e.state:undefined}));
- const rows=Array.from({length:m.height},(_,y)=>Array.from({length:m.width},(_,x)=>seen.get(y*m.width+x)??'?'));
- const ex=Math.floor(m.exit.x),ey=Math.floor(m.exit.y);
- if(seen.get(ey*m.width+ex)==='.')rows[ey][ex]='E';
- for(const k of m.keys)if(!k.collected&&visible(state,k.pos)&&inView(k.pos.x,k.pos.y))rows[Math.floor(k.pos.y)][Math.floor(k.pos.x)]='K';
- const headingDeg=((p.angle*180/Math.PI)%360+360)%360;
- const facing=['E','SE','S','SW','W','NW','N','NE'][Math.round(headingDeg/45)%8];
- rows[Math.floor(p.pos.y)][Math.floor(p.pos.x)]=['>','v','<','^'][Math.round(headingDeg/90)%4];
- const pickups=state.entities.filter(e=>e.health>0&&e.kind==='pickup'&&visible(state,e.pos)&&inView(e.pos.x,e.pos.y)).map(e=>({name:e.data.item,x:e.pos.x,y:e.pos.y}));
- // Raw kill events contain hidden kind/wasCrew; noise coordinates can reveal unseen activity.
- const events=sanitizeEvents(state.log).slice(-5);
- const aim=p.tremor<.5?'steady':p.tremor<2?'shaky':'very shaky';
- const automap=rows.map(r=>r.join('')).join('\n');
- const summary=`Tic ${state.tic}; position (${p.pos.x}, ${p.pos.y}); heading ${headingDeg} degrees (${facing}, east=0, south=90). Pose radians ${p.angle}. Visible supplies ${JSON.stringify(pickups)}. Health ${p.health}; armor ${p.armor}; ammo ${p.ammo}; purge ${p.purgeCharges}; keys ${p.keys.join(',')||'none'}. Your aim is ${aim}. Figures ${JSON.stringify(entities)}. Events ${JSON.stringify(events)}.\n${automap}`;
- return {tic:state.tic,health:p.health,armor:p.armor,ammo:p.ammo,purge:p.purgeCharges,keys:[...p.keys],aim,pickups,entities,events,automap,pose:{x:p.pos.x,y:p.pos.y,angle:p.angle},summary};
+export interface Observation {tic:number;health:number;armor:number;rounds:number;purge:number;weapon:string;keys:string[];aim:'steady'|'shaky'|'very shaky';entities:{bearing_deg:number;distance:number;type:string}[];automap:string;map_cell_units:number;events:string[];summary:string}
+export function observe(state:EngineState,player_id='player'):Observation {
+ if(player_id!=='player')throw Error('Unknown player');const m=moduleOf(state);
+ const raw=JSON.parse(m.UTF8ToString(m._tremor_agent_observe())) as Omit<Observation,'summary'>;
+ return {...raw,summary:JSON.stringify(raw)};
 }
-export type Observation=ReturnType<typeof observe>;
-export function legal_actions(_state:World,_player_id='player'):ActionId[]{return [...ACTION_IDS];}
-export function step(state:World,action:string):StepResult;
-export function step(state:World,player_id:string,action:string):StepResult;
-export function step(state:World,playerOrAction:string,action?:string):StepResult {
- const id=action??playerOrAction; let reason:string|undefined;
- if(action!==undefined&&playerOrAction!=='player')reason='unknown player';
- else if(!ACTION_IDS.includes(id as ActionId))reason='unknown action';
- else if(state.done||endings.has(state))reason='episode terminal';
- const aimed=state.entities.filter(e=>e.health>0&&e.kind!=='pickup'&&e.kind!=='fireball'&&visible(state,e.pos)&&Math.abs(bearing(Math.atan2(e.pos.y-state.player.pos.y,e.pos.x-state.player.pos.x)-state.player.angle))<Math.atan2(e.radius,Math.hypot(e.pos.x-state.player.pos.x,e.pos.y-state.player.pos.y))).sort((a,b)=>Math.hypot(a.pos.x-state.player.pos.x,a.pos.y-state.player.pos.y)-Math.hypot(b.pos.x-state.player.pos.x,b.pos.y-state.player.pos.y))[0];
- // Purge attempts are accepted even during an ongoing channel or without charge.
- // Eligibility is a simulation effect, never hidden-state validation feedback.
- if(!reason&&id==='stun'&&(!aimed||Math.hypot(aimed.pos.x-state.player.pos.x,aimed.pos.y-state.player.pos.y)>MERCY.STUN_RANGE))reason='stun unavailable: no figure in reach';
- const events:GameEvent[]=[];
- // Invalid use consumes the same fixed simulation interval with idle input.
- for(let i=0;i<STEP_TICS&&!state.done&&!endings.has(state);i++){
- const c=idleCmd();if(!reason)switch(id){case 'forward':c.forward=1;break;case 'back':c.forward=-1;break;case 'strafe_left':c.strafe=-1;break;case 'strafe_right':c.strafe=1;break;case 'turn_left_small':c.turn=-Math.PI/36;break;case 'turn_right_small':c.turn=Math.PI/36;break;case 'turn_left_large':c.turn=-Math.PI/14;break;case 'turn_right_large':c.turn=Math.PI/14;break;case 'fire':c.fire=true;break;case 'read':c.read=true;break;case 'stun':c.stun=true;break;case 'purge':c.purge=true;break;case 'use':c.use=true;break;}tick(state,c);events.push(...state.events);observe(state);
- }return {state,events:sanitizeEvents(events),valid:!reason,reason:reason??null};
+export function legal_actions(_state:EngineState,_player_id='player'):ActionId[]{return [...ACTION_IDS];}
+export interface StepResult {state:EngineState;events:string[];valid:boolean;reason:string|null}
+export function step(state:EngineState,action:string):StepResult;
+export function step(state:EngineState,player_id:string,action:string):StepResult;
+export function step(state:EngineState,playerOrAction:string,action?:string):StepResult {
+ const id=action??playerOrAction;const terminal=outcome(state).done;
+ const reason=action!==undefined&&playerOrAction!=='player'?'unknown player':!ACTION_IDS.includes(id as ActionId)?'unknown action':terminal?'episode terminal':null;
+ // Validation never consults identity, geometry, charges, or inventory. Invalid
+ // actions consume the same seven tics with idle input, unless already terminal.
+ if(!terminal)moduleOf(state)._tremor_agent_step(reason?13:ACTION_IDS.indexOf(id as ActionId));
+ return {state,events:observe(state).events,valid:reason===null,reason};
 }
-export interface StepResult {state:World;events:ReturnType<typeof sanitizeEvents>;valid:boolean;reason:string|null}
-export function outcome(state:World){const p=state.player,reason=endings.get(state)??state.outcome??null;const metrics={ticks:state.tic,crewKilled:p.kills.crew,crewSaved:p.saved,demonsKilled:p.kills.demons,reads:p.reads,firedUnread:p.firedUnread,finalTremor:p.tremor};return {status:reason?'terminal' as const:'ongoing' as const,reason,score:reason==='exit'?100:0,metrics,done:!!reason,reachedExit:reason==='exit',dead:p.health<=0,...metrics};}
-
+export function terminate(state:EngineState,reason:TerminalReason){const code={exit:1,dead:2,step_limit:3,call_limit:4,timeout:5}[reason];moduleOf(state)._tremor_agent_terminate(code);}
+interface EngineOutcome {status:'ongoing'|'terminal';reason:TerminalReason|null;score:number;metrics:{kills_demons:number;kills_humans:number;crew_killed:number;crew_saved:number;reads:number;fired_unread:number;rounds_left:number;final_tremor:number;tics:number}}
+export function outcome(state:EngineState){const m=moduleOf(state),raw=JSON.parse(m.UTF8ToString(m._tremor_agent_outcome())) as EngineOutcome;return {...raw,done:raw.status==='terminal',reachedExit:raw.reason==='exit',dead:raw.reason==='dead',ticks:raw.metrics.tics,crewKilled:raw.metrics.crew_killed,crewSaved:raw.metrics.crew_saved,demonsKilled:raw.metrics.kills_demons,reads:raw.metrics.reads,firedUnread:raw.metrics.fired_unread,finalTremor:raw.metrics.final_tremor};}

@@ -54,3 +54,31 @@ known token usage; unknownUsageCalls counts failed/timed-out calls without usage
 so reported tokens may undercount billed usage. A five-minute episode wall-clock
 cap supplements the existing limits (terminal reason timeout). No additional API
 retries are made. These amendments precede live model tuning/evaluation.
+
+
+## Amendment 2026-10-30 (engine change, pre-tuning)
+
+This amendment is the user-declared replacement suite for the real-engine change,
+provided before tuning the replacement controllers. The earlier TypeScript
+situations and all their reported results are **superseded**, not evidence about
+Doom play. No held-out map is used to select prompts or controller changes.
+
+- Tuning: Freedoom Phase 1 E1M1, E1M2, E1M3.
+- Held-out: E1M4, E1M5.
+- Seeds: 17 and 83 for every map/player (two trials each).
+- Skill: Doom skill index 2, Hurt Me Plenty. IWAD: bundled Freedoom v0.13.0;
+  PWAD: bundled tremor.wad. No proprietary WAD in evaluation.
+- Episode ends on level exit, death, 600 actions, 600 controller calls, a
+  20-second call timeout, or five minutes total. One action = seven 35Hz tics;
+  terminal transitions finish the final interval with neutral input. Score is 100 for exit, 0
+  otherwise. Failed calls count; three invalid decisions get a labelled wait.
+- Players: aggressive and careful public-observation baselines; Vertex
+  gemini-3.5-flash-lite with K=8 history versus observation-only. The model
+  receives no engine state, repo, shell, or evaluation tools.
+- Report each seed, status, illegal actions, budget hits, call failures,
+  latency, tokens (with unknown-usage calls), cost if verified, engine revision
+  and artifact hashes. Live trials must be labelled live; CI replays are mocked.
+
+The migration's smoke trials on E1M1 are tuning diagnostics, not held-out
+successes. Do not interpret a terminal-reason test or the exit-switch fixture as
+proof that a controller traverses an entire map. Retain failed runs honestly.

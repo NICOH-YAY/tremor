@@ -1,6 +1,29 @@
+# Active real-engine design ? 2026-10-30
+
+The browser and agent use the same doomgeneric/Tremor engine with Freedoom Episode
+1. Recognition introduces uncertainty before violence: crew and possessed share
+an unknown-figure label until 35 aimed tics of READ. Killing any human, including
+possessed, increases persistent aim instability (cap6). Human/demon kills heal
+15/10 health up to100. A fixed enemies+1 ammunition budget prevents indefinite
+firearms; fists remain available with tenfold damage. Crew never attack or damage
+the player and cower in danger. Close STUN freezes humans for70 tics; holding
+PURGE for35 uninterrupted nearby tics saves a stunned possessed human, reveals
+crew and spends one of two charges. Damage interrupts purge. These rules create
+time/resource pressure without a moral score. Exact constants and implementations
+are in `engine/tremor/tremor.h`, `tremor.c`, and the rule/source map.
+
+The evaluated adaptation is seven-tic macros and public-only observations, with
+an opaque authoritative engine owned by the runner. See CONTRACTS and the
+real-engine amendment in DECISIONS for alternatives and observation limits.
+
+## Superseded prototype design
+
+The material below is historical design, not current engine behavior or evidence.
+Its collar/sealing/custom levels and clean-room claims do not apply to the engine.
+
 # Tremor: design brief
 
-The browser entry point now runs the real vendored Doom engine with original Tremor patches. `engine/PATCHES.md` and `engine/tremor/tremor.h` describe the active implementation and constants. The TypeScript prototype below is retained for agent experiments; its custom levels, enemies, collar mechanic and timing adaptations are not used by the browser Doom mod. The loaded IWAD supplies browser maps, enemies, weapons, sounds and episode finales.
+The browser entry point now runs the real vendored Doom engine with original Tremor patches. `engine/PATCHES.md` and `engine/tremor/tremor.h` describe the active implementation and constants. The TypeScript prototype below is retained as superseded historical source; its custom levels, enemies, collar mechanic and timing adaptations are not used by the browser Doom mod. The loaded IWAD supplies browser maps, enemies, weapons, sounds and episode finales.
 
 Creative Director: Nicoh. A reconstruction of **Doom (id Software, 1993)**, rebuilt from scratch in TypeScript as a 2D-canvas raycaster. No id code, art, sound, music or level layouts are shipped. Doom's rules (35 Hz tic rate, hitscan vs projectile enemies, keycards, monster infighting, pain chance, sound propagation) are reconstructed and each one is mapped to the original source in `docs/rule-source-map.md` (linuxdoom-1.10, GPL release; cited, not copied).
 

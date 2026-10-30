@@ -20,7 +20,7 @@ EMSCRIPTEN_KEEPALIVE void web_key(int key,int down) { event_t e={0};e.type=down?
 EMSCRIPTEN_KEEPALIVE void web_mouse(int buttons,int dx) { event_t e={0};e.type=ev_mouse;e.data1=buttons;e.data2=dx;D_PostEvent(&e); }
 EM_JS(int, settings_is_open, (), { return Module.settingsOpen?1:0; });
 static void tick(void) { if(settings_is_open())paused_ms+=settings_wait();doomgeneric_Tick(); }
-int main(int argc,char **argv) { doomgeneric_Create(argc,argv); emscripten_set_main_loop(tick,0,1); return 0; }
+int main(int argc,char **argv) { static int entered; if(entered)return 0;entered=1;doomgeneric_Create(argc,argv); emscripten_set_main_loop(tick,0,1); return 0; }
 
 EMSCRIPTEN_KEEPALIVE void web_read_mouse(int down) { static int heldkey; if(down) heldkey=tr_keys[0]; web_key(heldkey,down); }
 

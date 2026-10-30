@@ -1,5 +1,5 @@
 import { it, expect } from 'vitest';
-import { reset } from '../src/player_interface';
+import { reset } from '../src/legacy_player_interface';
 import { tick, idleCmd } from '../src/sim/world';
 import { renderToBuffer, makeFallbackTextures } from '../src/render/raycaster';
 import { writeFileSync } from 'node:fs';

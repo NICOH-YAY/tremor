@@ -61,5 +61,10 @@ int M_Random (void)
 
 void M_ClearRandom (void)
 {
+    #ifdef TR_HEADLESS
+    extern int tr_agent_seed;
+    rndindex = prndindex = tr_agent_seed & 255;
+#else
     rndindex = prndindex = 0;
+#endif
 }

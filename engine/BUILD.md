@@ -49,3 +49,29 @@ Music is enabled, including the engine title/demo sequence and native per-level 
 Additional ABI exports (KEEPALIVE): `tremor_translate_key(slot,key)`, `tremor_input(slot,down)`, `tremor_menu_active()`, `tremor_set_screen_shake(enabled)`, `tremor_music_rate(hz)`, `tremor_music_render(frames)` (pointer to static interleaved int16 stereo, maximum 4096 frames), `tremor_music_active()`, `tremor_music_song_serial()`. Rendering and music consumers must refresh heap views when memory grows. The framebuffer callback now takes a pointer rather than an allocated byte view.
 
 Checks: `npm test`, `npm run typecheck`, `npm run build`, `npm run engine:test`, `node engine/build/smoke.mjs`, `node engine/build/music-smoke.mjs`, and `node engine/build/music-smoke.mjs --mus`. The music smoke checks nonzero production PCM for title and level and a changed song serial; the MUS variant substitutes an original tiny test tune into the in-memory WAD without modifying bundled assets. Settings tests cover defaults, aliases, rebinds, conflicts, persistence, validation, and blocked storage. Production ABI tests instantiate the distributed module. Browser/Brave audible output, pointer lock, reload/IndexedDB save restoration, and real CPU profiling still require browser verification: this session's UI inventory had no browsers/apps.
+
+
+## Node agent target (2026-10-30)
+
+From the project folder, `npm run engine:headless` builds
+`public/engine-headless/doom.cjs` and `doom.wasm` with emcc; synchronous WASM
+compilation preserves the five synchronous course operations. `npm run
+engine:headless:test` builds the separate `doom-test.cjs`/`doom-test.wasm` fixture
+variant. Both binaries must accompany the repository so `npm test` works on Node
+24 CI without emsdk. Use EMSDK and EMSDK_PYTHON to override the local Windows SDK
+locations. Python commands directly: `python engine/build/headless.py [--test]`.
+No main/canvas/audio loop runs: reset initializes the WAD/mod, step feeds ticcmds
+into G_Ticker seven times, software visibility after each tic updates
+ML_MAPPED; observation only reads it. `-nosound` disables sound/music initialization.
+
+The public ABI is tremor_agent_reset(seed, episode, map, skill),
+tremor_agent_step(integer_action_id), tremor_agent_observe() -> const JSON string,
+tremor_agent_outcome() -> const JSON string, plus evaluator terminate(reason).
+Pointers refer to a reusable C buffer and must be decoded before the next JSON
+call. Read/purge take35 tics; terminal transitions finish the macro with neutral input. The
+production build omits every test helper. Engine/module/WAD artifacts are hashed
+in `public/engine-headless/artifacts.json` after rebuilding.
+
+Rebuild browser output too with `npm run engine:build` so the packaged GPL source
+archive corresponds to both targets' C changes. Earlier TODO/status sections in
+this file describe bring-up history; the README and EVALUATION.md are current.

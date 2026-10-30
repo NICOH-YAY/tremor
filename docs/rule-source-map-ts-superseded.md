@@ -1,0 +1,64 @@
+# Superseded prototype source map
+
+Historical only.
+
+# Implemented rule / source map
+
+Labels: **code** = a rule evidenced by upstream source, **manual** = manual evidence, **observed** = measured regression, **assumed** = unverified premise, **design** = original rule/adaptation. No manual or assumed rows are needed here. A code label identifies the source of the rule, not copied code or exact numerical fidelity. Every numerical/structural difference below is an original adaptation specified in [DESIGN: Integration adaptations](DESIGN.md#integration-adaptations). No id implementation or assets are included.
+
+Doom-derived locators refer to `linuxdoom-1.10` in the [id source repository](https://github.com/id-Software/DOOM/tree/master/linuxdoom-1.10); evidence and confidence caveats are recorded in [research/doom-rules.md](research/doom-rules.md). File/function locators are preferred over unstable line numbers. Our paths below are relative to `src/sim/` unless stated otherwise.
+
+| Implemented rule | Label | Evidence locator | Implementation / adaptation |
+| --- | --- | --- | --- |
+| Fixed 35 Hz tics | code | [Doom research](research/doom-rules.md): `linuxdoom-1.10/doomdef.h / TICRATE` | `world.ts; types.ts`: exact rate; rendering interpolates. |
+| Momentum, running and strafe addition | code | [Doom research](research/doom-rules.md): `linuxdoom-1.10/p_user.c / P_MovePlayer, P_Thrust; g_game.c / G_BuildTiccmd` | `world.ts`: retuned .035 thrust, .78 friction, run default, no diagonal normalization. |
+| Wall sliding and circle collision | code | [Doom research](research/doom-rules.md): `linuxdoom-1.10/p_map.c / P_SlideMove; info.c / MT_PLAYER` | `geometry.ts`: grid substeps, radius .22; no actor blocking. |
+| Friction | code | [Doom research](research/doom-rules.md): `linuxdoom-1.10/p_mobj.c / P_XYMovement` | `world.ts`: .78 retention, not Doom .90625. |
+| Shot occlusion and nearest ray hit | code | [Doom research](research/doom-rules.md): `linuxdoom-1.10/p_map.c / P_LineAttack` | `world.ts / target`: ray/circle intersections before wall. |
+| No reload; consume ammunition | code | [Doom research](research/doom-rules.md): `linuxdoom-1.10/p_pspr.c / P_CheckAmmo, A_FireShotgun` | `world.ts`: single 40-damage ray, eight-tic cooldown are design. |
+| Player damage and armor | code | [Doom research](research/doom-rules.md): `linuxdoom-1.10/p_inter.c / P_DamageMobj` | `enemies/common.ts / hurtPlayer`: armor absorbs one third; health saturates at zero. |
+| Normal health cap | code | [Doom research](research/doom-rules.md): `linuxdoom-1.10/p_inter.c / P_GiveBody` | `world.ts; rules/temptation.ts`: cap 100; no health bonuses. |
+| Keyed doors | code | [Doom research](research/doom-rules.md): `linuxdoom-1.10/p_doors.c / EV_DoLockedDoor, EV_VerticalDoor` | `world.ts`: red/blue; 1.6-tile radial use; no key consumption. |
+| Door movement and monster opening | code | [Doom research](research/doom-rules.md): `linuxdoom-1.10/p_doors.c / T_VerticalDoor, EV_VerticalDoor` | `world.ts; enemies/common.ts / tryOpenDoorAhead`: opening .08 per tic, pass at .85, no auto-close. |
+| Medkits | code | [Doom research](research/doom-rules.md): `linuxdoom-1.10/p_inter.c / P_TouchSpecialThing, P_GiveBody` | `world.ts`: +25 capped at 100; full-health kit remains. |
+| Ammo supplies | code | [Doom research](research/doom-rules.md): `linuxdoom-1.10/p_inter.c / P_GiveAmmo` | `world.ts`: +10, cap 200; no monster drops. |
+| Idle sight / rear blind cone | code | [Doom research](research/doom-rules.md): `linuxdoom-1.10/p_enemy.c / A_Look, P_LookForPlayers` | `enemies/monster.ts`: 180-degree cone and close rear reaction; capped sight range. |
+| Chase and direction choice | code | [Doom research](research/doom-rules.md): `linuxdoom-1.10/p_enemy.c / A_Chase, P_NewChaseDir, P_Move` | `enemies/common.ts / chaseStep`: greedy direction trials, not global pathfinding. |
+| Reaction, windup, recovery | code | [Doom research](research/doom-rules.md): `linuxdoom-1.10/p_enemy.c / A_Chase, P_CheckMissileRange; info.c / S_POSS_ATK1, S_TROO_ATK1, S_SARG_ATK1` | `enemies/monster.ts; enemies/common.ts / C`: original role timings with retuned recovery/reaction. |
+| Possessed hitscan and damage | code | [Doom research](research/doom-rules.md): `linuxdoom-1.10/p_enemy.c / A_PosAttack` | `enemies/possessed.ts`: 3 times d5, triangular angular error. |
+| Ember melee and missile attack | code | [Doom research](research/doom-rules.md): `linuxdoom-1.10/p_enemy.c / A_TroopAttack; p_mobj.c / P_SpawnMissile` | `enemies/ember.ts; enemies/fireball.ts`: 3 times d8, planar projectile. |
+| Hound melee damage | code | [Doom research](research/doom-rules.md): `linuxdoom-1.10/p_enemy.c / A_SargAttack` | `enemies/hound.ts`: 4 times d10 with windup. |
+| Enemy health / movement / pain probabilities | code | [Doom research](research/doom-rules.md): `linuxdoom-1.10/info.c / mobjinfo MT_POSSESSED, MT_TROOP, MT_SERGEANT` | `enemies/common.ts / C; enemies/monster.ts`: role-inspired movement; authored spawn health defaults 40, not Doom health. |
+| Pain interruption | code | [Doom research](research/doom-rules.md): `linuxdoom-1.10/p_inter.c / P_DamageMobj; info.c / S_POSS_PAIN` | `enemies/common.ts; enemies/monster.ts`: 200/256 or hound 180/256; six tics. |
+| Infighting retarget / persistence | code | [Doom research](research/doom-rules.md): `linuxdoom-1.10/p_inter.c / P_DamageMobj; p_local.h / BASETHRESHOLD` | `enemies/common.ts / damageEntity; enemies/monster.ts`: 100-tic target persistence; no player rewards. |
+| Projectile collision and same-species immunity | code | [Doom research](research/doom-rules.md): `linuxdoom-1.10/p_map.c / PIT_CheckThing` | `enemies/fireball.ts`: substepped planar circle tests; owner species immune. |
+| Gunfire sound flood and closed-door blocking | code | [Doom research](research/doom-rules.md): `linuxdoom-1.10/p_enemy.c / P_NoiseAlert, P_RecursiveSound` | `rules/noise.ts`: tile connectivity flood; no Doom sector soundblock lines. |
+| Seeded deterministic simulation separate from cosmetics | code | [Doom research](research/doom-rules.md): `linuxdoom-1.10/m_random.c / P_Random, M_Random` | `rng.ts; main.ts`: original PRNG instead of copying random table. |
+| Weapon bob and muzzle light | code | [Doom research](research/doom-rules.md): `linuxdoom-1.10/p_pspr.c / A_WeaponReady, A_Light1; p_user.c / P_CalcHeight` | `render/core.ts; main.ts`: retuned speed bob and frame-time flash. |
+| Shotgun balance, spread and fireball target exclusion | design | [DESIGN: Integration adaptations](DESIGN.md#integration-adaptations) | `world.ts; types.ts / SHOT_DAMAGE`: 40 damage, eight tics; uniform tremor spread; shots skip fireballs. |
+| Recognition and progress decay | design | [DESIGN: Injected rules](DESIGN.md#injected-rules) | `rules/recognition.ts`: 35 progress; range/light/close bonuses; one reveal event per transition. |
+| Permanent crew-kill trauma | design | [DESIGN: Injected rules](DESIGN.md#injected-rules) | `rules/trauma.ts; main.ts`: +1 capped at 6; drift and spread; no numeric human meter. |
+| Kill healing / temptation | design | [DESIGN: Injected rules](DESIGN.md#injected-rules) | `rules/temptation.ts`: crew 15, demon 10; cap 100. |
+| Stun, purge, charges, interruption and slowdown | design | [DESIGN: Integration adaptations](DESIGN.md#integration-adaptations) | `rules/mercy.ts`: ranges/timers in MERCY; charges spent on start; no refund. |
+| Cured helper warning and seeded relapse | design | [DESIGN: Integration adaptations](DESIGN.md#integration-adaptations) | `rules/mercy.ts`: 50% helper, 15% relapse at 600 tics; no escort. |
+| Collar release and freed-hound targets | design | [DESIGN: Integration adaptations](DESIGN.md#integration-adaptations) | `rules/collar.ts; enemies/hound.ts`: 40% centered-shot break; shared damage refund; collarBreak event. |
+| Ember isolation, retreat and nest | design | [DESIGN: Enemies (original names/art)](DESIGN.md#enemies-original-namesart) | `enemies/ember.ts`: isolation within six tiles; original behavior. |
+| Crew fleeing and cowering | design | [DESIGN: Integration adaptations](DESIGN.md#integration-adaptations) | `enemies/crew.ts`: unarmed, flee visible demons, cower if blocked. |
+| Fireball speed, lifetime and corpse cleanup | design | [DESIGN: Integration adaptations](DESIGN.md#integration-adaptations) | `enemies/fireball.ts; world.ts`: .11 tiles/tic; 200-tic life; eight-tic linger; core prunes. |
+| Supply collection and purge pickups | design | [DESIGN: Integration adaptations](DESIGN.md#integration-adaptations) | `world.ts`: distance .55, consume once; keys .5; no revival from zero. |
+| Sealing and edge-triggered use | design | [DESIGN: Integration adaptations](DESIGN.md#integration-adaptations) | `world.ts`: close and seal; next press unseals/opens. |
+| Red-key closet release | design | [DESIGN: Levels](DESIGN.md#levels) | `world.ts; src/levels/hangar.ts`: red key opens nearby sealed closet, alerts hound. |
+| Ordered radio, proximity triggers and original layouts | design | [DESIGN: Levels](DESIGN.md#levels) | `world.ts; src/levels/*`: exact-tic radio; once-only triggers; B-2 sequence gates. |
+| Proximity exit and per-level reset | design | [DESIGN: Integration adaptations](DESIGN.md#integration-adaptations) | `world.ts; src/main.ts`: within .5 tiles; clone level; inventory resets; story trauma carries. |
+| Title, pause, retry and prose-only intermission | design | [DESIGN: Integration adaptations](DESIGN.md#integration-adaptations) | `src/main.ts; src/levels/* / endText`: two-story flow; situations via URL; no score panel. |
+| Mouse sensitivity, crosshair arc, subtitles and effects | design | [DESIGN: Presentation and controller adaptations](DESIGN.md#presentation-and-controller-adaptations) | `src/main.ts`: local storage, pointer lock and keyboard fallback; smooth drift/decays. |
+| Grid raycasting, fog, per-cell light, sprites and recoil | design | [DESIGN: Feel](DESIGN.md#feel) | `src/render/*`: CPU Canvas 2D at about 480x270; interpolation; original textures. |
+| Spatial event audio and footsteps | design | [DESIGN: Presentation and controller adaptations](DESIGN.md#presentation-and-controller-adaptations) | `src/audio/index.ts; src/main.ts`: procedural voices, source positions, moving-player steps. |
+| Five-operation interface and seven-tic macros | design | [DESIGN: Agent](DESIGN.md#agent) | `src/player_interface.ts`: constant vocabulary; invalid-use feedback; terminal result. |
+| Observation FOV, seen map and identity sanitization | design | [DESIGN: Presentation and controller adaptations](DESIGN.md#presentation-and-controller-adaptations) | `src/player_interface.ts`: 120-degree view, line of sight, qualitative aim; no raw hidden events. |
+| Controller limits, timeout, fallback and memory ablation | design | [DESIGN: Presentation and controller adaptations](DESIGN.md#presentation-and-controller-adaptations) | `src/eval/runner.ts; src/agent/model_player.ts`: 400 steps/calls, 20 seconds, K=8; failed calls counted. |
+| Careful/aggressive baseline policy | design | [DESIGN: Presentation and controller adaptations](DESIGN.md#presentation-and-controller-adaptations) | `src/agent/baselines.ts`: bounded nearby combat and key-first BFS; observed inputs only. |
+| Terminal health clamp | design | [DESIGN: Health invariant](DESIGN.md#health-invariant) | `enemies/common.ts / hurtPlayer; world.ts`: [0,100] including dead states. |
+| Negative player health after mechanics merge | observed | [DECISIONS](DECISIONS.md): observed -2 agent invariant failure | `tests/integration.test.ts`: regression: player health can go negative after merge of mechanics damage; lethal damage must saturate at zero. |
+
+Verification: `tests/sim.test.ts`, `tests/agent.test.ts`, `tests/integration.test.ts`, `src/sim/__tests__/mechanics.test.ts`, level/renderer tests, story/situation baseline completion and CPU-budget tests. Research statements describing absent features (Doom pellet patterns, auto-closing doors, item drops, vertical autoaim, bonus health and intermission statistics) are not implementation claims.

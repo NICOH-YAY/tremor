@@ -29,3 +29,63 @@
 ## Observed regressions
 
 - `tests/agent.test.ts`: "regression: stun/purge feedback leaked hidden identity (found by independent review)" was written and run failing before the fix. It compares step validity, feedback, sanitized events and subsequent observations for identically placed unread crew/Possessed through stun and purge. The all-action paired test also initially failed on Possessed-only alert events. It now runs every ACTION_ID with matched stunned behavior to isolate the interface from legitimate hostile movement. Existing kill-event and negative-health regressions remain.
+
+
+## Real-engine amendment, 2026-10-30
+
+- The browser and evaluated player now share doomgeneric, the Tremor C hooks,
+  Freedoom Phase 1, and tremor.wad. This replaces evaluating the easier custom
+  raycaster while presenting a different game to people. Existing upstream code
+  stays vendored with GPL provenance; new adapter/rule code is original.
+- Freedoom beats distributing id's proprietary levels: freely licensed complete
+  Episode 1 data makes play and CI reproducible. A local IWAD loader lets owners
+  play their own DOOM data without uploading or redistributing it. Doom II and
+  arbitrary PWAD compatibility are outside the evaluated scope.
+- Seven-tic commands preserve real Doom physics and weapon timing while reducing
+  model calls compared with per-tic control. Small/large turns are approximately
+  35/90 degrees over a full action. Movement uses Doom walk forward/strafe values
+  25/24. Read and purge require five continuous actions (35 tics). Weapon selection
+  is explicit: fist, pistol, shotgun. The browser retains its broader controls.
+- Synchronous WASM compilation and an opaque per-episode module preserve the
+  five synchronous course operations, versus introducing async signatures or a
+  second simulation. Node initialization reads bundled artifacts; CI needs no
+  emsdk. A separate fixture build exposes test helpers absent from production.
+- Observations whitelist health, armor, rounds, purge charges, weapon, keys,
+  qualitative steadiness, 90-degree/P_CheckSight-visible entities, seen automap
+  lines and five displayed messages. Unknown humans share one label. No actor
+  IDs, coordinates, hidden allegiance, numeric trauma, or kill metrics enter the
+  observation. A JSON summary contains all fields available to baselines.
+- The map is north-up, 25x25, 64 units/cell, centered on the player's cell. Only
+  ML_MAPPED lines are sampled. Software rendering updates those flags without a
+  canvas or sound. Rendering does not advance tics. Coarsening deliberately
+  sacrifices precise pathfinding; it does not expose full-map geometry or hidden
+  exit tags. Baselines explore unseen boundaries and periodically use nearby
+  walls/switches, including exits, without privileged navigation.
+- Validation is constant across identity, range, inventory and charges. Every
+  known macro is accepted; failed stun/purge effects are not validation errors.
+  Invalid inputs consume idle time. Natural hostile movement and a completed
+  READ/purge can legitimately distinguish humans. Purge success reveals crew;
+  charge use and saving are then observable effects. Before that transition,
+  matched frozen crew/possessed fixtures remain indistinguishable.
+- Baselines keep bounded map-visit memory and use only public fields. Aggressive
+  shoots the nearest aligned figure; careful reads first, approaches/stuns/purges
+  identified possessed when charged, and both switch to fists without rounds.
+  This beats random movement as a reproducible cheap comparison, but initial
+  smoke trials fail to complete E1M1. No success claim carries over from the old
+  custom suite. K=8 versus observation-only remains the model ablation.
+- Doom health pickups may reach 200; tests bound health in [0,200]. Tremor kill
+  healing caps at 100. Trauma is monotonic within an episode, capped at six, and
+  resets only on reset/new game. Seed selects the initial 256-entry P_Random
+  table index before map spawning, rather than a wall-clock seed; only the low
+  eight seed bits select a stream. Seeds 17 and 83 are distinct streams.
+- Browser regression fixes: noInitialRun plus C/JS entry guards prevent duplicate
+  initialization; one intro listener resolves all waiters; pointer lock is
+  requested only on canvas clicks and rejection is caught. Music uses the
+  existing original MUS/MIDI bridge with Nuked OPL3, not Chocolate Doom music code.
+- Real-engine smoke testing exposed missing Doom II decoration sprites in
+  Freedoom Phase 1 after hyper-gore kills, and a revealed-crew range check using
+  the hostile animation frame. Check sprite availability before spawning a gore
+  decoration and validate the actual crew display frame. Both have engine tests.
+
+The decisions and success claims above this amendment describe the superseded
+TypeScript prototype and must not be read as current engine evidence.

@@ -75,3 +75,25 @@ This update supersedes the earlier silent-music/MEMFS-only boundaries above.
 * Tests: settings store and callable production ABI; updated framebuffer smoke; MIDI/MUS production PCM smoke and song-transition checks. See BUILD.md for commands, verification boundaries and remaining MIDI-controller/ScriptProcessor limitations.
 
 The browser build also marks `d_loop.c` with a single-player Emscripten-only early return when no simulation tic is due. It avoids Asyncify sleep/poll cycles inside TryRunTics, permitting rAF-rate presentation of the current state while NetUpdate retains the 35 Hz simulation clock. Other builds/network scheduling are unchanged. Blit swizzles packed 32-bit pixels into a reusable ImageData buffer. This does not add interpolated actor movement.
+
+
+## Agent and browser regression amendment, 2026-10-30
+
+Original additions: `engine/tremor/agent_api.c`,
+`engine/platform/doomgeneric_headless.c`, `engine/build/headless.py`.
+Headless-only changes: `d_main.c / D_DoomLoop` returns without starting real-time
+frames; `m_random.c / M_ClearRandom` uses the chosen initial RNG table index;
+`hu_stuff.c / HU_Ticker` captures displayed messages before Doom consumes them.
+Browser `main` has a one-entry guard; JS uses noInitialRun, shared intro waiters
+and caught pointer-lock promises on canvas clicks only.
+
+`tremor.c` now records evaluator kill/read/unread-shot counters (not observations),
+reveals successful purges, and checks loaded sprite frames before spawning optional
+gore decorations. `r_things.c` validates the actual two-frame crew display index,
+not the original hostile animation frame. This prevents crashes in Freedoom1.
+Separate test-only exports provide matched crew/possessed and exit-switch fixtures.
+No fixture functions are present in the production headless artifact.
+
+Rebuild both Node targets and the browser target after C changes. `npm test` uses
+bundled artifacts and never requires emsdk. Headless details and commands are in
+BUILD.md; course interface details are in docs/CONTRACTS.md.

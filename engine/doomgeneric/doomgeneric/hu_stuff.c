@@ -419,7 +419,11 @@ void HU_Ticker(void)
 	if ((plr->message && !message_nottobefuckedwith)
 	    || (plr->message && message_dontfuckwithme))
 	{
-	    HUlib_addMessageToSText(&w_message, 0, plr->message);
+	    #ifdef TR_HEADLESS
+            extern void TR_AgentMessage(const char *);
+            TR_AgentMessage(plr->message);
+#endif
+            HUlib_addMessageToSText(&w_message, 0, plr->message);
 	    plr->message = 0;
 	    message_on = true;
 	    message_counter = HU_MSGTIMEOUT;

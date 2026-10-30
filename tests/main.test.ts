@@ -2,7 +2,7 @@
 import { it, expect, vi } from 'vitest';
 import type { World } from '../src/sim/types';
 const capture = vi.hoisted(() => ({ world: undefined as World | undefined }));
-vi.mock('../src/player_interface', async (original) => { const m = await original<typeof import('../src/player_interface')>(); return { ...m, reset: (seed: number, id?: string) => capture.world = m.reset(seed, id) }; });
+vi.mock('../src/legacy_player_interface', async (original) => { const m = await original<typeof import('../src/legacy_player_interface')>(); return { ...m, reset: (seed: number, id?: string) => capture.world = m.reset(seed, id) }; });
 vi.mock('../src/render/raycaster', () => ({ Raycaster: class {
         resize() { }
         render() { }

@@ -1,7 +1,7 @@
 import { describe,it,expect } from 'vitest';
 import { createWorld,idleCmd,tick } from '../src/sim/world';
 import { testRoom } from '../src/levels/test_room';
-import * as api from '../src/player_interface';
+import * as api from '../src/legacy_player_interface';
 describe('simulation',()=>{
  it('replays identically with the same seed and commands',()=>{const a=createWorld(testRoom,42),b=createWorld(testRoom,42);for(let i=0;i<120;i++){const c={...idleCmd(),forward:i<20?1:0,turn:0.02,fire:i%9===0};tick(a,c);tick(b,c);}expect(a).toEqual(b);});
  it('moves with momentum and cannot cross walls',()=>{const w=createWorld(testRoom,1);w.entities=[];w.player.angle=Math.PI;for(let i=0;i<100;i++)tick(w,{...idleCmd(),forward:1});expect(w.player.pos.x).toBeGreaterThanOrEqual(1.22);expect(w.player.pos.x).toBeLessThan(2);const velocity=Math.abs(w.player.vel.x);tick(w,idleCmd());expect(Math.abs(w.player.vel.x)).toBeLessThan(velocity);});

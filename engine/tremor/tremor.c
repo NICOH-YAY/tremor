@@ -1,6 +1,7 @@
 /* Original Tremor implementation. GPL-2.0-or-later. */
 #include "tremor.h"
 #include "doomstat.h"
+#include "r_local.h"
 #include "m_random.h"
 #include "m_controls.h"
 #include "s_sound.h"
@@ -11,6 +12,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+int tr_kills_demons,tr_kills_humans,tr_crew_killed,tr_reads,tr_fired_unread;
 int tr_keys[3]={'r','f','q'};
 int tr_trauma,tr_rounds,tr_charges,tr_saved,tr_gore=2;
 static mobj_t *read_target,*purge_target;
@@ -18,12 +20,17 @@ static int screen_shake=1;
 static int read_tics,purge_tics,stun_cooldown,kick,damaged;
 extern int mouseSensitivity;
 void P_SetPsprite(player_t *, int, statenum_t);
+#ifndef TR_HEADLESS
 EM_JS(int, tr_has_intro, (), { return Module.onIntro?1:0; });
 EM_ASYNC_JS(void, tr_intro, (), { if(Module.onIntro) await Module.onIntro(); });
+#else
+static int tr_has_intro(void){return 0;}
+static void tr_intro(void){}
+#endif
 static int clamp(int v,int max) { return v<0?0:v>max?max:v; }
 int TR_Human(mobj_t *m) { return m && (m->type==MT_POSSESSED || m->type==MT_SHOTGUY || m->type==MT_CHAINGUY); }
 static void syncammo(player_t *p) { int i; for(i=0;i<NUMAMMO;i++) p->ammo[i]=tr_rounds; }
-void TR_NewGame(void) { tr_trauma=0; }
+void TR_NewGame(void) { tr_trauma=0; tr_kills_demons=tr_kills_humans=tr_crew_killed=tr_reads=tr_fired_unread=0; }
 void TR_MapSpawn(mobj_t *m) {
  if ((m->type==MT_POSSESSED || m->type==MT_SHOTGUY) && P_Random()<TR_CREW_THRESHOLD) {
   m->tr_crew=1; m->flags &= ~MF_COUNTKILL;
@@ -85,7 +92,7 @@ void TR_PlayerThink(player_t *p) {
  m=crosshair(p,MISSILERANGE);
  if((buttons&TR_READ) && m) {
   if(m!=read_target) { read_target=m; read_tics=0; }
-  if(++read_tics==TR_READ_TICS) { m->tr_revealed=1; p->message=m->tr_crew?"crew":"possessed"; }
+  if(++read_tics==TR_READ_TICS) { if(!m->tr_revealed) ++tr_reads; m->tr_revealed=1; p->message=m->tr_crew?"crew":"possessed"; }
  } else { read_target=NULL; read_tics=0; }
  m=crosshair(p,MELEERANGE);
  if((buttons&TR_STUN) && !stun_cooldown) {
@@ -95,7 +102,7 @@ void TR_PlayerThink(player_t *p) {
  if(!damaged && (buttons&TR_PURGE) && m && m->tr_stun>0 && !m->tr_crew && tr_charges>0) {
   if(purge_target!=m) { purge_target=m; purge_tics=0; }
   if(++purge_tics>=TR_PURGE_TICS) {
-   --tr_charges; ++tr_saved; m->tr_crew=1; m->target=NULL;
+   --tr_charges; ++tr_saved; m->tr_crew=1; m->tr_revealed=1; p->message="crew"; m->target=NULL;
    if(m->flags&MF_COUNTKILL) { m->flags &= ~MF_COUNTKILL; --totalkills; }
    purge_target=NULL; purge_tics=0;
   }
@@ -107,7 +114,7 @@ int TR_CheckAmmo(player_t *p) {
  p->pendingweapon=wp_fist;
  P_SetPsprite(p,ps_weapon,weaponinfo[p->readyweapon].downstate); return 0;
 }
-void TR_SpendRound(player_t *p) { if(tr_rounds>0) --tr_rounds; syncammo(p); TR_Shot(p); }
+void TR_SpendRound(player_t *p) { mobj_t *target=crosshair(p,MISSILERANGE); if(target && !target->tr_revealed) ++tr_fired_unread; if(tr_rounds>0) --tr_rounds; syncammo(p); TR_Shot(p); }
 angle_t TR_Aim(void) { return tr_trauma?(angle_t)((P_Random()-P_Random())*tr_trauma*TR_AIM_UNIT):0; }
 fixed_t TR_Sway(void) { return screen_shake?(FixedMul(tr_trauma*FRACUNIT/3,finesine[(leveltime*311)&FINEMASK])+kick*FRACUNIT/3):0; }
 void TR_Impact(void) { kick=TR_IMPACT_TICS; }
@@ -123,6 +130,7 @@ void TR_Kill(mobj_t *s,mobj_t *t) {
  if(t->player || (!(t->flags&MF_COUNTKILL) && !t->tr_crew && t->type!=MT_SKULL)) return;
  if(s && s->player && s->player->health>0) {
   player_t *p=s->player;
+  if(TR_Human(t)) { ++tr_kills_humans; if(t->tr_crew) ++tr_crew_killed; } else ++tr_kills_demons;
   if(TR_Human(t)) tr_trauma=clamp(tr_trauma+1,TR_MAX_TRAUMA);
   p->health=clamp(p->health+(TR_Human(t)?TR_HUMAN_HEAL:TR_DEMON_HEAL),TR_HEALTH_CAP); s->health=p->health;
   if(P_AproxDistance(t->x-s->x,t->y-s->y)<TR_CLOSE_RANGE) p->damagecount=TR_KILL_FLASH_TICS;
@@ -136,7 +144,10 @@ void TR_Kill(mobj_t *s,mobj_t *t) {
  /* Existing WAD decorations: pools of blood / brains (thing 79/80/81). */
  decoration=79+P_Random()%3;
  for(i=0;i<NUMMOBJTYPES;i++) if(mobjinfo[i].doomednum==decoration) {
-  P_SpawnMobj(t->x,t->y,ONFLOORZ,i); break;
+  /* Episode-1 IWADs need not contain Doom-II decoration sprites. */
+  state_t *state=&states[mobjinfo[i].spawnstate];
+  if(sprites[state->sprite].numframes>(state->frame&FF_FRAMEMASK)) P_SpawnMobj(t->x,t->y,ONFLOORZ,i);
+  break;
  }
 }
 /* A palette-index translation retains sector shading and uses the IWAD palette. */

@@ -424,6 +424,9 @@ void doomgeneric_Tick()
 //
 void D_DoomLoop (void)
 {
+#ifdef TR_HEADLESS
+    return; /* Agent owns the fixed-tic clock; no real-time loop. */
+#endif
     if (bfgedition &&
         (demorecording || (gameaction == ga_playdemo) || netgame))
     {

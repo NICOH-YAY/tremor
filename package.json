@@ -11,11 +11,13 @@
     "build": "vite build --base ./",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
-    "eval": "tsx scripts/eval.ts",
-    "eval:live": "tsx scripts/eval.ts --live",
+    "eval": "node --import ./scripts/typescript-loader.mjs scripts/eval.ts",
+    "eval:live": "node --import ./scripts/typescript-loader.mjs scripts/eval.ts --live",
     "engine:test": "node engine/build/test.mjs",
     "engine:wad": "python scripts/build-tremor-wad.py",
-    "engine:build": "python engine/build/build.py"
+    "engine:build": "python engine/build/build.py",
+    "engine:headless": "python engine/build/headless.py",
+    "engine:headless:test": "python engine/build/headless.py --test"
   },
   "devDependencies": {
     "happy-dom": "^21.0.4",

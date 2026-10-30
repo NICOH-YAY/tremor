@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { reset } from '../src/player_interface';
+import { reset } from '../src/legacy_player_interface';
 import { idleCmd, tick } from '../src/sim/world';
 import { hurtPlayer } from '../src/sim/enemies/common';
 import { spawnFireball } from '../src/sim/enemies/fireball';

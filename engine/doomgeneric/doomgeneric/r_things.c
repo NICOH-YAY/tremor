@@ -505,7 +505,7 @@ void R_ProjectSprite (mobj_t* thing)
     /* TREMOR: recognition affects rendering, never the hostile sprite states. */
     sprdef = &sprites[(thing->tr_crew && thing->tr_revealed && thing->health>0) ? SPR_CREW : thing->sprite];
 #ifdef RANGECHECK
-    if ( (thing->frame&FF_FRAMEMASK) >= sprdef->numframes )
+    if ( ((thing->tr_crew && thing->tr_revealed && thing->health>0) ? ((thing->tr_cower || thing->tr_stun)?1:0) : (thing->frame&FF_FRAMEMASK)) >= sprdef->numframes )
 	I_Error ("R_ProjectSprite: invalid sprite frame %i : %i ",
 		 thing->sprite, thing->frame);
 #endif

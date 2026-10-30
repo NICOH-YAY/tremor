@@ -1,22 +1,15 @@
-import { it, expect } from 'vitest';
-import { baseline } from '../src/agent/baselines';
-import { runEpisode } from '../src/eval/runner';
-import { writeFileSync, mkdirSync } from 'node:fs';
-it('baselines traverse authored levels', async () => {
-    const report = process.env.INTEGRATION_REPORT === '1';
-    if (report)
-        mkdirSync('eval', { recursive: true });
-    const rows = [];
-    for (const careful of [true, false])
-        for (const id of ['hangar', 'quarantine', 's1_corridor', 's2_collar', 's3_triage', 'h1_dark', 'h2_door'])
-            for (const seed of [17, 83]) {
-                const { trace, ...r } = await runEpisode(baseline(careful), { seed, levelId: id, tracePath: false });
-                if (report && !r.reachedExit)
-                    writeFileSync(`eval/debug-${r.player}-${id}-${seed}.json`, JSON.stringify(trace.slice(-12), null, 2));
-                rows.push(r);
-                console.log(r.player, id, seed, r.reason, r.steps);
-            }
-    if (report)
-        writeFileSync('eval/integration-baselines.json', JSON.stringify(rows, null, 2));
-    expect(rows.every(r => r.reachedExit)).toBe(true);
-}, 60000);
+import {test,expect} from 'vitest';
+import {baseline} from '../src/agent/baselines';
+import {reset,observe,ACTION_IDS} from '../src/player_interface';
+const signal=new AbortController().signal;
+test('baselines use public observations to shoot/read, stun/purge, and select fists',async()=>{
+ const o=observe(reset(17));o.entities=[{type:'unknown figure',bearing_deg:0,distance:48}];
+ const aggressive=baseline(),careful=baseline(true);
+ expect((await aggressive.decide(o,[...ACTION_IDS],'',signal)).action).toBe('fire');
+ expect((await careful.decide(o,[...ACTION_IDS],'',signal)).action).toBe('read');
+ o.entities[0].type='possessed';expect((await careful.decide(o,[...ACTION_IDS],'',signal)).action).toBe('stun');
+ for(let i=0;i<5;i++)expect((await careful.decide(o,[...ACTION_IDS],'',signal)).action).toBe('purge');
+ o.rounds=0;o.purge=0;expect((await aggressive.decide(o,[...ACTION_IDS],'',signal)).action).toBe('weapon_fist');
+ o.weapon='fist';expect((await aggressive.decide(o,[...ACTION_IDS],'',signal)).action).toBe('fire');
+ o.entities=[];expect(ACTION_IDS).toContain((await careful.decide(o,[...ACTION_IDS],'',signal)).action);
+});

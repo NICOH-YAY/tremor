@@ -1,4 +1,4 @@
-import { reset } from './player_interface';
+import { reset } from './legacy_player_interface';
 import { idleCmd, tick, TICRATE } from './sim/world';
 import { Raycaster } from './render/raycaster';
 import { audio } from './audio';

@@ -1,3 +1,62 @@
+# Real-engine contracts ? 2026-10-30
+
+`src/player_interface.ts` is the active five-operation API. State is an opaque
+frozen handle to a private per-episode WASM instance, never passed to a controller.
+Node 24 is required; `public/engine-headless/doom.cjs` and `doom.wasm` are shipped.
+The `.cjs` factory's options are initialized synchronously with
+WASM_ASYNC_COMPILATION=0; a runtime flag assertion protects that assumption.
+
+- `reset(seed, levelId='E1M1')` accepts safe integer seed and E1M1?E1M9,
+  skill index2, `/freedoom1.wad` plus `/tremor.wad`. Low eight seed bits select
+  the deterministic P_Random table start before map spawn.
+- `observe(state, player_id='player')` returns fresh public JSON plus a summary
+  containing every field. Entities have bearing_deg (left positive), distance in
+  Doom units and type; 90? cone plus P_CheckSight. Unread humans are always
+  `unknown figure`, without IDs or hidden kind. Numeric trauma/kill counters are
+  confined to outcome, which controllers never receive. Map is 25x25 north-up,
+  cell size64, centered on the player cell, with >^<v heading. # is a seen solid
+  line, . a seen two-sided line, ? no mapped line; ? can also be open space.
+  This is a line map, not an occupancy grid. No hidden exit/door tags are exposed.
+- `legal_actions(state, player_id='player')` always returns the same 17 IDs:
+  forward, back, strafe_left, strafe_right, turn_left_small, turn_left_large,
+  turn_right_small, turn_right_large, fire, use, read, stun, purge, wait,
+  weapon_fist, weapon_pistol, weapon_shotgun. No range, identity, inventory,
+  charge or terminal filtering. Unknown observe player IDs throw.
+- `step(state, player_id, action)` (two-argument shorthand also retained) returns
+  state, last five displayed events, valid and reason. Unknown player/action
+  returns `unknown player`/`unknown action`; valid macros after termination return
+  `episode terminal`. Invalid actions run idle for the same interval. Known
+  attempts are accepted even if mechanically ineffective. A live action advances
+  exactly seven G_Ticker calls; remaining tics use neutral input after death/exit. Use is edge-triggered: wait
+  or another action releases it. Read/purge must be continuous for 35 tics.
+- `outcome(state)` includes ongoing/terminal, reason, score and evaluator-only
+  metrics: kills_demons, kills_humans, crew_killed, crew_saved, reads,
+  fired_unread, rounds_left, final_tremor, tics. Compatibility summary aliases
+  support the runner/report. Terminal reasons: exit, dead, step_limit, call_limit,
+  timeout. A natural ending takes precedence over a later limit. C enforces600
+  actions; runner may impose a smaller step budget and owns calls/timeouts.
+
+Headless initialization skips D_DoomLoop. Software R_RenderPlayerView updates
+ML_MAPPED at reset and after every tic, without canvas or audio. JSON generation is synchronous;
+observing does not change gameplay RNG or simulation time. `hu_stuff.c / HU_Ticker`
+forwards only messages actually displayed to the player, with JSON escaping;
+there are no raw kill/AI events. Each module's resources are GC-owned; parallel
+state handles never share engine globals. Test-only exports live in separate
+`doom-test.cjs/.wasm` artifacts, never the course API or production WASM.
+
+`runEpisode` retains step/call/timeout/trace/fallback accounting. It passes cloned
+observations, legal IDs and validation feedback only. Failed calls consume budget;
+three illegal decisions produce a separately labelled wait. A rejected/slow call
+never becomes a model move. Outcome metrics are withheld until the episode ends.
+
+---
+
+## Superseded TypeScript prototype contracts
+
+Everything below documents the historical simulation only. It is not the active
+play/evaluation contract. Claims about excluding id code are historical; the real
+engine includes credited GPL upstream source.
+
 # Tremor integration contracts
 
 Node 24+, TypeScript, Vite and npm. PowerShell can use npm.cmd. Commands: npm ci, npm run dev (5191), npm test, npm run typecheck, npm run build, npm run eval, npm run eval:live. Vite base is './'. No id code, assets or level layouts are included. Integrator may now edit any merged module; original ownership is recorded in AGENTS.md.

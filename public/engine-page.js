@@ -1,7 +1,9 @@
+import {createIntroGate, requestCanvasLock} from './startup.js';
 import {setupSettings} from './settings-ui.js';
 
 const canvas=document.querySelector('canvas'), ctx=canvas.getContext('2d',{alpha:false});
-const image=ctx.createImageData(320,200), pixels=new Uint32Array(image.data.buffer);let engine,starting=false;
+const image=ctx.createImageData(320,200), pixels=new Uint32Array(image.data.buffer);let engine,enginePromise,starting=false;
+const introGate=createIntroGate(document.querySelector('#intro'),document.querySelector('#continue'),()=>{release();},()=>canvas.focus());
 let masterGain,musicNode,musicGain;
 const audio={context:null,channels:new Map(),buffers:new Map(),
  params(c,v,s){const ch=this.channels.get(c);if(ch){ch.gain.gain.value=v/127*(ch.boost||1);ch.pan.pan.value=(s-127)/127;}},
@@ -14,12 +16,12 @@ async function start(file){if(starting)return;starting=true;document.querySelect
  try{audio.context=new AudioContext();masterGain=audio.context.createGain();masterGain.connect(audio.context.destination);await audio.context.resume();const bytes=file?new Uint8Array(await file.arrayBuffer()):new Uint8Array(await (await fetch(new URL('./wad/freedoom1.wad',import.meta.url))).arrayBuffer());
  const view=new DataView(bytes.buffer,bytes.byteOffset,bytes.byteLength);const magic=new TextDecoder().decode(bytes.subarray(0,4));if(bytes.length<12||magic!=='IWAD')throw Error('Select a supported Doom IWAD.');const count=view.getInt32(4,true),offset=view.getInt32(8,true);if(count<0||offset<12||offset+count*16>bytes.length)throw Error('Invalid WAD directory.');
  const {default:createDoom}=await import(/* @vite-ignore */ new URL('./engine/doom.js',import.meta.url).href);
- engine=await createDoom({audio,onIntro(){return new Promise(resolve=>{release();document.querySelector('#intro').hidden=false;document.querySelector('#continue').onclick=()=>{document.querySelector('#intro').hidden=true;resolve();canvas.focus();};});},onFrame(ptr){
+ engine=await (enginePromise??=createDoom({noInitialRun:true,audio,onIntro:()=>introGate.wait(),onFrame(ptr){
  // Reuse a view until WASM memory grows; no typed-array allocation per blit.
  if(frameBuffer!==engine.HEAPU8.buffer||framePointer!==ptr){frameBuffer=engine.HEAPU8.buffer;framePointer=ptr;framePixels=new Uint32Array(frameBuffer,ptr,320*200);}
  for(let i=0;i<framePixels.length;i++){const p=framePixels[i];pixels[i]=0xff000000|(p&0xff00)|((p&255)<<16)|((p>>>16)&255);}ctx.putImageData(image,0,0);
  frames++;const now=performance.now();if(now-fpsTime>=1000){fps.textContent=(frames*1000/(now-fpsTime)).toFixed(0)+' FPS';frames=0;fpsTime=now;}
- },printErr:console.error});
+ },printErr:console.error}));
  engine.FS.mkdir('/persist');engine.FS.mount(engine.IDBFS,{},'/persist');
  await new Promise((resolve,reject)=>engine.FS.syncfs(true,e=>e?reject(e):resolve()));
  engine.FS.chdir('/persist');
@@ -30,7 +32,7 @@ async function start(file){if(starting)return;starting=true;document.querySelect
  musicNode=audio.context.createScriptProcessor(2048,0,2);musicNode.onaudioprocess=e=>{const l=e.outputBuffer.getChannelData(0),r=e.outputBuffer.getChannelData(1);if(settings.opened){l.fill(0);r.fill(0);return;}const ptr=engine._tremor_music_render(l.length)>>1;const heap=engine.HEAP16;for(let i=0;i<l.length;i++){l[i]=heap[ptr+i*2]/32768;r[i]=heap[ptr+i*2+1]/32768;}};musicNode.connect(musicGain);
  settings.apply();engine.onSettingsReady=()=>settings.apply();
  engine.FS.writeFile('/game.wad',bytes);engine.FS.writeFile('/tremor.wad',new Uint8Array(await (await fetch(new URL('./wad/tremor.wad',import.meta.url))).arrayBuffer()));document.querySelector('#title').style.display='none';document.querySelector('#game').style.display='block';canvas.focus();engine.callMain(['-iwad','/game.wad','-file','/tremor.wad','-config','/persist/default.cfg','-extraconfig','/persist/doom.cfg']);
- }catch(e){document.querySelector('#error').textContent=String(e);starting=false;document.querySelectorAll('button').forEach(b=>b.disabled=false);}}
+ }catch(e){document.querySelector('#error').textContent=String(e)+(enginePromise?' Reload the page to retry engine startup.':'');starting=!!enginePromise;document.querySelectorAll('button').forEach(b=>b.disabled=false);}}
 document.querySelector('#play').onclick=()=>start();document.querySelector('#load').onclick=()=>document.querySelector('#wad').click();document.querySelector('#wad').onchange=e=>{if(e.target.files[0])start(e.target.files[0]);};
 
 const held=new Set();
@@ -48,7 +50,7 @@ const settings=setupSettings({getEngine:()=>engine,release,onApply(s){if(masterG
 function resize(s=settings.state){if(s.scale==='integer'){const n=Math.max(1,Math.floor(Math.min(innerWidth/320,(innerHeight-70)/240)));canvas.style.width=320*n+'px';canvas.style.height=240*n+'px';}else{canvas.style.width='';canvas.style.height='';}}
 window.addEventListener('resize',()=>resize());window.addEventListener('blur',release);
 document.addEventListener('pointerlockchange',()=>{if(document.pointerLockElement!==canvas)release();});
-canvas.onclick=()=>{if(!settings.opened){audio.context?.resume();canvas.requestPointerLock();}};
+canvas.onclick=()=>{if(!settings.opened){audio.context?.resume();void requestCanvasLock(canvas);}};
 document.addEventListener('mousemove',e=>{if(engine&&!settings.opened&&document.pointerLockElement===canvas){mouseX+=e.movementX;}});
 // Accumulate all events, smooth at a stable presentation cadence, retain fractional motion.
 function motion(){if(engine&&!settings.opened){const amount=settings.state.smoothing?mouseX*.5:mouseX;const dx=Math.trunc(amount*settings.state.sensitivity*8);if(dx){mouseX-=dx/(settings.state.sensitivity*8);engine._web_mouse(0,dx);}}requestAnimationFrame(motion);}requestAnimationFrame(motion);
