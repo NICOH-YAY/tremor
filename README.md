@@ -49,13 +49,15 @@ Invalid actions idle for 7 tics; three invalid decisions trigger labelled wait.
 Errors preserve that streak. Natural exit/death takes precedence over later limits.
 Date+run ID reports: eval/results/. Raw gzip traces: eval/traces/ (ignored).
 Representative traces: eval/traces-sample/. Seeds choose only an 8-bit RNG start:
-17 and 273 are identical,17 and 83 distinct; no random level generation.
+17 and 273 are identical, 17 and 83 distinct; no random level generation.
 
 Live trials require ADC credentials and GOOGLE_CLOUD_PROJECT; optional
 GOOGLE_CLOUD_LOCATION defaults global. Run `npm run eval:live -- --players
 model-history,model-obs-only --cases all`. Both use gemini-3.5-flash-lite, K=8
-versus observation-only. Model rows remain **pending live run**. No paid data is
-invented. [Evaluation](EVALUATION.md), [declaration](docs/EVALUATION-PLAN.md).
+versus observation-only. The full live suite ran from clean revision `8f0e4a9` on 2026-10-31.
+Aggressive/careful each exited 2/14; history/observation-only each exited 0/14.
+Model episode-cap timeouts: 8/7; call timeouts: 0/0; errors: 20/11.
+Estimated recorded-usage costs: $4.626329/$3.339141 at the dated prices (lower bounds). [Evaluation](EVALUATION.md), [declaration](docs/EVALUATION-PLAN.md).
 
 CI uses committed WASM; no compiler needed. Optional source rebuild needs Python
 and emsdk 6.0.13: set EMSDK root / optional EMSDK_PYTHON or put emcc on PATH.
@@ -99,7 +101,7 @@ Nuked OPL3 is LGPL-2.1-or-later with source/relink inputs shipped.
 [Third-party table](THIRD-PARTY.md). Phobos/UAC are descriptive; no affiliation
 with id Software or ZeniMax. Proprietary Doom WADs do not ship.
 
-Nicoh's personal agent-team account, peer notes, recording, live trials and course
+Nicoh's personal agent-team account, peer notes, recording and course
 PR remain human submission work. Codex does not invent personal testimony.
 
 Model prompts preserve all public map information with lossless row RLE and reverse history deltas; see [contracts](docs/CONTRACTS.md). Seen/held-out baseline comparisons concern route progress and survival; completion has only been demonstrated on E1M1.

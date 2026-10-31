@@ -10,7 +10,7 @@ clean committed result, target-Brave measurement or human testimony is invented.
 | Finding | Disposition and file/evidence |
 |---|---|
 | M1 baseline regression | Fixed on E1M1 tuning only: bounded close READ, health>=90 reading threshold, close combat; src/agent/baselines.ts; tests/baseline.test.ts both 17/83 normal exits. Other maps may still fail; full report retains them. |
-| M2 purge oracle | Fixed: full 35tics consumes 1,+3rounds,same message/radio/revealed crew for either identity; only evaluator saved differs. tremor.c TR_PlayerThink. Full unstunned unread fixtures, STUN then six PURGEs, no 1000tic shortcut; tests/agent.test.ts. Test failed before fix at tic 42. |
+| M2 purge oracle | Fixed: full 35tics consumes 1, +3 rounds, same message/radio/revealed crew for either identity; only evaluator saved differs. tremor.c TR_PlayerThink. Full unstunned unread fixtures, STUN then six PURGEs, no 1000tic shortcut; tests/agent.test.ts. Test failed before fix at tic 42. |
 | M3 corpse/drop leak | Fixed: +1seen/+2fresh-close all humans; same 31/256 drops, human-death radio neutral. tests.c twin corpses at 0/24/49/79/99, once-only over 1000ticks and matched full-byte drop trials. |
 | M4 contradictory docs | Rewritten current README, CONTRACTS, DECISIONS, DESIGN, rule map.40actions,257x257/16map,600caps, public terror bucket and numeric rounds/charges. Historical declaration under History only. |
 | M5 CI C tests / paths | tests.c linked/exported in committed doom-test artifact, called from agent.test.ts and engine:test without emsdk. compiler.py uses EMSDK/EMSDK_PYTHON or PATH, no local paths. Manifest includes LF C snapshot as well as binaries. |

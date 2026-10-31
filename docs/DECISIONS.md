@@ -8,13 +8,13 @@
 | Public aggressive/careful heuristics | Random baseline | Route/doors/pickups/combat; careful READ/PURGE when safe |
 | Close READ while health>=90 | Distant stationary READ | E1M1/17 tuning trace died while reading; low-health careful may fire unread |
 | K=8 history | Unbounded history | Predictable context/cost; observation-only ablation |
-|3 tuning,2seen,2fresh-held-out,17/83 | Handpicked successful starts | E1M4/E1M5 seen; freeze E1M6/E1M7 before model trials |
+|3 tuning, 2 seen, 2 fresh held-out, 17/83 | Handpicked successful starts | E1M4/E1M5 seen; freeze E1M6/E1M7 before model trials |
 | Corpse-attention fear | Elapsed-time fear | Looking/moving matter; once/body prevents farming |
 | Shared rare ammo | Infinite ammo/zero resupply | Scarcity with mercy/exploration recovery; initial hostile total public |
 | Shared geometry route cue | Straight arrow/agent-only path | Unseen geometry guidance intentionally public for both; secrets blocked |
 | Exit 100 else 0; separate moral metrics | Weighted horror/morality score | Avoid ambiguous aggregate; inherited kill% remains bookkeeping |
 | Clamped Y-shear freelook | True 3D renderer | Cheap software compatibility; aimed interactions follow shot pitch |
-| Full crew/possessed purge parity | Silent crew no-op/free oracle | Completed 35 tics spends 1,+3rounds,same radio/message, revealed crew; saved metric alone differs |
+| Full crew/possessed purge parity | Silent crew no-op/free oracle | Completed 35 tics spends 1, +3 rounds, same radio/message, revealed crew; saved metric alone differs |
 | Identical human corpse fear/drop | Hidden identity weights/crew no drops | Closes bucket/probabilistic identity channels |
 | Heal only below 100 | Clamp every kill to 100 | Never reduce bonus health |
 | Cosmetic M_Random gore | P_Random gore | Visual settings must not change gameplay stream |

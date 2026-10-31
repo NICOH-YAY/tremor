@@ -1,7 +1,7 @@
 {
   "date": "2026-10-31",
-  "runId": "2026-10-31T06-16-26-402Z",
-  "report": "eval/results/2026-10-31-2026-10-31T06-16-26-402Z-results.json",
+  "runId": "2026-10-31T06-19-01-385Z",
+  "report": "eval/results/2026-10-31-2026-10-31T06-19-01-385Z-results.json",
   "samples": [
     {
       "path": "eval/traces-sample/baseline-success.jsonl.gz",
@@ -10,7 +10,9 @@
       "player": "baseline_aggressive",
       "level": "E1M1",
       "seed": 17,
-      "reason": "exit"
+      "reason": "exit",
+      "runId": "2026-10-31T06-16-26-402Z",
+      "report": "eval/results/2026-10-31-2026-10-31T06-16-26-402Z-results.json"
     },
     {
       "path": "eval/traces-sample/baseline-death.jsonl.gz",
@@ -19,7 +21,9 @@
       "player": "baseline_aggressive",
       "level": "E1M2",
       "seed": 17,
-      "reason": "dead"
+      "reason": "dead",
+      "runId": "2026-10-31T06-16-26-402Z",
+      "report": "eval/results/2026-10-31-2026-10-31T06-16-26-402Z-results.json"
     },
     {
       "path": "eval/traces-sample/baseline-limit.jsonl.gz",
@@ -28,7 +32,31 @@
       "player": "baseline_aggressive",
       "level": "E1M2",
       "seed": 83,
-      "reason": "step_limit"
+      "reason": "step_limit",
+      "runId": "2026-10-31T06-16-26-402Z",
+      "report": "eval/results/2026-10-31-2026-10-31T06-16-26-402Z-results.json"
+    },
+    {
+      "path": "eval/traces-sample/model-history-E1M1-17.jsonl.gz",
+      "sha256": "d8ef5acf3bc513604d2722639b9a5deda2bdd31ca0c4e3d38e9456873f8d1c0d",
+      "source": "eval/traces/2026-10-31T06-19-01-385Z-model-history-E1M1-17.jsonl.gz",
+      "player": "model-history",
+      "level": "E1M1",
+      "seed": 17,
+      "reason": "timeout",
+      "runId": "2026-10-31T06-19-01-385Z",
+      "report": "eval/results/2026-10-31-2026-10-31T06-19-01-385Z-results.json"
+    },
+    {
+      "path": "eval/traces-sample/model-obs-only-E1M1-17.jsonl.gz",
+      "sha256": "04dd986103a68dfc2b0a1e30c38dc02cdd0178592be77c7237471145b8979847",
+      "source": "eval/traces/2026-10-31T06-19-01-385Z-model-obs-only-E1M1-17.jsonl.gz",
+      "player": "model-obs-only",
+      "level": "E1M1",
+      "seed": 17,
+      "reason": "timeout",
+      "runId": "2026-10-31T06-19-01-385Z",
+      "report": "eval/results/2026-10-31-2026-10-31T06-19-01-385Z-results.json"
     }
   ]
 }

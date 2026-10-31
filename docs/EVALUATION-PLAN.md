@@ -165,7 +165,7 @@ The v5 public-route 40 config replaces the straight-line human/agent objective
 bearing with a shared geometry-derived waypoint, and adds four constant human
 control combinations (40 total). Quest planning considers heights and activation
 dependencies. The route prefers safe floor over damaging floor and large drops.
-The step duration,1800 action/call cap, skill, seeds and tuning/held-out split are
+The step duration, 1800 action/call cap, skill, seeds and tuning/held-out split are
 unchanged. This is a public rule/interface change, so comparisons with v4 do not
 isolate controller improvements. Only E1M1-E1M3 diagnostics/parameter trials
 informed tuning. Fixed-seed repeats are development trials, not new independent

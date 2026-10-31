@@ -125,4 +125,4 @@ callTimeouts and episodeTimeouts identify the triggering deadline.
 Runner maxSteps is an integer 1..600: larger requests are rejected before reset,
 matching the engine's fixed 600 ceiling. Natural terminals retain precedence.
 
-Preflight rejects prompts above 24,000 characters before any network request (no truncation); output cap 256 tokens. This is a character budget, not an exact Gemini tokenizer limit. Offline E1M1 character measurements and chars/4 planning estimates are in docs/reviews/prompt-size-e1m1.json. Real Gemini input token counts require the next authorized live run.
+Preflight rejects prompts above 24,000 characters before any network request (no truncation); output cap 256 tokens. This is a character budget, not an exact Gemini tokenizer limit. Offline E1M1 character measurements and chars/4 planning estimates are in docs/reviews/prompt-size-e1m1.json. Real Gemini input token counts are recorded in the 2026-10-31 live results linked from [EVALUATION](../EVALUATION.md).

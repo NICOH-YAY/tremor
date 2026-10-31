@@ -25,14 +25,14 @@ browser, headless and fixture artifacts; refreshed LF-byte/source hashes. A
 whitespace-only final rebuild preserved every evaluation engine/WAD hash.
 
 Root npm ci and the same checks passed. A scratch copy under
-`game-dev-f26/midterms/nicoh-yay/` also passed npm ci,43 tests,typecheck,build and
+`game-dev-f26/midterms/nicoh-yay/` also passed npm ci, 43 tests, typecheck, build and
 508 C checks. Initial temp-alias cwd access and default global npm cache were
 blocked by filesystem permissions; using the writable tools-root copy and project
 .npmrc cache fixed the reproducibility check without elevated permissions.
 
 Results: EVALUATION.md links exact date+run-ID JSON, controller/config/artifact
 hashes and three sample gzipped traces with SHA-256 manifest. Both scripted players
-exit 2/14, die 10/14, hit step limit 2/14; zero illegal actions, calls/time limits0.
+exit 2/14, die 10/14, hit step limit 2/14; zero illegal actions, call/time limits 0.
 No live trials, commits or paid requests. Working tree is honestly dirty.
 
 Measured before/after: stationary E1M1 software renderer mean 0.229680->0.193101 ms,
@@ -46,9 +46,9 @@ plus completed exit, not text-change spam. Final report preserves baseline failu
 These are two actual invocations in this session, not two invented sessions.
 
 Final result path: `eval/results/2026-10-31-2026-10-31T05-54-45-516Z-results.json`. Trace paths/hashes: `eval/traces-sample/manifest.json`.
-Final root and copied-folder checks:43 active tests/9files,508 C checks, typecheck
-and build passed. Evaluation command returned exit code0. Artifact/controller
-hashes and all3sample gzip hashes rechecked against final working files.
+Final root and copied-folder checks: 43 active tests/9 files, 508 C checks, typecheck
+and build passed. Evaluation command returned exit code 0. Artifact/controller
+hashes and all 3 sample gzip hashes rechecked against final working files.
 ## 2026-10-31 - Codex session codex-doom13 - before changes
 Invoked **tremor-level-check** by name in this new, separate session. Read the
 skill, AGENTS, CONTRACTS, RUBRIC-CHECKLIST, independent review and current sources.
@@ -98,7 +98,7 @@ not this offline measurement. Target <8k vendor input tokens needs next live run
 Vertex standard global pricing checked on official URL 2026-10-31: $0.30 input,
 $2.50 output, $0.03 cached/1M tokens (cache unused); separate discounted table
 not used. Central config/date/URL copied to report JSON; explicit temperature
-0.2/global, output cap256, prompt character preflight24000. Cost includes known
+0.2/global, output cap 256, prompt character preflight 24000. Cost includes known
 output/reasoning tokens, unknown usage flagged. Timeout ends episode, with call
 and episode deadlines separately counted. Runner rejects maxSteps>600.
 
@@ -106,3 +106,7 @@ Remaining limits/reasons for intentional non-fixes are individually mapped in
 docs/reviews/review-response.md (M1-M6, m1-m16). No live model trials, commits,
 paid token counts, human testimony or invented outcomes. No proprietary assets
 added; upstream licenses, notices and provenance retained.
+
+## 2026-10-31 - live evidence documentation update
+
+No rule changes; tremor-level-check was not invoked for this docs/evidence-only task. Summarized the human-run full live suite from clean revision 8f0e4a9, run 2026-10-31T06-19-01-385Z, without new evaluations or paid calls. Added an offline aggregation script and two exact-copy live gzip samples with verified SHA-256s. npm test (50 tests, 10 files), typecheck, build and engine:test (508 checks, 0 failures) passed. Existing art/title.jpg build warning remains. No commits. Historical invocation records above describe their original sessions; the current live evidence supersedes their pending-live status.
