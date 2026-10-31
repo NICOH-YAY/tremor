@@ -2,19 +2,30 @@
 
 Current engine, skill index 2, 40 constant seven-tic actions. Tuning E1M1-E1M3; seen E1M4/E1M5; fresh model held-out E1M6/E1M7 frozen 2026-10-31 before model trials. Two RNG starts 17/83 per map/player. Seeds change only the low-eight-bit RNG table start: modulo-256 equivalent seeds are identical, not different levels.
 
-Report: [full JSON](eval/results/2026-10-31-2026-10-31T05-54-45-516Z-results.json). Run ID: `2026-10-31T05-54-45-516Z`. HEAD: `c6316ff03972c0a2aaf8ccdf44386357e660a674`. Working tree: **dirty**; this is not clean committed-tree evidence. Codex was forbidden to commit; Claude must commit then rerun the frozen command. Controller/artifact hashes and computed configuration ID are in the JSON.
-Configuration: `c5337d427eec768ce4379a1e402abca5b9ca071df7e67cf70a9520bc11c0791a`. Limits: 600 actions, 600 calls, 20 seconds/call, five minutes/episode. Natural exit/death precedes later limits.
+Report: [full JSON](eval/results/2026-10-31-2026-10-31T06-16-26-402Z-results.json). Run ID: `2026-10-31T06-16-26-402Z`. HEAD: `203810dcda4d7197d05309cb4437a1db25f37f31`. Working tree: **dirty**; this is not clean committed-tree evidence. Codex was forbidden to commit; Claude must commit then rerun the frozen command. Controller/artifact hashes and computed configuration ID are in the JSON.
+Configuration: `faebcbfb97da87f4e3953745bc163d276f15e2e22c506ee9a343582eb8d6a363`. Limits: 600 actions, 600 calls, 20 seconds/call, five minutes/episode. Natural exit/death precedes later limits.
 
 Command: `npm run eval -- --players baseline_aggressive,baseline_careful --cases all`. Default `npm run eval` also explicitly skips model players without --live. No live numbers fabricated.
 
-| Player | Exits/trials | Deaths | Step/call limits | Timeouts | Illegal | Errors | Calls | Decision latency total ms | Tokens in/out | API cost USD (2026-10-31) |
+| Player | Exits/trials | Deaths | Step/call limits | Timeouts | Illegal | Errors | Calls | Decision latency total ms | Tokens in/out | Unknown usage calls | API cost USD (2026-10-31) |
 |---|---|---|---|---|---|---|---|---|---|---|---|
-| baseline_aggressive | 2/14 | 10 | 2/0 | 0 | 0 | 0 | 3037 | 239.8 | 0/0 | 0 (scripted, no API) |
-| baseline_careful | 2/14 | 10 | 2/0 | 0 | 0 | 0 | 3427 | 255.8 | 0/0 | 0 (scripted, no API) |
-| model-history | **pending live run** | pending | pending | pending | pending | pending | pending | pending | pending | pending; price unverified |
-| model-obs-only | **pending live run** | pending | pending | pending | pending | pending | pending | pending | pending | pending; price unverified |
+| baseline_aggressive | 2/14 | 10 | 2/0 | 0 | 0 | 0 | 3037 | 239.5 | 0/0 | 0 | 0 (scripted, no API) |
+| baseline_careful | 2/14 | 10 | 2/0 | 0 | 0 | 0 | 3427 | 258.1 | 0/0 | 0 | 0 (scripted, no API) |
+| model-history | **pending live run** | pending | pending | pending | pending | pending | pending | pending | pending | pending | pending |
+| model-obs-only | **pending live run** | pending | pending | pending | pending | pending | pending | pending | pending | pending | pending |
 
-Latency above is controller decision time, not engine episode/frame cost. Model transport failures may have unknown billed usage. No live cost estimate or pricing assertion is made. No statistical claim from two fixed seeds. Both baselines use only public observations; careful may fire unread below 90 health. E1M1 success does not establish whole-suite competence.
+Pricing verified 2026-10-31: gemini-3.5-flash-lite, global, standard, USD $0.3/1M input, $2.5/1M output, $0.03/1M cached (unused). [Vertex pricing](https://cloud.google.com/vertex-ai/generative-ai/pricing). Temperature 0.2; location global.
+
+| Player | Call timeouts | Episode timeouts |
+|---|---|---|
+| baseline_aggressive | 0 | 0 |
+| baseline_careful | 0 | 0 |
+| model-history | pending | pending |
+| model-obs-only | pending | pending |
+
+A 20 s call timeout ends the episode with reason timeout; the 300 s episode cap also ends it. Counters distinguish which deadline fired.
+
+Latency above is controller decision time, not engine episode/frame cost. Model transport failures may have unknown billed usage. Estimated costs use reported input plus output/reasoning tokens; unknown-usage transport failures make totals lower bounds. No statistical claim from two fixed seeds. Both baselines use only public observations; careful may fire unread below 90 health. E1M1 success does not establish whole-suite competence. Seen/held-out baseline comparisons concern route progress and survival, with no demonstrated completion. Public route/objective guidance reveals unseen geometry and key dependencies; this is easier than vision-only navigation.
 
 | Player | Tuning exits | Seen exits | Held-out exits |
 |---|---|---|---|
@@ -56,9 +67,9 @@ Secondary metrics are present for every trial. Route progress is an evaluator-on
 
 Representative complete public-observation/action traces (gzipped JSONL; raw traces remain gitignored). A model trace is pending a live trial:
 
-- [exit: baseline_aggressive E1M1/17](eval/traces-sample/baseline-success.jsonl.gz), SHA-256 `8a9d7f6c9b53ca1bbe862e3d687499040285ce2960e6933577ced73407cf7274`.
-- [dead: baseline_aggressive E1M2/17](eval/traces-sample/baseline-death.jsonl.gz), SHA-256 `fc252edc54cec804652e949343375aac2361b8e47d18c9c322223a28a220873f`.
-- [step_limit: baseline_aggressive E1M2/83](eval/traces-sample/baseline-limit.jsonl.gz), SHA-256 `e51fe9992ded7752db00eb2274a1fdf58edecede23dc48e6aa867ddb23ca9251`.
+- [exit: baseline_aggressive E1M1/17](eval/traces-sample/baseline-success.jsonl.gz), SHA-256 `83f25608218121c312d89858bec362ab8782652231078d4317301ce01d08cd17`.
+- [dead: baseline_aggressive E1M2/17](eval/traces-sample/baseline-death.jsonl.gz), SHA-256 `b6011f85561ff97a1aaa09de46e58169f97aebe7a7eff0fc0d41fa63706036ae`.
+- [step_limit: baseline_aggressive E1M2/83](eval/traces-sample/baseline-limit.jsonl.gz), SHA-256 `36c00f4169b5d991cede5ce8be63887bbae19e39ff3607bce32df52ef9342cff`.
 
 | Date | Declaration/amendment | Prior results seen? |
 |---|---|---|
@@ -69,6 +80,6 @@ Representative complete public-observation/action traces (gzipped JSONL; raw tra
 
 Full declaration history: [EVALUATION-PLAN](docs/EVALUATION-PLAN.md). No controller/prompt changes used E1M6/E1M7 outcomes. Review-driven engine corrections rerun all cases, not selected successful seeds.
 
-Validation: 43 active Vitest tests / 9 files; 508 compiled C checks, no failures; typecheck/build/engine:test pass. [Five kinds](tests/README.md). [Every finding response](docs/reviews/review-response-2026-10-31.md). [Two skill invocations](docs/SKILL-INVOCATIONS.md).
+Validation: see docs/SKILL-INVOCATIONS.md for current commands; 508 compiled C checks, no failures; typecheck/build/engine:test pass. [Five kinds](tests/README.md). [Every finding response](docs/reviews/review-response.md). [Two skill invocations](docs/SKILL-INVOCATIONS.md).
 
 Software-render mean 0.230 to 0.193 ms/frame; p95 0.338 to 0.275 ms. 200 headless wait+observe steps 1290 to 771 ms. Excludes Canvas/DOM/audio and is not a target-Brave measurement. No browser was exposed by UI tools. Visual/audible fixes and a full human episode still need playtesting. Live comparisons, clean committed rerun, personal agent-team account, peer notes and recording remain submission work.

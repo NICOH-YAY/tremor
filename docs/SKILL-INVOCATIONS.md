@@ -49,3 +49,60 @@ Final result path: `eval/results/2026-10-31-2026-10-31T05-54-45-516Z-results.jso
 Final root and copied-folder checks:43 active tests/9files,508 C checks, typecheck
 and build passed. Evaluation command returned exit code0. Artifact/controller
 hashes and all3sample gzip hashes rechecked against final working files.
+## 2026-10-31 - Codex session codex-doom13 - before changes
+Invoked **tremor-level-check** by name in this new, separate session. Read the
+skill, AGENTS, CONTRACTS, RUBRIC-CHECKLIST, independent review and current sources.
+Initial git status was clean. No live calls or commits. Regression tests and
+validation pending; scope is lossless prompt encoding, accounting and review fixes.
+
+
+## 2026-10-31 - Codex session codex-doom13 - after changes
+Invoked **tremor-level-check** again by name. Reread the skill and ownership;
+reviewed contracts/rubric, final diff, rule map and independent-review response.
+This is the required separate session from codex-doom12. review.md unchanged.
+
+Failing regression first: npx.cmd vitest run tests/model-player.test.ts failed
+because src/agent/prompt did not exist. (Initial npx PowerShell wrapper was
+blocked by local execution policy; using npx.cmd worked.) After implementation:
+npm test 50/50, 10 files; npm run typecheck passed; npm run build passed;
+npm run engine:test 508 checks, 0 failures. Build retains the existing art/title.jpg
+resolution warning. Dist has no doom-test.*; Pages uploads dist. No C changes,
+no rebuilds, no engine/WAD bytes changed. LF manifest byte/hash tests pass.
+
+Ran npm run eval -- --players baseline_aggressive,baseline_careful --cases all.
+Final stable-source result:
+eval/results/2026-10-31-2026-10-31T06-16-26-402Z-results.json.
+Both players: 2/14 exits, 10 deaths, 2 step limits; 0 illegal actions, call limits
+or timeouts. All 28 terminal/step/crew killed/saved/read/unread/trauma/terror
+metrics match prior 05-54-45 reference. First 06-15-20 run was during final
+accounting edits, archived as superseded diagnostic; final report source hashes
+were verified against current raw files. Start revision 203810dc, dirty, honestly
+stamped before episodes. Model is null for baseline-only report. No clean
+committed evidence claimed; human/Claude must commit and rerun.
+
+Generated EVALUATION.md from the final JSON. Trace paths live in that report;
+three representative gzipped traces and source run/hash metadata are in
+eval/traces-sample/manifest.json. Verified sample and artifact hashes, report
+source hashes, all markdown table widths, fixture omission and unaltered review.
+
+Lossless model encoding tests cover every recorded E1M1 map and reverse-history
+field; mocked client covers compact rules/legal input, JSON and malformed-response
+usage. Oversized prompt preflight rejects before network without truncation.
+Exact per-call character measurements: docs/reviews/prompt-size-e1m1.json,
+285 E1M1 observations: history mean 600153.55 -> 11339.82 chars, maximum
+612361 -> 17640; obs-only after mean 8339.65, max 8960. chars/4 planning estimate
+for after-history mean/max is 2835/4410 tokens; actual Gemini post-change token
+counts are unmeasured (no live calls). Prior live ~78k/call is review evidence,
+not this offline measurement. Target <8k vendor input tokens needs next live run.
+
+Vertex standard global pricing checked on official URL 2026-10-31: $0.30 input,
+$2.50 output, $0.03 cached/1M tokens (cache unused); separate discounted table
+not used. Central config/date/URL copied to report JSON; explicit temperature
+0.2/global, output cap256, prompt character preflight24000. Cost includes known
+output/reasoning tokens, unknown usage flagged. Timeout ends episode, with call
+and episode deadlines separately counted. Runner rejects maxSteps>600.
+
+Remaining limits/reasons for intentional non-fixes are individually mapped in
+docs/reviews/review-response.md (M1-M6, m1-m16). No live model trials, commits,
+paid token counts, human testimony or invented outcomes. No proprietary assets
+added; upstream licenses, notices and provenance retained.

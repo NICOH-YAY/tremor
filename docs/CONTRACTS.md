@@ -97,3 +97,32 @@ counts distinct key types collected plus a completed level exit; switch-only sub
 health/kills/moral metrics apply to all players. Tremor 3 saves persist identities,
 resources,trauma,radio/corpse flags; partial channels reset on load. Browser pitch
 is clamped Y-shear. legacy/ is excluded from every active pipeline.
+
+## Lossless model prompt encoding (codex-doom13)
+
+The course Observation and baseline inputs remain unchanged. Current model input
+serializes every observation field once, replacing automap with row-rle:
+width/height are original dimensions, x/y are zero-based column/row crop offsets.
+Only all-unknown outer rows/columns are omitted; every omitted cell is `?`.
+Each crop row is space-separated character+decimal-count runs (`?120 .5 #3`).
+Rows are north-to-south, runs west-to-east. An empty crop means all unknown.
+trailingNewline preserves the exact raw map string terminator.
+
+K=8 history contains newest-to-oldest reverse deltas, anchored to Current.
+Overwrite fields, resize the raw map string to mapLength, then replace each
+mapPatches [zero-based raw string offset, old text] to recover the previous
+observation. Offsets count newline characters. Unchanged fields inherit; action
+was chosen from the reconstructed observation. This is reversible, including
+viewport shifts, radio/events, inventory and full historical maps. Summary is a
+redundant serialization and is reconstructed from these same fields.
+
+Both model conditions get the same lossless current view; obs-only gets no past
+views. Model config/pricing lives in src/eval/model_config.ts: global standard,
+temperature 0.2, no regional fallback or cache. Failed transport usage is unknown;
+estimated cost is a lower bound when unknownUsageCalls > 0. Output accounting
+includes reasoning tokens. Call timeout ends the episode, reason timeout;
+callTimeouts and episodeTimeouts identify the triggering deadline.
+Runner maxSteps is an integer 1..600: larger requests are rejected before reset,
+matching the engine's fixed 600 ceiling. Natural terminals retain precedence.
+
+Preflight rejects prompts above 24,000 characters before any network request (no truncation); output cap 256 tokens. This is a character budget, not an exact Gemini tokenizer limit. Offline E1M1 character measurements and chars/4 planning estimates are in docs/reviews/prompt-size-e1m1.json. Real Gemini input token counts require the next authorized live run.

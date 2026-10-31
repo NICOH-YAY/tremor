@@ -187,3 +187,14 @@ was corrected from tuning-map evidence by restoring its original close-combat
 branch, then all 20 episodes were rerun. Held-out results selected no changes.
 Final careful tuning completion is 2/6, below 4/6. See dated EVALUATION.md for the
 full failures and split-labelled report; no live model trials were run.
+
+## 2026-10-31 codex-doom13 prompt/accounting amendment
+
+Before further live trials: current public observation is losslessly row-RLE
+encoded with only unknown borders omitted and explicit crop offsets; history K8
+uses reversible deltas. No known cells or HUD/entity/story fields are removed.
+Both memory conditions share this encoding. Global standard gemini-3.5-flash-lite,
+explicit temperature 0.2; no regional fallback. Prices dated 2026-10-31 in
+src/eval/model_config.ts. A 20s call timeout terminates with reason timeout;
+report call and episode deadline counters separately. No live trials in this
+session; held-out outcomes are not used to tune this encoding.

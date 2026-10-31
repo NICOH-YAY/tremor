@@ -1,12 +1,12 @@
 {
   "date": "2026-10-31",
-  "runId": "2026-10-31T05-54-45-516Z",
-  "report": "eval/results/2026-10-31-2026-10-31T05-54-45-516Z-results.json",
+  "runId": "2026-10-31T06-16-26-402Z",
+  "report": "eval/results/2026-10-31-2026-10-31T06-16-26-402Z-results.json",
   "samples": [
     {
       "path": "eval/traces-sample/baseline-success.jsonl.gz",
-      "sha256": "8a9d7f6c9b53ca1bbe862e3d687499040285ce2960e6933577ced73407cf7274",
-      "source": "eval/traces/2026-10-31T05-54-45-516Z-baseline_aggressive-E1M1-17.jsonl.gz",
+      "sha256": "83f25608218121c312d89858bec362ab8782652231078d4317301ce01d08cd17",
+      "source": "eval/traces/2026-10-31T06-16-26-402Z-baseline_aggressive-E1M1-17.jsonl.gz",
       "player": "baseline_aggressive",
       "level": "E1M1",
       "seed": 17,
@@ -14,8 +14,8 @@
     },
     {
       "path": "eval/traces-sample/baseline-death.jsonl.gz",
-      "sha256": "fc252edc54cec804652e949343375aac2361b8e47d18c9c322223a28a220873f",
-      "source": "eval/traces/2026-10-31T05-54-45-516Z-baseline_aggressive-E1M2-17.jsonl.gz",
+      "sha256": "b6011f85561ff97a1aaa09de46e58169f97aebe7a7eff0fc0d41fa63706036ae",
+      "source": "eval/traces/2026-10-31T06-16-26-402Z-baseline_aggressive-E1M2-17.jsonl.gz",
       "player": "baseline_aggressive",
       "level": "E1M2",
       "seed": 17,
@@ -23,8 +23,8 @@
     },
     {
       "path": "eval/traces-sample/baseline-limit.jsonl.gz",
-      "sha256": "e51fe9992ded7752db00eb2274a1fdf58edecede23dc48e6aa867ddb23ca9251",
-      "source": "eval/traces/2026-10-31T05-54-45-516Z-baseline_aggressive-E1M2-83.jsonl.gz",
+      "sha256": "36c00f4169b5d991cede5ce8be63887bbae19e39ff3607bce32df52ef9342cff",
+      "source": "eval/traces/2026-10-31T06-16-26-402Z-baseline_aggressive-E1M2-83.jsonl.gz",
       "player": "baseline_aggressive",
       "level": "E1M2",
       "seed": 83,

@@ -2,6 +2,7 @@
 
 Legend: code=inherited executable rule; manual=player-facing manual;
 observed=measured evidence, not guarantee; assumed=declared equivalence/approximation;
+implementation detail=internal bitmask or cosmetic tuning;
 design=original adaptation, rationale DESIGN.md / DECISIONS.md. Locators file+symbol.
 Upstream engine locators below are in engine/doomgeneric/doomgeneric/.
 
@@ -12,10 +13,10 @@ Upstream engine locators below are in engine/doomgeneric/doomgeneric/.
 | Health/armor | code | stim 10/medkit 25 cap 100;bonuses/spheres cap 200;armor absorbs 1/3 or 1/2 | p_inter.c P_TouchSpecialThing/P_GiveBody/P_DamageMobj |
 | Weapons/missiles/AI | code | inherited state-tic/damage tables | info.c states/mobjinfo;p_pspr.c A_*;p_enemy.c A_Chase/P_NoiseAlert;p_map.c P_LineAttack/P_RadiusAttack |
 | Keys/exits/hazards | code | key specials 26/27/28/32/33/34 etc;exit 11/51/52/124 | p_doors.c EV_DoLockedDoor;p_switch.c P_UseSpecialLine;p_spec.c P_CrossSpecialLine/P_PlayerInSpecialSector;g_game.c G_DoCompleted |
-| Controls/player manual | manual | exact control/channels | docs/RULES.md;index.html how-to-play |
+| Controls/player manual | design | exact control/channels | docs/RULES.md;index.html how-to-play |
 | Freedoom-for-Doom data | assumed | engine rules equivalent, layouts/art differ | engine/UPSTREAM.md;public/wad/FREEDOOM-LICENSE.txt |
 | Observation FOV | assumed |90degree horizontal cone+LOS approximates screen knowledge | agent_api.c tremor_agent_observe/discover |
-| Crew fraction | observed |90/256=35.15625% full RNG threshold; not exact each map | tremor.c TR_MapSpawn;seed tests |
+| Crew probability | design |90/256=35.15625% RNG threshold; not a measured map fraction | engine/tremor/tremor.c TR_MapSpawn; DESIGN.md Parameter rationale |
 | CPU cost | observed | measured scope excludes Canvas/audio | review-response-2026-10-31.md;engine/build/session-*-browser.json |
 | TR_CREW_THRESHOLD | design | `90` P_Random byte <90: 35.16% of POSS/SPOS. | `engine/tremor/tremor.h TR_CREW_THRESHOLD`; `tremor.c`; [rationale](DESIGN.md) |
 | TR_READ_TICS | design | `35` Continuous crosshair identification. | `engine/tremor/tremor.h TR_READ_TICS`; `tremor.c`; [rationale](DESIGN.md) |
@@ -28,20 +29,20 @@ Upstream engine locators below are in engine/doomgeneric/doomgeneric/.
 | TR_DEMON_HEAL | design | `10`  | `engine/tremor/tremor.h TR_DEMON_HEAL`; `tremor.c`; [rationale](DESIGN.md) |
 | TR_HEALTH_CAP | design | `100`  | `engine/tremor/tremor.h TR_HEALTH_CAP`; `tremor.c`; [rationale](DESIGN.md) |
 | TR_MELEE_MULTIPLIER | design | `10` Berserk-strength fists without a powerup. | `engine/tremor/tremor.h TR_MELEE_MULTIPLIER`; `tremor.c`; [rationale](DESIGN.md) |
-| TR_SHOTGUN_GIB_THRESHOLD | design | `192` 75% at close range in hyper mode. | `engine/tremor/tremor.h TR_SHOTGUN_GIB_THRESHOLD`; `tremor.c`; [rationale](DESIGN.md) |
-| TR_IMPACT_TICS | design | `6` Render-only melee shake duration. | `engine/tremor/tremor.h TR_IMPACT_TICS`; `tremor.c`; [rationale](DESIGN.md) |
-| TR_SHOT_KICK_TICS | design | `3` Render-only firearm kick duration. | `engine/tremor/tremor.h TR_SHOT_KICK_TICS`; `tremor.c`; [rationale](DESIGN.md) |
-| TR_KILL_FLASH_TICS | design | `8` Near kill red flash; not actual damage. | `engine/tremor/tremor.h TR_KILL_FLASH_TICS`; `tremor.c`; [rationale](DESIGN.md) |
+| TR_SHOTGUN_GIB_THRESHOLD | implementation detail | `192` 75% at close range in hyper mode. | `engine/tremor/tremor.h TR_SHOTGUN_GIB_THRESHOLD`; `tremor.c`; [rationale](DESIGN.md) |
+| TR_IMPACT_TICS | implementation detail | `6` Render-only melee shake duration. | `engine/tremor/tremor.h TR_IMPACT_TICS`; `tremor.c`; [rationale](DESIGN.md) |
+| TR_SHOT_KICK_TICS | implementation detail | `3` Render-only firearm kick duration. | `engine/tremor/tremor.h TR_SHOT_KICK_TICS`; `tremor.c`; [rationale](DESIGN.md) |
+| TR_KILL_FLASH_TICS | implementation detail | `8` Near kill red flash; not actual damage. | `engine/tremor/tremor.h TR_KILL_FLASH_TICS`; `tremor.c`; [rationale](DESIGN.md) |
 | TR_AIM_UNIT | design | `16384` Binary angle units per random-byte delta / trauma. | `engine/tremor/tremor.h TR_AIM_UNIT`; `tremor.c`; [rationale](DESIGN.md) |
 | TR_CLOSE_RANGE | design | `(128*FRACUNIT)` Kill flash / shotgun gib range. | `engine/tremor/tremor.h TR_CLOSE_RANGE`; `tremor.c`; [rationale](DESIGN.md) |
 | TR_FEAR_RANGE | design | `(192*FRACUNIT)` Visible demons cause cowering. | `engine/tremor/tremor.h TR_FEAR_RANGE`; `tremor.c`; [rationale](DESIGN.md) |
 | TR_GUN_FEAR_RANGE | design | `(512*FRACUNIT)` Nearby gunfire makes crew cower. | `engine/tremor/tremor.h TR_GUN_FEAR_RANGE`; `tremor.c`; [rationale](DESIGN.md) |
 | TR_COWER_TICS | design | `35`  | `engine/tremor/tremor.h TR_COWER_TICS`; `tremor.c`; [rationale](DESIGN.md) |
-| TR_BLOOD_MIN | design | `8`  | `engine/tremor/tremor.h TR_BLOOD_MIN`; `tremor.c`; [rationale](DESIGN.md) |
-| TR_BLOOD_VARIATION | design | `9` Inclusive burst range 8..16. | `engine/tremor/tremor.h TR_BLOOD_VARIATION`; `tremor.c`; [rationale](DESIGN.md) |
-| TR_READ | design | `1`  | `engine/tremor/tremor.h TR_READ`; `tremor.c`; [rationale](DESIGN.md) |
-| TR_STUN | design | `2`  | `engine/tremor/tremor.h TR_STUN`; `tremor.c`; [rationale](DESIGN.md) |
-| TR_PURGE | design | `4`  | `engine/tremor/tremor.h TR_PURGE`; `tremor.c`; [rationale](DESIGN.md) |
+| TR_BLOOD_MIN | implementation detail | `8`  | `engine/tremor/tremor.h TR_BLOOD_MIN`; `tremor.c`; [rationale](DESIGN.md) |
+| TR_BLOOD_VARIATION | implementation detail | `9` Inclusive burst range 8..16. | `engine/tremor/tremor.h TR_BLOOD_VARIATION`; `tremor.c`; [rationale](DESIGN.md) |
+| TR_READ | implementation detail | `1`  | `engine/tremor/tremor.h TR_READ`; `tremor.c`; [rationale](DESIGN.md) |
+| TR_STUN | implementation detail | `2`  | `engine/tremor/tremor.h TR_STUN`; `tremor.c`; [rationale](DESIGN.md) |
+| TR_PURGE | implementation detail | `4`  | `engine/tremor/tremor.h TR_PURGE`; `tremor.c`; [rationale](DESIGN.md) |
 | TR_TERROR_RANGE | design | `(1024*FRACUNIT)`  | `engine/tremor/tremor.h TR_TERROR_RANGE`; `tremor.c`; [rationale](DESIGN.md) |
 | TR_TERROR_CLOSE | design | `(256*FRACUNIT)`  | `engine/tremor/tremor.h TR_TERROR_CLOSE`; `tremor.c`; [rationale](DESIGN.md) |
 | TR_TERROR_SCAN | design | `8` At most eight LOS tests per player tic. | `engine/tremor/tremor.h TR_TERROR_SCAN`; `tremor.c`; [rationale](DESIGN.md) |
@@ -63,6 +64,8 @@ Upstream engine locators below are in engine/doomgeneric/doomgeneric/.
 | Radio/save | design |16KB transcript,once/map briefing,3150 tic cooldown;Tremor 3;partial channels reset | TR_QueueRadio/TR_Radio/TR_StoryStart;p_saveg.c |
 | Runner | design |600 actions/calls,7 tics,20s/call,300s total,K8/obs-only;exit 100else0 | runner.ts runEpisode;agent_api.c |
 | UI/effects | design |320x200 at 4:3;pre-scale<=3;story 4Hz | engine-page.js;horror.js;settings-store.js;DESIGN.md |
+
+| Model encoding | design | Lossless row RLE and K8 reverse deltas; no cropped known cells | src/agent/prompt.ts; CONTRACTS.md Lossless model prompt encoding; tests/model-player.test.ts |
 
 ##40-action ABI
 

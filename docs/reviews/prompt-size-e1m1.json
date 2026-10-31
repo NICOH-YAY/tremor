@@ -1,0 +1,1733 @@
+{
+  "beforeRevision": "203810dcda4d7197d05309cb4437a1db25f37f31",
+  "source": "eval/traces-sample/baseline-death.jsonl.gz",
+  "calls": 285,
+  "method": "Exact JS character counts. chars/4 is only a token planning estimate, not measured Gemini token usage; no network/model calls.",
+  "before": {
+    "min": 71002,
+    "mean": 600153.5473684211,
+    "max": 612361
+  },
+  "after": {
+    "min": 6544,
+    "mean": 11339.82456140351,
+    "max": 17640
+  },
+  "obsOnly": {
+    "min": 6524,
+    "mean": 8339.649122807017,
+    "max": 8960
+  },
+  "perCall": [
+    {
+      "call": 1,
+      "beforeChars": 71002,
+      "afterChars": 6544,
+      "obsOnlyChars": 6544
+    },
+    {
+      "call": 2,
+      "beforeChars": 138654,
+      "afterChars": 9350,
+      "obsOnlyChars": 6862
+    },
+    {
+      "call": 3,
+      "beforeChars": 206316,
+      "afterChars": 10617,
+      "obsOnlyChars": 6958
+    },
+    {
+      "call": 4,
+      "beforeChars": 274066,
+      "afterChars": 11986,
+      "obsOnlyChars": 7102
+    },
+    {
+      "call": 5,
+      "beforeChars": 341810,
+      "afterChars": 13177,
+      "obsOnlyChars": 7144
+    },
+    {
+      "call": 6,
+      "beforeChars": 409642,
+      "afterChars": 14515,
+      "obsOnlyChars": 7267
+    },
+    {
+      "call": 7,
+      "beforeChars": 477214,
+      "afterChars": 15650,
+      "obsOnlyChars": 7032
+    },
+    {
+      "call": 8,
+      "beforeChars": 544703,
+      "afterChars": 16750,
+      "obsOnlyChars": 6744
+    },
+    {
+      "call": 9,
+      "beforeChars": 612361,
+      "afterChars": 17640,
+      "obsOnlyChars": 6910
+    },
+    {
+      "call": 10,
+      "beforeChars": 612284,
+      "afterChars": 17051,
+      "obsOnlyChars": 6993
+    },
+    {
+      "call": 11,
+      "beforeChars": 612189,
+      "afterChars": 16896,
+      "obsOnlyChars": 7017
+    },
+    {
+      "call": 12,
+      "beforeChars": 612015,
+      "afterChars": 16552,
+      "obsOnlyChars": 6960
+    },
+    {
+      "call": 13,
+      "beforeChars": 611756,
+      "afterChars": 16240,
+      "obsOnlyChars": 6929
+    },
+    {
+      "call": 14,
+      "beforeChars": 611408,
+      "afterChars": 15651,
+      "obsOnlyChars": 6839
+    },
+    {
+      "call": 15,
+      "beforeChars": 610818,
+      "afterChars": 14798,
+      "obsOnlyChars": 6672
+    },
+    {
+      "call": 16,
+      "beforeChars": 610397,
+      "afterChars": 13757,
+      "obsOnlyChars": 6591
+    },
+    {
+      "call": 17,
+      "beforeChars": 610024,
+      "afterChars": 13346,
+      "obsOnlyChars": 6554
+    },
+    {
+      "call": 18,
+      "beforeChars": 609444,
+      "afterChars": 11687,
+      "obsOnlyChars": 6524
+    },
+    {
+      "call": 19,
+      "beforeChars": 608974,
+      "afterChars": 10867,
+      "obsOnlyChars": 6527
+    },
+    {
+      "call": 20,
+      "beforeChars": 608501,
+      "afterChars": 10145,
+      "obsOnlyChars": 6533
+    },
+    {
+      "call": 21,
+      "beforeChars": 608106,
+      "afterChars": 9470,
+      "obsOnlyChars": 6534
+    },
+    {
+      "call": 22,
+      "beforeChars": 607705,
+      "afterChars": 8915,
+      "obsOnlyChars": 6536
+    },
+    {
+      "call": 23,
+      "beforeChars": 607388,
+      "afterChars": 8509,
+      "obsOnlyChars": 6570
+    },
+    {
+      "call": 24,
+      "beforeChars": 607235,
+      "afterChars": 8347,
+      "obsOnlyChars": 6579
+    },
+    {
+      "call": 25,
+      "beforeChars": 607164,
+      "afterChars": 8236,
+      "obsOnlyChars": 6597
+    },
+    {
+      "call": 26,
+      "beforeChars": 607226,
+      "afterChars": 8538,
+      "obsOnlyChars": 6695
+    },
+    {
+      "call": 27,
+      "beforeChars": 607319,
+      "afterChars": 8663,
+      "obsOnlyChars": 6698
+    },
+    {
+      "call": 28,
+      "beforeChars": 607407,
+      "afterChars": 8732,
+      "obsOnlyChars": 6697
+    },
+    {
+      "call": 29,
+      "beforeChars": 607494,
+      "afterChars": 8826,
+      "obsOnlyChars": 6698
+    },
+    {
+      "call": 30,
+      "beforeChars": 607584,
+      "afterChars": 9043,
+      "obsOnlyChars": 6668
+    },
+    {
+      "call": 31,
+      "beforeChars": 607599,
+      "afterChars": 9014,
+      "obsOnlyChars": 6585
+    },
+    {
+      "call": 32,
+      "beforeChars": 607608,
+      "afterChars": 9047,
+      "obsOnlyChars": 6598
+    },
+    {
+      "call": 33,
+      "beforeChars": 607609,
+      "afterChars": 9513,
+      "obsOnlyChars": 6724
+    },
+    {
+      "call": 34,
+      "beforeChars": 607778,
+      "afterChars": 10056,
+      "obsOnlyChars": 6892
+    },
+    {
+      "call": 35,
+      "beforeChars": 607947,
+      "afterChars": 10184,
+      "obsOnlyChars": 6978
+    },
+    {
+      "call": 36,
+      "beforeChars": 608119,
+      "afterChars": 10581,
+      "obsOnlyChars": 7109
+    },
+    {
+      "call": 37,
+      "beforeChars": 608289,
+      "afterChars": 10827,
+      "obsOnlyChars": 7116
+    },
+    {
+      "call": 38,
+      "beforeChars": 608460,
+      "afterChars": 10871,
+      "obsOnlyChars": 7138
+    },
+    {
+      "call": 39,
+      "beforeChars": 608628,
+      "afterChars": 11049,
+      "obsOnlyChars": 7157
+    },
+    {
+      "call": 40,
+      "beforeChars": 608879,
+      "afterChars": 11181,
+      "obsOnlyChars": 7156
+    },
+    {
+      "call": 41,
+      "beforeChars": 609061,
+      "afterChars": 11034,
+      "obsOnlyChars": 7074
+    },
+    {
+      "call": 42,
+      "beforeChars": 609149,
+      "afterChars": 10683,
+      "obsOnlyChars": 7015
+    },
+    {
+      "call": 43,
+      "beforeChars": 609056,
+      "afterChars": 10947,
+      "obsOnlyChars": 7084
+    },
+    {
+      "call": 44,
+      "beforeChars": 608880,
+      "afterChars": 10739,
+      "obsOnlyChars": 7083
+    },
+    {
+      "call": 45,
+      "beforeChars": 608701,
+      "afterChars": 10673,
+      "obsOnlyChars": 7114
+    },
+    {
+      "call": 46,
+      "beforeChars": 608530,
+      "afterChars": 10567,
+      "obsOnlyChars": 7131
+    },
+    {
+      "call": 47,
+      "beforeChars": 608349,
+      "afterChars": 10378,
+      "obsOnlyChars": 7133
+    },
+    {
+      "call": 48,
+      "beforeChars": 608167,
+      "afterChars": 10293,
+      "obsOnlyChars": 7155
+    },
+    {
+      "call": 49,
+      "beforeChars": 607980,
+      "afterChars": 10102,
+      "obsOnlyChars": 7155
+    },
+    {
+      "call": 50,
+      "beforeChars": 607893,
+      "afterChars": 10181,
+      "obsOnlyChars": 7236
+    },
+    {
+      "call": 51,
+      "beforeChars": 607894,
+      "afterChars": 10137,
+      "obsOnlyChars": 7283
+    },
+    {
+      "call": 52,
+      "beforeChars": 608307,
+      "afterChars": 11683,
+      "obsOnlyChars": 8126
+    },
+    {
+      "call": 53,
+      "beforeChars": 608634,
+      "afterChars": 11907,
+      "obsOnlyChars": 8053
+    },
+    {
+      "call": 54,
+      "beforeChars": 608894,
+      "afterChars": 12413,
+      "obsOnlyChars": 8063
+    },
+    {
+      "call": 55,
+      "beforeChars": 609142,
+      "afterChars": 12633,
+      "obsOnlyChars": 8064
+    },
+    {
+      "call": 56,
+      "beforeChars": 609477,
+      "afterChars": 13087,
+      "obsOnlyChars": 8190
+    },
+    {
+      "call": 57,
+      "beforeChars": 609728,
+      "afterChars": 14137,
+      "obsOnlyChars": 8266
+    },
+    {
+      "call": 58,
+      "beforeChars": 610122,
+      "afterChars": 14692,
+      "obsOnlyChars": 8415
+    },
+    {
+      "call": 59,
+      "beforeChars": 610598,
+      "afterChars": 15484,
+      "obsOnlyChars": 8526
+    },
+    {
+      "call": 60,
+      "beforeChars": 610985,
+      "afterChars": 15521,
+      "obsOnlyChars": 8484
+    },
+    {
+      "call": 61,
+      "beforeChars": 611062,
+      "afterChars": 16028,
+      "obsOnlyChars": 8758
+    },
+    {
+      "call": 62,
+      "beforeChars": 611219,
+      "afterChars": 16055,
+      "obsOnlyChars": 8768
+    },
+    {
+      "call": 63,
+      "beforeChars": 611458,
+      "afterChars": 16493,
+      "obsOnlyChars": 8770
+    },
+    {
+      "call": 64,
+      "beforeChars": 611709,
+      "afterChars": 16612,
+      "obsOnlyChars": 8771
+    },
+    {
+      "call": 65,
+      "beforeChars": 611807,
+      "afterChars": 16584,
+      "obsOnlyChars": 8853
+    },
+    {
+      "call": 66,
+      "beforeChars": 611980,
+      "afterChars": 16370,
+      "obsOnlyChars": 8842
+    },
+    {
+      "call": 67,
+      "beforeChars": 611923,
+      "afterChars": 15879,
+      "obsOnlyChars": 8760
+    },
+    {
+      "call": 68,
+      "beforeChars": 611697,
+      "afterChars": 15384,
+      "obsOnlyChars": 8651
+    },
+    {
+      "call": 69,
+      "beforeChars": 611548,
+      "afterChars": 14911,
+      "obsOnlyChars": 8652
+    },
+    {
+      "call": 70,
+      "beforeChars": 611217,
+      "afterChars": 14507,
+      "obsOnlyChars": 8566
+    },
+    {
+      "call": 71,
+      "beforeChars": 610817,
+      "afterChars": 13917,
+      "obsOnlyChars": 8478
+    },
+    {
+      "call": 72,
+      "beforeChars": 610398,
+      "afterChars": 13499,
+      "obsOnlyChars": 8478
+    },
+    {
+      "call": 73,
+      "beforeChars": 609905,
+      "afterChars": 12605,
+      "obsOnlyChars": 8399
+    },
+    {
+      "call": 74,
+      "beforeChars": 609483,
+      "afterChars": 12218,
+      "obsOnlyChars": 8393
+    },
+    {
+      "call": 75,
+      "beforeChars": 609054,
+      "afterChars": 11830,
+      "obsOnlyChars": 8428
+    },
+    {
+      "call": 76,
+      "beforeChars": 608638,
+      "afterChars": 11275,
+      "obsOnlyChars": 8353
+    },
+    {
+      "call": 77,
+      "beforeChars": 608313,
+      "afterChars": 11297,
+      "obsOnlyChars": 8398
+    },
+    {
+      "call": 78,
+      "beforeChars": 608401,
+      "afterChars": 11752,
+      "obsOnlyChars": 8889
+    },
+    {
+      "call": 79,
+      "beforeChars": 608315,
+      "afterChars": 11895,
+      "obsOnlyChars": 8638
+    },
+    {
+      "call": 80,
+      "beforeChars": 608323,
+      "afterChars": 11959,
+      "obsOnlyChars": 8640
+    },
+    {
+      "call": 81,
+      "beforeChars": 608413,
+      "afterChars": 11994,
+      "obsOnlyChars": 8727
+    },
+    {
+      "call": 82,
+      "beforeChars": 608584,
+      "afterChars": 12156,
+      "obsOnlyChars": 8730
+    },
+    {
+      "call": 83,
+      "beforeChars": 608692,
+      "afterChars": 12237,
+      "obsOnlyChars": 8656
+    },
+    {
+      "call": 84,
+      "beforeChars": 608791,
+      "afterChars": 12444,
+      "obsOnlyChars": 8697
+    },
+    {
+      "call": 85,
+      "beforeChars": 609123,
+      "afterChars": 12478,
+      "obsOnlyChars": 8861
+    },
+    {
+      "call": 86,
+      "beforeChars": 609543,
+      "afterChars": 12668,
+      "obsOnlyChars": 8960
+    },
+    {
+      "call": 87,
+      "beforeChars": 609379,
+      "afterChars": 12243,
+      "obsOnlyChars": 8789
+    },
+    {
+      "call": 88,
+      "beforeChars": 609313,
+      "afterChars": 12146,
+      "obsOnlyChars": 8625
+    },
+    {
+      "call": 89,
+      "beforeChars": 609235,
+      "afterChars": 12083,
+      "obsOnlyChars": 8626
+    },
+    {
+      "call": 90,
+      "beforeChars": 609066,
+      "afterChars": 11871,
+      "obsOnlyChars": 8621
+    },
+    {
+      "call": 91,
+      "beforeChars": 608884,
+      "afterChars": 11649,
+      "obsOnlyChars": 8621
+    },
+    {
+      "call": 92,
+      "beforeChars": 608862,
+      "afterChars": 11505,
+      "obsOnlyChars": 8701
+    },
+    {
+      "call": 93,
+      "beforeChars": 608931,
+      "afterChars": 11538,
+      "obsOnlyChars": 8787
+    },
+    {
+      "call": 94,
+      "beforeChars": 608837,
+      "afterChars": 11379,
+      "obsOnlyChars": 8785
+    },
+    {
+      "call": 95,
+      "beforeChars": 608599,
+      "afterChars": 11171,
+      "obsOnlyChars": 8715
+    },
+    {
+      "call": 96,
+      "beforeChars": 608512,
+      "afterChars": 11173,
+      "obsOnlyChars": 8692
+    },
+    {
+      "call": 97,
+      "beforeChars": 608602,
+      "afterChars": 11475,
+      "obsOnlyChars": 8698
+    },
+    {
+      "call": 98,
+      "beforeChars": 608840,
+      "afterChars": 11714,
+      "obsOnlyChars": 8853
+    },
+    {
+      "call": 99,
+      "beforeChars": 609079,
+      "afterChars": 11948,
+      "obsOnlyChars": 8842
+    },
+    {
+      "call": 100,
+      "beforeChars": 609314,
+      "afterChars": 12249,
+      "obsOnlyChars": 8848
+    },
+    {
+      "call": 101,
+      "beforeChars": 609478,
+      "afterChars": 12450,
+      "obsOnlyChars": 8852
+    },
+    {
+      "call": 102,
+      "beforeChars": 609552,
+      "afterChars": 12543,
+      "obsOnlyChars": 8846
+    },
+    {
+      "call": 103,
+      "beforeChars": 609627,
+      "afterChars": 12588,
+      "obsOnlyChars": 8848
+    },
+    {
+      "call": 104,
+      "beforeChars": 609671,
+      "afterChars": 12509,
+      "obsOnlyChars": 8763
+    },
+    {
+      "call": 105,
+      "beforeChars": 609722,
+      "afterChars": 12335,
+      "obsOnlyChars": 8758
+    },
+    {
+      "call": 106,
+      "beforeChars": 609777,
+      "afterChars": 12355,
+      "obsOnlyChars": 8760
+    },
+    {
+      "call": 107,
+      "beforeChars": 609674,
+      "afterChars": 12253,
+      "obsOnlyChars": 8758
+    },
+    {
+      "call": 108,
+      "beforeChars": 609599,
+      "afterChars": 12097,
+      "obsOnlyChars": 8760
+    },
+    {
+      "call": 109,
+      "beforeChars": 609503,
+      "afterChars": 11956,
+      "obsOnlyChars": 8759
+    },
+    {
+      "call": 110,
+      "beforeChars": 609497,
+      "afterChars": 11944,
+      "obsOnlyChars": 8846
+    },
+    {
+      "call": 111,
+      "beforeChars": 609584,
+      "afterChars": 12030,
+      "obsOnlyChars": 8934
+    },
+    {
+      "call": 112,
+      "beforeChars": 609584,
+      "afterChars": 11947,
+      "obsOnlyChars": 8846
+    },
+    {
+      "call": 113,
+      "beforeChars": 609599,
+      "afterChars": 11939,
+      "obsOnlyChars": 8771
+    },
+    {
+      "call": 114,
+      "beforeChars": 609526,
+      "afterChars": 11893,
+      "obsOnlyChars": 8685
+    },
+    {
+      "call": 115,
+      "beforeChars": 609458,
+      "afterChars": 11832,
+      "obsOnlyChars": 8686
+    },
+    {
+      "call": 116,
+      "beforeChars": 609387,
+      "afterChars": 11812,
+      "obsOnlyChars": 8686
+    },
+    {
+      "call": 117,
+      "beforeChars": 609321,
+      "afterChars": 11792,
+      "obsOnlyChars": 8686
+    },
+    {
+      "call": 118,
+      "beforeChars": 609175,
+      "afterChars": 11634,
+      "obsOnlyChars": 8613
+    },
+    {
+      "call": 119,
+      "beforeChars": 608859,
+      "afterChars": 11308,
+      "obsOnlyChars": 8535
+    },
+    {
+      "call": 120,
+      "beforeChars": 608458,
+      "afterChars": 10965,
+      "obsOnlyChars": 8533
+    },
+    {
+      "call": 121,
+      "beforeChars": 608135,
+      "afterChars": 10668,
+      "obsOnlyChars": 8532
+    },
+    {
+      "call": 122,
+      "beforeChars": 607909,
+      "afterChars": 10431,
+      "obsOnlyChars": 8532
+    },
+    {
+      "call": 123,
+      "beforeChars": 607754,
+      "afterChars": 10336,
+      "obsOnlyChars": 8570
+    },
+    {
+      "call": 124,
+      "beforeChars": 607602,
+      "afterChars": 10190,
+      "obsOnlyChars": 8570
+    },
+    {
+      "call": 125,
+      "beforeChars": 607432,
+      "afterChars": 10143,
+      "obsOnlyChars": 8560
+    },
+    {
+      "call": 126,
+      "beforeChars": 607356,
+      "afterChars": 10052,
+      "obsOnlyChars": 8640
+    },
+    {
+      "call": 127,
+      "beforeChars": 607357,
+      "afterChars": 10142,
+      "obsOnlyChars": 8640
+    },
+    {
+      "call": 128,
+      "beforeChars": 607428,
+      "afterChars": 10245,
+      "obsOnlyChars": 8640
+    },
+    {
+      "call": 129,
+      "beforeChars": 607596,
+      "afterChars": 10441,
+      "obsOnlyChars": 8731
+    },
+    {
+      "call": 130,
+      "beforeChars": 607758,
+      "afterChars": 10618,
+      "obsOnlyChars": 8732
+    },
+    {
+      "call": 131,
+      "beforeChars": 607924,
+      "afterChars": 10785,
+      "obsOnlyChars": 8727
+    },
+    {
+      "call": 132,
+      "beforeChars": 608085,
+      "afterChars": 10939,
+      "obsOnlyChars": 8730
+    },
+    {
+      "call": 133,
+      "beforeChars": 608255,
+      "afterChars": 10960,
+      "obsOnlyChars": 8731
+    },
+    {
+      "call": 134,
+      "beforeChars": 608417,
+      "afterChars": 11074,
+      "obsOnlyChars": 8731
+    },
+    {
+      "call": 135,
+      "beforeChars": 608494,
+      "afterChars": 11039,
+      "obsOnlyChars": 8729
+    },
+    {
+      "call": 136,
+      "beforeChars": 608587,
+      "afterChars": 11109,
+      "obsOnlyChars": 8734
+    },
+    {
+      "call": 137,
+      "beforeChars": 608688,
+      "afterChars": 11201,
+      "obsOnlyChars": 8735
+    },
+    {
+      "call": 138,
+      "beforeChars": 608686,
+      "afterChars": 11191,
+      "obsOnlyChars": 8734
+    },
+    {
+      "call": 139,
+      "beforeChars": 608691,
+      "afterChars": 11232,
+      "obsOnlyChars": 8733
+    },
+    {
+      "call": 140,
+      "beforeChars": 608703,
+      "afterChars": 11267,
+      "obsOnlyChars": 8735
+    },
+    {
+      "call": 141,
+      "beforeChars": 608719,
+      "afterChars": 11286,
+      "obsOnlyChars": 8737
+    },
+    {
+      "call": 142,
+      "beforeChars": 608898,
+      "afterChars": 11522,
+      "obsOnlyChars": 8901
+    },
+    {
+      "call": 143,
+      "beforeChars": 608995,
+      "afterChars": 11652,
+      "obsOnlyChars": 8809
+    },
+    {
+      "call": 144,
+      "beforeChars": 608999,
+      "afterChars": 11743,
+      "obsOnlyChars": 8727
+    },
+    {
+      "call": 145,
+      "beforeChars": 608987,
+      "afterChars": 11706,
+      "obsOnlyChars": 8727
+    },
+    {
+      "call": 146,
+      "beforeChars": 608987,
+      "afterChars": 11850,
+      "obsOnlyChars": 8739
+    },
+    {
+      "call": 147,
+      "beforeChars": 609072,
+      "afterChars": 11907,
+      "obsOnlyChars": 8829
+    },
+    {
+      "call": 148,
+      "beforeChars": 609158,
+      "afterChars": 12001,
+      "obsOnlyChars": 8824
+    },
+    {
+      "call": 149,
+      "beforeChars": 609310,
+      "afterChars": 12160,
+      "obsOnlyChars": 8891
+    },
+    {
+      "call": 150,
+      "beforeChars": 609455,
+      "afterChars": 12320,
+      "obsOnlyChars": 8896
+    },
+    {
+      "call": 151,
+      "beforeChars": 609436,
+      "afterChars": 12262,
+      "obsOnlyChars": 8896
+    },
+    {
+      "call": 152,
+      "beforeChars": 609426,
+      "afterChars": 12141,
+      "obsOnlyChars": 8813
+    },
+    {
+      "call": 153,
+      "beforeChars": 609347,
+      "afterChars": 12063,
+      "obsOnlyChars": 8654
+    },
+    {
+      "call": 154,
+      "beforeChars": 609272,
+      "afterChars": 11853,
+      "obsOnlyChars": 8652
+    },
+    {
+      "call": 155,
+      "beforeChars": 609252,
+      "afterChars": 11771,
+      "obsOnlyChars": 8729
+    },
+    {
+      "call": 156,
+      "beforeChars": 609064,
+      "afterChars": 11509,
+      "obsOnlyChars": 8655
+    },
+    {
+      "call": 157,
+      "beforeChars": 608885,
+      "afterChars": 11296,
+      "obsOnlyChars": 8655
+    },
+    {
+      "call": 158,
+      "beforeChars": 608643,
+      "afterChars": 10996,
+      "obsOnlyChars": 8653
+    },
+    {
+      "call": 159,
+      "beforeChars": 608405,
+      "afterChars": 10753,
+      "obsOnlyChars": 8654
+    },
+    {
+      "call": 160,
+      "beforeChars": 608243,
+      "afterChars": 10544,
+      "obsOnlyChars": 8730
+    },
+    {
+      "call": 161,
+      "beforeChars": 608162,
+      "afterChars": 10470,
+      "obsOnlyChars": 8728
+    },
+    {
+      "call": 162,
+      "beforeChars": 608160,
+      "afterChars": 10445,
+      "obsOnlyChars": 8653
+    },
+    {
+      "call": 163,
+      "beforeChars": 608088,
+      "afterChars": 10417,
+      "obsOnlyChars": 8575
+    },
+    {
+      "call": 164,
+      "beforeChars": 607937,
+      "afterChars": 10308,
+      "obsOnlyChars": 8573
+    },
+    {
+      "call": 165,
+      "beforeChars": 607850,
+      "afterChars": 10251,
+      "obsOnlyChars": 8572
+    },
+    {
+      "call": 166,
+      "beforeChars": 607779,
+      "afterChars": 10218,
+      "obsOnlyChars": 8572
+    },
+    {
+      "call": 167,
+      "beforeChars": 607700,
+      "afterChars": 10177,
+      "obsOnlyChars": 8569
+    },
+    {
+      "call": 168,
+      "beforeChars": 607613,
+      "afterChars": 10146,
+      "obsOnlyChars": 8571
+    },
+    {
+      "call": 169,
+      "beforeChars": 607455,
+      "afterChars": 9967,
+      "obsOnlyChars": 8572
+    },
+    {
+      "call": 170,
+      "beforeChars": 607285,
+      "afterChars": 9960,
+      "obsOnlyChars": 8562
+    },
+    {
+      "call": 171,
+      "beforeChars": 607202,
+      "afterChars": 9859,
+      "obsOnlyChars": 8561
+    },
+    {
+      "call": 172,
+      "beforeChars": 607277,
+      "afterChars": 10009,
+      "obsOnlyChars": 8641
+    },
+    {
+      "call": 173,
+      "beforeChars": 607360,
+      "afterChars": 10132,
+      "obsOnlyChars": 8642
+    },
+    {
+      "call": 174,
+      "beforeChars": 607436,
+      "afterChars": 10253,
+      "obsOnlyChars": 8646
+    },
+    {
+      "call": 175,
+      "beforeChars": 607432,
+      "afterChars": 10284,
+      "obsOnlyChars": 8561
+    },
+    {
+      "call": 176,
+      "beforeChars": 607522,
+      "afterChars": 10397,
+      "obsOnlyChars": 8638
+    },
+    {
+      "call": 177,
+      "beforeChars": 607595,
+      "afterChars": 10484,
+      "obsOnlyChars": 8638
+    },
+    {
+      "call": 178,
+      "beforeChars": 607678,
+      "afterChars": 10378,
+      "obsOnlyChars": 8640
+    },
+    {
+      "call": 179,
+      "beforeChars": 607838,
+      "afterChars": 10516,
+      "obsOnlyChars": 8725
+    },
+    {
+      "call": 180,
+      "beforeChars": 607993,
+      "afterChars": 10559,
+      "obsOnlyChars": 8723
+    },
+    {
+      "call": 181,
+      "beforeChars": 608000,
+      "afterChars": 10543,
+      "obsOnlyChars": 8643
+    },
+    {
+      "call": 182,
+      "beforeChars": 608008,
+      "afterChars": 10521,
+      "obsOnlyChars": 8643
+    },
+    {
+      "call": 183,
+      "beforeChars": 608006,
+      "afterChars": 10473,
+      "obsOnlyChars": 8643
+    },
+    {
+      "call": 184,
+      "beforeChars": 608162,
+      "afterChars": 10621,
+      "obsOnlyChars": 8720
+    },
+    {
+      "call": 185,
+      "beforeChars": 608251,
+      "afterChars": 10735,
+      "obsOnlyChars": 8721
+    },
+    {
+      "call": 186,
+      "beforeChars": 608339,
+      "afterChars": 10872,
+      "obsOnlyChars": 8720
+    },
+    {
+      "call": 187,
+      "beforeChars": 608334,
+      "afterChars": 10891,
+      "obsOnlyChars": 8635
+    },
+    {
+      "call": 188,
+      "beforeChars": 608251,
+      "afterChars": 10835,
+      "obsOnlyChars": 8637
+    },
+    {
+      "call": 189,
+      "beforeChars": 608163,
+      "afterChars": 10813,
+      "obsOnlyChars": 8638
+    },
+    {
+      "call": 190,
+      "beforeChars": 608165,
+      "afterChars": 10833,
+      "obsOnlyChars": 8640
+    },
+    {
+      "call": 191,
+      "beforeChars": 608173,
+      "afterChars": 11065,
+      "obsOnlyChars": 8649
+    },
+    {
+      "call": 192,
+      "beforeChars": 608094,
+      "afterChars": 10993,
+      "obsOnlyChars": 8566
+    },
+    {
+      "call": 193,
+      "beforeChars": 608034,
+      "afterChars": 10955,
+      "obsOnlyChars": 8661
+    },
+    {
+      "call": 194,
+      "beforeChars": 607956,
+      "afterChars": 10933,
+      "obsOnlyChars": 8649
+    },
+    {
+      "call": 195,
+      "beforeChars": 607953,
+      "afterChars": 10924,
+      "obsOnlyChars": 8721
+    },
+    {
+      "call": 196,
+      "beforeChars": 608043,
+      "afterChars": 11031,
+      "obsOnlyChars": 8724
+    },
+    {
+      "call": 197,
+      "beforeChars": 608127,
+      "afterChars": 11054,
+      "obsOnlyChars": 8718
+    },
+    {
+      "call": 198,
+      "beforeChars": 608366,
+      "afterChars": 11288,
+      "obsOnlyChars": 8887
+    },
+    {
+      "call": 199,
+      "beforeChars": 608602,
+      "afterChars": 11279,
+      "obsOnlyChars": 8888
+    },
+    {
+      "call": 200,
+      "beforeChars": 608830,
+      "afterChars": 11454,
+      "obsOnlyChars": 8887
+    },
+    {
+      "call": 201,
+      "beforeChars": 608975,
+      "afterChars": 11530,
+      "obsOnlyChars": 8721
+    },
+    {
+      "call": 202,
+      "beforeChars": 609029,
+      "afterChars": 11502,
+      "obsOnlyChars": 8720
+    },
+    {
+      "call": 203,
+      "beforeChars": 609102,
+      "afterChars": 11576,
+      "obsOnlyChars": 8722
+    },
+    {
+      "call": 204,
+      "beforeChars": 609025,
+      "afterChars": 11499,
+      "obsOnlyChars": 8646
+    },
+    {
+      "call": 205,
+      "beforeChars": 608941,
+      "afterChars": 11364,
+      "obsOnlyChars": 8649
+    },
+    {
+      "call": 206,
+      "beforeChars": 608945,
+      "afterChars": 11327,
+      "obsOnlyChars": 8721
+    },
+    {
+      "call": 207,
+      "beforeChars": 608780,
+      "afterChars": 11157,
+      "obsOnlyChars": 8723
+    },
+    {
+      "call": 208,
+      "beforeChars": 608615,
+      "afterChars": 10968,
+      "obsOnlyChars": 8723
+    },
+    {
+      "call": 209,
+      "beforeChars": 608445,
+      "afterChars": 10793,
+      "obsOnlyChars": 8721
+    },
+    {
+      "call": 210,
+      "beforeChars": 608450,
+      "afterChars": 10805,
+      "obsOnlyChars": 8721
+    },
+    {
+      "call": 211,
+      "beforeChars": 608458,
+      "afterChars": 10834,
+      "obsOnlyChars": 8724
+    },
+    {
+      "call": 212,
+      "beforeChars": 608303,
+      "afterChars": 10731,
+      "obsOnlyChars": 8567
+    },
+    {
+      "call": 213,
+      "beforeChars": 608231,
+      "afterChars": 10709,
+      "obsOnlyChars": 8566
+    },
+    {
+      "call": 214,
+      "beforeChars": 608148,
+      "afterChars": 10655,
+      "obsOnlyChars": 8567
+    },
+    {
+      "call": 215,
+      "beforeChars": 608001,
+      "afterChars": 10562,
+      "obsOnlyChars": 8566
+    },
+    {
+      "call": 216,
+      "beforeChars": 607849,
+      "afterChars": 10466,
+      "obsOnlyChars": 8562
+    },
+    {
+      "call": 217,
+      "beforeChars": 607684,
+      "afterChars": 10498,
+      "obsOnlyChars": 8553
+    },
+    {
+      "call": 218,
+      "beforeChars": 607691,
+      "afterChars": 10515,
+      "obsOnlyChars": 8719
+    },
+    {
+      "call": 219,
+      "beforeChars": 607612,
+      "afterChars": 10504,
+      "obsOnlyChars": 8633
+    },
+    {
+      "call": 220,
+      "beforeChars": 607523,
+      "afterChars": 10368,
+      "obsOnlyChars": 8635
+    },
+    {
+      "call": 221,
+      "beforeChars": 607587,
+      "afterChars": 10413,
+      "obsOnlyChars": 8634
+    },
+    {
+      "call": 222,
+      "beforeChars": 607667,
+      "afterChars": 10521,
+      "obsOnlyChars": 8641
+    },
+    {
+      "call": 223,
+      "beforeChars": 607743,
+      "afterChars": 10584,
+      "obsOnlyChars": 8640
+    },
+    {
+      "call": 224,
+      "beforeChars": 607903,
+      "afterChars": 10736,
+      "obsOnlyChars": 8724
+    },
+    {
+      "call": 225,
+      "beforeChars": 608081,
+      "afterChars": 10764,
+      "obsOnlyChars": 8725
+    },
+    {
+      "call": 226,
+      "beforeChars": 608161,
+      "afterChars": 10832,
+      "obsOnlyChars": 8642
+    },
+    {
+      "call": 227,
+      "beforeChars": 607991,
+      "afterChars": 10578,
+      "obsOnlyChars": 8558
+    },
+    {
+      "call": 228,
+      "beforeChars": 607916,
+      "afterChars": 10446,
+      "obsOnlyChars": 8558
+    },
+    {
+      "call": 229,
+      "beforeChars": 607839,
+      "afterChars": 10330,
+      "obsOnlyChars": 8558
+    },
+    {
+      "call": 230,
+      "beforeChars": 607758,
+      "afterChars": 10185,
+      "obsOnlyChars": 8558
+    },
+    {
+      "call": 231,
+      "beforeChars": 607749,
+      "afterChars": 10166,
+      "obsOnlyChars": 8637
+    },
+    {
+      "call": 232,
+      "beforeChars": 607742,
+      "afterChars": 10162,
+      "obsOnlyChars": 8638
+    },
+    {
+      "call": 233,
+      "beforeChars": 607656,
+      "afterChars": 10076,
+      "obsOnlyChars": 8637
+    },
+    {
+      "call": 234,
+      "beforeChars": 607579,
+      "afterChars": 10037,
+      "obsOnlyChars": 8637
+    },
+    {
+      "call": 235,
+      "beforeChars": 607504,
+      "afterChars": 9983,
+      "obsOnlyChars": 8557
+    },
+    {
+      "call": 236,
+      "beforeChars": 607512,
+      "afterChars": 10118,
+      "obsOnlyChars": 8556
+    },
+    {
+      "call": 237,
+      "beforeChars": 607520,
+      "afterChars": 10186,
+      "obsOnlyChars": 8559
+    },
+    {
+      "call": 238,
+      "beforeChars": 607530,
+      "afterChars": 10403,
+      "obsOnlyChars": 8567
+    },
+    {
+      "call": 239,
+      "beforeChars": 607543,
+      "afterChars": 10439,
+      "obsOnlyChars": 8566
+    },
+    {
+      "call": 240,
+      "beforeChars": 607476,
+      "afterChars": 10367,
+      "obsOnlyChars": 8566
+    },
+    {
+      "call": 241,
+      "beforeChars": 607479,
+      "afterChars": 10359,
+      "obsOnlyChars": 8643
+    },
+    {
+      "call": 242,
+      "beforeChars": 607476,
+      "afterChars": 10344,
+      "obsOnlyChars": 8645
+    },
+    {
+      "call": 243,
+      "beforeChars": 607470,
+      "afterChars": 10315,
+      "obsOnlyChars": 8646
+    },
+    {
+      "call": 244,
+      "beforeChars": 607551,
+      "afterChars": 10351,
+      "obsOnlyChars": 8647
+    },
+    {
+      "call": 245,
+      "beforeChars": 607706,
+      "afterChars": 10476,
+      "obsOnlyChars": 8722
+    },
+    {
+      "call": 246,
+      "beforeChars": 607785,
+      "afterChars": 10364,
+      "obsOnlyChars": 8650
+    },
+    {
+      "call": 247,
+      "beforeChars": 608105,
+      "afterChars": 10684,
+      "obsOnlyChars": 8888
+    },
+    {
+      "call": 248,
+      "beforeChars": 608424,
+      "afterChars": 11041,
+      "obsOnlyChars": 8889
+    },
+    {
+      "call": 249,
+      "beforeChars": 608741,
+      "afterChars": 11366,
+      "obsOnlyChars": 8888
+    },
+    {
+      "call": 250,
+      "beforeChars": 608988,
+      "afterChars": 11603,
+      "obsOnlyChars": 8890
+    },
+    {
+      "call": 251,
+      "beforeChars": 609233,
+      "afterChars": 11845,
+      "obsOnlyChars": 8890
+    },
+    {
+      "call": 252,
+      "beforeChars": 609391,
+      "afterChars": 11972,
+      "obsOnlyChars": 8803
+    },
+    {
+      "call": 253,
+      "beforeChars": 609471,
+      "afterChars": 12074,
+      "obsOnlyChars": 8722
+    },
+    {
+      "call": 254,
+      "beforeChars": 609395,
+      "afterChars": 11998,
+      "obsOnlyChars": 8647
+    },
+    {
+      "call": 255,
+      "beforeChars": 609384,
+      "afterChars": 11948,
+      "obsOnlyChars": 8648
+    },
+    {
+      "call": 256,
+      "beforeChars": 609221,
+      "afterChars": 11762,
+      "obsOnlyChars": 8724
+    },
+    {
+      "call": 257,
+      "beforeChars": 609047,
+      "afterChars": 11521,
+      "obsOnlyChars": 8721
+    },
+    {
+      "call": 258,
+      "beforeChars": 608869,
+      "afterChars": 11295,
+      "obsOnlyChars": 8719
+    },
+    {
+      "call": 259,
+      "beforeChars": 608707,
+      "afterChars": 11140,
+      "obsOnlyChars": 8723
+    },
+    {
+      "call": 260,
+      "beforeChars": 608464,
+      "afterChars": 10897,
+      "obsOnlyChars": 8648
+    },
+    {
+      "call": 261,
+      "beforeChars": 608227,
+      "afterChars": 10690,
+      "obsOnlyChars": 8567
+    },
+    {
+      "call": 262,
+      "beforeChars": 608079,
+      "afterChars": 10569,
+      "obsOnlyChars": 8566
+    },
+    {
+      "call": 263,
+      "beforeChars": 608006,
+      "afterChars": 10517,
+      "obsOnlyChars": 8566
+    },
+    {
+      "call": 264,
+      "beforeChars": 607926,
+      "afterChars": 10419,
+      "obsOnlyChars": 8566
+    },
+    {
+      "call": 265,
+      "beforeChars": 607774,
+      "afterChars": 10340,
+      "obsOnlyChars": 8567
+    },
+    {
+      "call": 266,
+      "beforeChars": 607619,
+      "afterChars": 10218,
+      "obsOnlyChars": 8566
+    },
+    {
+      "call": 267,
+      "beforeChars": 607468,
+      "afterChars": 10059,
+      "obsOnlyChars": 8565
+    },
+    {
+      "call": 268,
+      "beforeChars": 607313,
+      "afterChars": 9870,
+      "obsOnlyChars": 8565
+    },
+    {
+      "call": 269,
+      "beforeChars": 607231,
+      "afterChars": 9724,
+      "obsOnlyChars": 8563
+    },
+    {
+      "call": 270,
+      "beforeChars": 607228,
+      "afterChars": 9681,
+      "obsOnlyChars": 8564
+    },
+    {
+      "call": 271,
+      "beforeChars": 607209,
+      "afterChars": 9797,
+      "obsOnlyChars": 8554
+    },
+    {
+      "call": 272,
+      "beforeChars": 607367,
+      "afterChars": 9974,
+      "obsOnlyChars": 8718
+    },
+    {
+      "call": 273,
+      "beforeChars": 607445,
+      "afterChars": 10114,
+      "obsOnlyChars": 8635
+    },
+    {
+      "call": 274,
+      "beforeChars": 607529,
+      "afterChars": 10238,
+      "obsOnlyChars": 8637
+    },
+    {
+      "call": 275,
+      "beforeChars": 607599,
+      "afterChars": 10343,
+      "obsOnlyChars": 8639
+    },
+    {
+      "call": 276,
+      "beforeChars": 607592,
+      "afterChars": 10353,
+      "obsOnlyChars": 8561
+    },
+    {
+      "call": 277,
+      "beforeChars": 607589,
+      "afterChars": 10353,
+      "obsOnlyChars": 8561
+    },
+    {
+      "call": 278,
+      "beforeChars": 607585,
+      "afterChars": 10382,
+      "obsOnlyChars": 8558
+    },
+    {
+      "call": 279,
+      "beforeChars": 607592,
+      "afterChars": 10233,
+      "obsOnlyChars": 8559
+    },
+    {
+      "call": 280,
+      "beforeChars": 607591,
+      "afterChars": 10207,
+      "obsOnlyChars": 8558
+    },
+    {
+      "call": 281,
+      "beforeChars": 607426,
+      "afterChars": 9946,
+      "obsOnlyChars": 8558
+    },
+    {
+      "call": 282,
+      "beforeChars": 607345,
+      "afterChars": 9812,
+      "obsOnlyChars": 8559
+    },
+    {
+      "call": 283,
+      "beforeChars": 607267,
+      "afterChars": 9690,
+      "obsOnlyChars": 8556
+    },
+    {
+      "call": 284,
+      "beforeChars": 607187,
+      "afterChars": 9551,
+      "obsOnlyChars": 8556
+    },
+    {
+      "call": 285,
+      "beforeChars": 607181,
+      "afterChars": 9500,
+      "obsOnlyChars": 8556
+    }
+  ]
+}

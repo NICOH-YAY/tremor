@@ -1,0 +1,13 @@
+import {readFileSync,writeFileSync} from 'node:fs';
+import {gunzipSync} from 'node:zlib';
+import {buildPrompt} from '../src/agent/prompt';
+import {execFileSync} from 'node:child_process';
+const original=execFileSync('git',['-c','safe.directory='+process.cwd(),'show','203810dcda4d7197d05309cb4437a1db25f37f31:src/agent/model_player.ts'],{encoding:'utf8'});
+const RULES=original.slice(original.indexOf("const RULES='")+13,original.indexOf("';\nexport function" )).replace(/\\'/g,"'");
+import {ACTION_IDS,type Observation} from '../src/player_interface';
+const rows=gunzipSync(readFileSync('eval/traces-sample/baseline-death.jsonl.gz')).toString().trim().split('\n').map(s=>JSON.parse(s));
+const observations=rows.map(r=>({...JSON.parse(r.observation),summary:r.observation}) as Observation);
+const metrics=observations.map((o,i)=>{const history=observations.slice(Math.max(0,i-8),i);return {call:i+1,beforeChars:[RULES,`Legal: ${ACTION_IDS.join(',')}`,history.map((p,j)=>p.summary+'\nAction: '+rows[Math.max(0,i-8)+j].action).join('\n'),`Current: ${o.summary}`,'Validation feedback: none'].join('\n').length,afterChars:buildPrompt(o,ACTION_IDS,history.map((o,j)=>({o,action:rows[Math.max(0,i-8)+j].action}))).length,obsOnlyChars:buildPrompt(o,ACTION_IDS,[]).length};});
+const stats=(key:'beforeChars'|'afterChars'|'obsOnlyChars')=>({min:Math.min(...metrics.map(r=>r[key])),mean:metrics.reduce((n,r)=>n+r[key],0)/metrics.length,max:Math.max(...metrics.map(r=>r[key]))});
+const result={beforeRevision:'203810dcda4d7197d05309cb4437a1db25f37f31',source:'eval/traces-sample/baseline-death.jsonl.gz',calls:metrics.length,method:'Exact JS character counts. chars/4 is only a token planning estimate, not measured Gemini token usage; no network/model calls.',before:stats('beforeChars'),after:stats('afterChars'),obsOnly:stats('obsOnlyChars'),perCall:metrics};
+writeFileSync('docs/reviews/prompt-size-e1m1.json',JSON.stringify(result,null,2)+'\n');console.log(JSON.stringify({...result,perCall:undefined},null,2));

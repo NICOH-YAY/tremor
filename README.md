@@ -88,7 +88,7 @@ excluded from vitest, typecheck and build. Historical wins are not engine eviden
 Root [LICENSE](LICENSE): GPL-2.0-or-later code. id Software GPL Doom via
 [doomgeneric](https://github.com/ozkl/doomgeneric); pinned revision in
 [provenance](engine/UPSTREAM.md). Redistribution/modification requires GPL terms
-and corresponding source, distributed as engine/source.zip.
+and corresponding source, distributed as public/engine/source.zip.
 Contains Freedoom Phase 1 v0.13.0 sprites recoloured by scripts/build-tremor-wad.py;
 (c) Contributors to the Freedoom project, BSD-3-Clause, modified. WAD and derived
 sprites retain [BSD terms](public/wad/FREEDOOM-LICENSE.txt) and credits.
@@ -101,3 +101,5 @@ with id Software or ZeniMax. Proprietary Doom WADs do not ship.
 
 Nicoh's personal agent-team account, peer notes, recording, live trials and course
 PR remain human submission work. Codex does not invent personal testimony.
+
+Model prompts preserve all public map information with lossless row RLE and reverse history deltas; see [contracts](docs/CONTRACTS.md). Seen/held-out baseline comparisons concern route progress and survival; completion has only been demonstrated on E1M1.

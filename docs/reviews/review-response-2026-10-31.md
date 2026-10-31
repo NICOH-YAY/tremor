@@ -68,7 +68,7 @@ clean committed result, target-Brave measurement or human testimony is invented.
 | HUD onboarding | DONE: persistent localStorage once-only hints for first visible unread human,human kill,shaken fear,zero rounds; separate from Halloran. Q held shows charges. |
 | Intermission moral-score contradiction | DONE: inherited kill% explicitly bookkeeping, no invented moral aggregate. |
 | WAD/audio leak | DONE: structural header/directory/lump/required-content validation and mod download before audio; repeated invalid-load DOM regression allocates zero contexts. Later failed startup closes context; instantiated engine failures require reload. |
-|1 route BFS | PARTIAL: static sector/wall/lock raster caches; keys refresh locks; dynamic heights; requested agent/TAB refresh 7tics, hidden browser <=1Hz; observation pure. Search remains synchronous when requested, not spread across tics: changing it to a delayed incremental job was deferred to preserve the synchronous course step/observe contract and responsive shared cue. This requested implementation detail remains unfinished, despite measured cost reduction. |
+|1 route BFS | PARTIAL: static sector/wall/lock raster caches; keys refresh locks; dynamic heights; requested agent/TAB refresh 7tics, browser TAB-closed cue every 35 advancing tics; story polling remains 4Hz independent of visibility; observation pure. Search remains synchronous when requested, not spread across tics: changing it to a delayed incremental job was deferred to preserve the synchronous course step/observe contract and responsive shared cue. This requested implementation detail remains unfinished, despite measured cost reduction. |
 |2 blit | DONE: pre-scale cap 3, ResizeObserver layout. |
 |3 Asyncify | DONE: removed, callback pause/direct transitions; measured before/after below. |
 |4 DOM writes | DONE: cache text/style values, update on change. |
@@ -80,7 +80,7 @@ clean committed result, target-Brave measurement or human testimony is invented.
 |10 preview | DONE: no suspended Asyncify stack; production preview smoke verifies paused tics. |
 | Playtest 1 holdTAB | DONE in am_map.c keydown starts, repeat stays,keyup stops; route arrow HTML remains visible while held. |
 | Playtest 2 take-control overlay | DONE: small corner hint, disappears after first keyboard/click; no centered crosshair obstruction. |
-| Playtest 3 id strings | DONE: text-only Freedoom BEX replacements generated from licensed DEHACKED strings; original finale/quit override; intermission graphics come from Freedoom WAD. Dehacked gameplay patches intentionally not loaded. |
+| Playtest 3 id strings | DONE: displayed text-only Freedoom BEX replacements (internal GPL mode/episode names remain) generated from licensed DEHACKED strings; original finale/quit override; intermission graphics come from Freedoom WAD. Dehacked gameplay patches intentionally not loaded. |
 | Playtest 4 damage | DONE: fear 0 damage multiplier 1.0 C check; red edge flash uses attacker bearing (unattributed hits use rear edge). Visual/audible target-Brave verification NOT DONE: UI inventory returned apps=[],browsers=[]. |
 
 ## Verification and limitations

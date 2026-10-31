@@ -1,20 +1,24 @@
 import { GoogleGenAI } from '@google/genai';
 import type { Controller } from './types';
-const RULES='Play Tremor in the real Doom engine on Freedoom Episode 1. Reach a level exit, survive. Crew never attack. Unknown figure hides whether a human is crew or possessed. Hold read for five consecutive actions (35 tics) on an aimed human to identify them. Stun at <=64 Doom units, then five consecutive purge actions on a stunned human to save them (two charges). A completed purge deliberately reveals crew, consumes one charge and gives +3 rounds identically for either hidden identity; possessed becomes crew. Interrupted attempts have identical feedback. Demons use Doom names and are hostile. Actions take seven 35Hz tics (0.2s); small turns total 10 degrees, fine turns 2, large turns 90. Compound _fire and _read actions hold those inputs while turning/moving. Bearings are positive LEFT, negative RIGHT. Distances are Doom map units. Fire at bearing near zero. If out of rounds select weapon_fist and approach melee range. Map is a 257x257 north-up viewport with 16 Doom units per cell: ? unknown, . previously visible floor, # mapped barrier, D closed manual door, d open passage (do not close it), S mapped switch, T mapped crossing activation, b/y/r closed blue/yellow/red locks, >^<v the player marker. The viewport recenters near its edge; no world coordinates or unvisited lines are supplied. heading_deg numerically describes the visible arrow; elevation_deg describes an entity position above/below the view. motion is the visible moving/blocked/still cue. weapons is the HUD inventory. The bounded episode radio log is also accessible to humans. Use opens nearby doors and activates exit switches. Only supplied observations and legal actions are available. HUD fields: health and armor are current supplies; rounds is the shared firearm budget; purge is remaining charges; weapon is selected, weapons owned, keys held; aim is qualitative lasting trauma. tic is simulation time. terror is steady (<25), shaken (25-49), terrified (50-79), breaking (80-100), describing corpse fear: hit success falls to 77/256 and damage rises to 1.6x at 100. objective is designed quest guidance; objective_bearing points to a geometry-derived route waypoint up to 256 units ahead, identically shown to humans holding TAB; objective_distance is near (<128), nearby (<512), far. radio_log is the bounded 16KB transcript, not a fresh event. events are displayed messages from this step (up to five). summary serializes these same fields. Each human kill adds lasting trauma up to 6, heals 15 up to 100 without reducing higher health; demons heal 10. Fear decays 1/350 tics without new exposure, halves each level. READ and PURGE need 35 uninterrupted tics; stun lasts 70, cooldown 35. Medium turns are 45 degrees. Return JSON {"action":"legal id","reason":"brief reason"}.';
-export function modelPlayer(memory:'history'|'obs-only'):Controller {
- const project=process.env.GOOGLE_CLOUD_PROJECT;if(!project)throw new Error('GOOGLE_CLOUD_PROJECT is required for live Vertex');
- const history:string[]=[];
- let location=process.env.GOOGLE_CLOUD_LOCATION??'global';
+import {buildPrompt} from './prompt';
+import {MODEL_CONFIG} from '../eval/model_config';
+import type {Observation} from '../player_interface';
+type Generate=(request:Parameters<GoogleGenAI['models']['generateContent']>[0])=>Promise<{text?:string;usageMetadata?:{promptTokenCount?:number;candidatesTokenCount?:number;thoughtsTokenCount?:number}}>;
+export function modelPlayer(memory:'history'|'obs-only',generate?:Generate):Controller {
+ const project=process.env.GOOGLE_CLOUD_PROJECT;
+ if(!generate&&!project)throw new Error('GOOGLE_CLOUD_PROJECT is required for live Vertex');
+ if(process.env.GOOGLE_CLOUD_LOCATION&&process.env.GOOGLE_CLOUD_LOCATION!==MODEL_CONFIG.location)throw new Error('Evaluation requires global Vertex location');
+ const history:{o:Observation;action:string}[]=[];
+ const request=generate??((r)=>new GoogleGenAI({vertexai:true,project,location:MODEL_CONFIG.location}).models.generateContent(r));
  return {id:`model-${memory}`,model:true,async decide(o,legal,feedback,signal){
- const prompt=[RULES,`Legal: ${legal.join(',')}`,memory==='history'?history.slice(-8).join('\n'):'',`Current: ${o.summary}`,`Validation feedback: ${feedback??'none'}`].join('\n');
- const request=()=>new GoogleGenAI({vertexai:true,project,location}).models.generateContent({model:'gemini-3.5-flash-lite',contents:prompt,config:{responseMimeType:'application/json',httpOptions:{timeout:20000,retryOptions:{attempts:1}},abortSignal:signal}});
- let response;try{response=await request();}catch(error){if(location==='global'&&/404|not found|location|unsupported/i.test(String(error))){location='us-central1';throw new Error('Global Vertex unavailable; failed call counted, next call uses us-central1', {cause:error});}else throw error;}
- let parsed:{action?:unknown;reason?:unknown}={};try{const candidate:unknown=JSON.parse(response.text??'{}');if(candidate&&typeof candidate==='object')parsed=candidate as typeof parsed;}catch{parsed={reason:'invalid JSON response'};}
+ const prompt=buildPrompt(o,legal,memory==='history'?history:[],feedback);
+ if(prompt.length>MODEL_CONFIG.maxPromptChars)return {action:'',error:'lossless prompt exceeds character preflight budget',tokensIn:0,tokensOut:0,usageKnown:true};
+ const response=await request({model:MODEL_CONFIG.model,contents:prompt,config:{temperature:MODEL_CONFIG.temperature,maxOutputTokens:MODEL_CONFIG.maxOutputTokens,responseMimeType:'application/json',httpOptions:{timeout:20000,retryOptions:{attempts:1}},abortSignal:signal}});
+ const usage={usageKnown:response.usageMetadata?.promptTokenCount!==undefined&&response.usageMetadata?.candidatesTokenCount!==undefined,tokensIn:response.usageMetadata?.promptTokenCount??0,tokensOut:(response.usageMetadata?.candidatesTokenCount??0)+(response.usageMetadata?.thoughtsTokenCount??0)};
+ let parsed:{action?:unknown;reason?:unknown}={};try{const candidate:unknown=JSON.parse(response.text??'{}');if(candidate&&typeof candidate==='object')parsed=candidate as typeof parsed;}catch{}
  const action=typeof parsed.action==='string'?parsed.action:'';
- if(!action) return {action:'',error:'invalid model response',tokensIn:response.usageMetadata?.promptTokenCount??0,tokensOut:response.usageMetadata?.candidatesTokenCount??0};
- history.push(`${o.summary}\nAction: ${action}`);if(history.length>8)history.shift();
- return {action,reason:typeof parsed.reason==='string'?parsed.reason:'',tokensIn:response.usageMetadata?.promptTokenCount??0,tokensOut:response.usageMetadata?.candidatesTokenCount??0};
+ history.push({o:structuredClone(o),action});if(history.length>8)history.shift();
+ if(!action)return {action:'',error:'invalid model response',...usage};
+ return {action,reason:typeof parsed.reason==='string'?parsed.reason:'',...usage};
  }};
 }
-
-
