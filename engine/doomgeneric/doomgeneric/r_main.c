@@ -627,7 +627,11 @@ void R_InitLightTables (void)
 	{
 	    scale = FixedDiv ((SCREENWIDTH/2*FRACUNIT), (j+1)<<LIGHTZSHIFT);
 	    scale >>= LIGHTSCALESHIFT;
-	    level = startmap - scale/DISTMAP;
+	    #if defined(TR_VANILLA_LIGHT) || defined(TR_PREVIOUS_LIGHT)
+            level = startmap - scale/DISTMAP;
+#else
+            level = startmap + 2 + j/3 - scale/DISTMAP;
+#endif
 	    
 	    if (level < 0)
 		level = 0;
@@ -746,7 +750,11 @@ void R_ExecuteSetViewSize (void)
 	startmap = ((LIGHTLEVELS-1-i)*2)*NUMCOLORMAPS/LIGHTLEVELS;
 	for (j=0 ; j<MAXLIGHTSCALE ; j++)
 	{
-	    level = startmap - j*SCREENWIDTH/(viewwidth<<detailshift)/DISTMAP;
+	    #if defined(TR_VANILLA_LIGHT) || defined(TR_PREVIOUS_LIGHT)
+            level = startmap - j*SCREENWIDTH/(viewwidth<<detailshift)/DISTMAP;
+#else
+            level = startmap + 5 - j*SCREENWIDTH/(viewwidth<<detailshift)/DISTMAP;
+#endif
 	    
 	    if (level < 0)
 		level = 0;
@@ -832,16 +840,21 @@ void R_SetupFrame (player_t* player)
     viewx = player->mo->x;
     viewy = player->mo->y;
     viewangle = player->mo->angle + viewangleoffset + (angle_t)(TR_Sway()*128);
-    extralight = player->extralight-1; /* TREMOR: lower ambient effective light. */
+#ifdef TR_VANILLA_LIGHT
+    extralight = player->extralight;
+#else
+    extralight = player->extralight-1;
+#endif /* TREMOR: lower ambient effective light. */
     /* TREMOR: Heretic-style shear, rebuilding dependent plane slopes. */
-    centery=viewheight/2 + tr_pitch*viewheight/200 + (TR_Sway()>>FRACBITS)/2;
+    centery=viewheight/2 + (player->mo->tr_oldtic==leveltime-1?TR_Interpolate(player->mo->tr_oldpitch*FRACUNIT,tr_pitch*FRACUNIT)/FRACUNIT:tr_pitch)*viewheight/200 + (TR_Sway()>>FRACBITS)/2;
     centeryfrac=centery*FRACUNIT;
     {int y;for(y=0;y<viewheight;y++) {fixed_t dy=abs((y-centery)*FRACUNIT+FRACUNIT/2);yslope[y]=FixedDiv((viewwidth<<detailshift)/2*FRACUNIT,dy);}}
 
 
     viewz = player->viewz + TR_Sway()/2; /* TREMOR: render-only sway/kick. */
     
-    if(player->mo->tr_oldtic==leveltime-1){viewx=TR_Interpolate(player->mo->tr_oldx,viewx);viewy=TR_Interpolate(player->mo->tr_oldy,viewy);}
+    if(player->mo->tr_oldtic==leveltime-1){viewx=TR_Interpolate(player->mo->tr_oldx,viewx);viewy=TR_Interpolate(player->mo->tr_oldy,viewy);viewz=TR_Interpolate(player->mo->tr_oldviewz,player->viewz)+TR_Sway()/2;viewangle=player->mo->tr_oldangle+(angle_t)((int64_t)(int32_t)(player->mo->angle-player->mo->tr_oldangle)*tr_fraction/FRACUNIT)+viewangleoffset+(angle_t)(TR_Sway()*128);}
+    viewangle+=TR_BrowserMouseView();
     TR_PreviewView(); /* TREMOR: render-only, no world movement. */
     viewsin = finesine[viewangle>>ANGLETOFINESHIFT];
     viewcos = finecosine[viewangle>>ANGLETOFINESHIFT];

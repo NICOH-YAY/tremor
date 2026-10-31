@@ -8,5 +8,6 @@ const module=await createDoom({onFrame(){frames++;},print:console.log,printErr:c
 module.FS.writeFile('/game.wad',readFileSync('public/wad/freedoom1.wad'));
 module.FS.writeFile('/tremor.wad',readFileSync('public/wad/tremor.wad'));
 module.callMain(['-iwad','/game.wad','-file','/tremor.wad','-nomusic','-warp','1','1']);
-const timer=setInterval(()=>{if(frames>2&&!ran){ran=true;const failures=module._tremor_test();clearInterval(timer);process.exit(failures?1:0);}},20);
+// Frames no longer imply simulation progress. Let the initial weapon finish raising.
+const timer=setInterval(()=>{if(frames>2&&module._tremor_tic()>=35&&!ran){ran=true;const failures=module._tremor_test();clearInterval(timer);process.exit(failures?1:0);}},20);
 setTimeout(()=>{console.error('Engine test timed out');process.exit(1);},20000);

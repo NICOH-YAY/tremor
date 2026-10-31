@@ -1,3 +1,4 @@
+#include "tremor.h"
 //
 // Copyright(C) 1993-1996 Id Software, Inc.
 // Copyright(C) 2005-2014 Simon Howard
@@ -1135,7 +1136,19 @@ void AM_drawWalls(void)
 	{
 	    if ((lines[i].flags & LINE_NEVERSEE) && !cheating)
 		continue;
-	    if (!lines[i].backsector)
+	    /* TREMOR: public mapped activation markers, matching the agent legend.
+           Secret/never-see lines retain their ordinary treatment. */
+        if (lines[i].special && !(lines[i].flags & ML_SECRET)) {
+            mline_t marker;fixed_t mx=l.a.x+(l.b.x-l.a.x)/2,my=l.a.y+(l.b.y-l.a.y)/2;
+            static const short door[]={-6,-8,-6,8,-6,8,3,8,3,8,6,4,6,4,6,-4,6,-4,3,-8,3,-8,-6,-8};
+            static const short button[]={6,8,-6,8,-6,8,-6,0,-6,0,6,0,6,0,6,-8,6,-8,-6,-8};
+            static const short trigger[]={-6,8,6,8,0,8,0,-8};
+            int kind=TR_LineMarker(lines[i].special),key=TR_KeyColor(lines[i].special),color=key==0?BLUES:key==1?YELLOWS:key==2?REDS:WHITE;
+            if(kind=='D'&&TR_DoorOpen(&lines[i]))color=GRAYS;
+            const short *glyph=kind=='D'?door:kind=='S'?button:trigger;int count=kind=='D'?6:kind=='S'?5:2;
+            for(int stroke=0;stroke<count;stroke++){marker.a.x=mx+glyph[stroke*4]*FRACUNIT;marker.a.y=my+glyph[stroke*4+1]*FRACUNIT;marker.b.x=mx+glyph[stroke*4+2]*FRACUNIT;marker.b.y=my+glyph[stroke*4+3]*FRACUNIT;AM_drawMline(&marker,color);}
+        }
+        if (!lines[i].backsector)
 	    {
 		AM_drawMline(&l, WALLCOLORS+lightlev);
 	    }

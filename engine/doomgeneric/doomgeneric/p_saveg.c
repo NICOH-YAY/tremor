@@ -1362,7 +1362,7 @@ void P_WriteSaveGameHeader(char *description)
         saveg_write8(0);
 
     memset(name, 0, sizeof(name));
-    M_snprintf(name, sizeof(name), "Tremor %i", 2);
+    M_snprintf(name, sizeof(name), "Tremor %i", 3);
 
     for (i=0; i<VERSIONSIZE; ++i)
         saveg_write8(name[i]);
@@ -1399,7 +1399,7 @@ boolean P_ReadSaveGameHeader(void)
         read_vcheck[i] = saveg_read8();
 
     memset(vcheck, 0, sizeof(vcheck));
-    M_snprintf(vcheck, sizeof(vcheck), "Tremor %i", 2);
+    M_snprintf(vcheck, sizeof(vcheck), "Tremor %i", 3);
     if (strcmp(read_vcheck, vcheck) != 0)
 	return false;				// bad version 
 
@@ -1448,7 +1448,7 @@ void P_ArchivePlayers (void)
 {
     int i;
     /* TREMOR: episode trauma and level resources. */
-    saveg_write32(tr_last_corpse);saveg_write32(tr_radio_pending);for(i=0;i<512;i++)saveg_write8(tr_radio_log[i]);saveg_write32(tr_story_clock); saveg_write32(tr_radio_last); saveg_write32(tr_radio_bits); saveg_write32(tr_pitch); saveg_write32(tr_terror); saveg_write32(tr_trauma); saveg_write32(tr_rounds);
+    for(i=0;i<16384;i++)saveg_write8(tr_radio_history[i]);saveg_write32(tr_briefing_bits);saveg_write32(tr_last_corpse);saveg_write32(tr_radio_pending);for(i=0;i<512;i++)saveg_write8(tr_radio_log[i]);saveg_write32(tr_story_clock); saveg_write32(tr_radio_last); saveg_write32(tr_radio_bits); saveg_write32(tr_pitch); saveg_write32(tr_terror); saveg_write32(tr_trauma); saveg_write32(tr_rounds);
     saveg_write32(tr_charges); saveg_write32(tr_saved);
 		
     for (i=0 ; i<MAXPLAYERS ; i++)
@@ -1471,7 +1471,7 @@ void P_UnArchivePlayers (void)
 {
     int i;
     /* TREMOR: episode trauma and level resources. */
-    tr_last_corpse=saveg_read32();tr_radio_pending=saveg_read32();for(i=0;i<512;i++)tr_radio_log[i]=saveg_read8();TR_ClearRadioQueue();tr_story_clock=saveg_read32();tr_radio_last=saveg_read32();tr_radio_bits=saveg_read32();tr_pitch=saveg_read32(); tr_terror=saveg_read32(); tr_trauma=saveg_read32(); tr_rounds=saveg_read32();
+    for(i=0;i<16384;i++)tr_radio_history[i]=saveg_read8();tr_radio_history[16383]=0;tr_briefing_bits=saveg_read32();tr_last_corpse=saveg_read32();tr_radio_pending=saveg_read32();for(i=0;i<512;i++)tr_radio_log[i]=saveg_read8();TR_ClearRadioQueue();tr_story_clock=saveg_read32();tr_radio_last=saveg_read32();tr_radio_bits=saveg_read32();tr_pitch=saveg_read32(); tr_terror=saveg_read32(); tr_trauma=saveg_read32(); tr_rounds=saveg_read32();
     tr_charges=saveg_read32(); tr_saved=saveg_read32();
 	
     for (i=0 ; i<MAXPLAYERS ; i++)

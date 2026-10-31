@@ -9,6 +9,17 @@ async function fixture(crew=0){const m=await createTestEngine({noInitialRun:true
 const obs=(m:any)=>JSON.parse(m.UTF8ToString(m._tremor_agent_observe()));
 const result=(m:any)=>JSON.parse(m.UTF8ToString(m._tremor_agent_outcome()));
 describe('real Doom engine course interface',()=>{
+ it.todo('baseline completes a Freedoom level from normal spawn within the step limit (completion target remains unmet)');
+ it('controllers receive only public view, map, HUD and story fields',async()=>{
+  const fields=['aim','armor','automap','entities','events','heading_deg','health','keys','map_cell_units','motion','objective','objective_bearing','objective_distance','purge','radio_log','rounds','summary','terror','tic','weapon','weapons'].sort();
+  const controller:Controller={id:'public-schema-check',async decide(o){
+   expect(Object.keys(o).sort()).toEqual(fields);
+   expect(Object.keys(JSON.parse(o.summary)).sort()).toEqual(fields.filter(k=>k!=='summary'));
+   for(const e of o.entities)expect(Object.keys(e).sort()).toEqual(['bearing_deg','distance','elevation_deg','type'].sort());
+   return {action:'wait'};
+  }};
+  await runEpisode(controller,{seed:17,levelId:'E1M2',maxSteps:1,tracePath:false});
+ });
  it('has five operations, a constant vocabulary, seven-tic actions and opaque state',()=>{const w=reset(17);expect(observe(w).tic).toBe(0);for(const action of ACTION_IDS){const before=observe(w).tic;expect(step(w,'player',action).valid).toBe(true);expect(observe(w).tic-before).toBe(7);}expect(legal_actions(w)).toEqual([...ACTION_IDS]);expect(Object.keys(w)).toEqual(['seed','levelId']);const o=observe(w);o.keys.push('red');expect(observe(w).keys).not.toContain('red');});
  it('validates action/player and treats all identity-dependent attempts neutrally',()=>{const w=reset(1);expect(step(w,'player','bad')).toMatchObject({valid:false,reason:'unknown action'});expect(observe(w).tic).toBe(7);expect(step(w,'other','wait')).toMatchObject({valid:false,reason:'unknown player'});for(const a of ['stun','purge','weapon_shotgun'])expect(step(w,a).valid).toBe(true);expect(()=>observe(w,'other')).toThrow('Unknown player');expect(()=>reset(1,'test_room')).toThrow('Unknown level');});
  it('deterministically replays independent WASM instances and isolates episodes',()=>{const a=reset(83),b=reset(83);for(const action of ['forward','turn_left_small','fire','wait','read','stun','purge']){step(a,action);step(b,action);expect(observe(a)).toEqual(observe(b));expect(outcome(a)).toEqual(outcome(b));}step(a,'forward');expect(observe(b).tic).toBe(49);});

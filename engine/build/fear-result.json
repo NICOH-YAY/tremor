@@ -1,0 +1,14 @@
+{
+  "0": {
+    "cameraSwayUnits": 0,
+    "weaponYUnits": 0,
+    "desaturationAlpha": 0,
+    "vignetteAlpha": 0
+  },
+  "100": {
+    "cameraSwayUnits": 1.89971923828125,
+    "weaponYUnits": -2.7559661865234375,
+    "desaturationAlpha": 0.7,
+    "vignetteAlpha": 0.9
+  }
+}

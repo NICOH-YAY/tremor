@@ -3,7 +3,7 @@ import {readFileSync} from 'node:fs';
 import createDoom from '../public/engine-headless/doom.cjs';
 export const STEP_TICS=7;
 // This order is the C agent ABI; append only with a matching agent_api.c change.
-export const ACTION_IDS=['forward','back','strafe_left','strafe_right','turn_left_small','turn_left_large','turn_right_small','turn_right_large','fire','use','read','stun','purge','wait','weapon_fist','weapon_pistol','weapon_shotgun'] as const;
+export const ACTION_IDS=['forward','back','strafe_left','strafe_right','turn_left_small','turn_left_large','turn_right_small','turn_right_large','fire','use','read','stun','purge','wait','weapon_fist','weapon_pistol','weapon_shotgun','turn_left_fine','turn_right_fine','forward_slow','advance_fire','strafe_left_fire','strafe_right_fire','back_fire','sprint','turn_left_small_fire','turn_right_small_fire','turn_left_fine_fire','turn_right_fine_fire','turn_left_small_read','turn_right_small_read','turn_left_fine_read','turn_right_fine_read','advance_read','approach_left_fire','approach_right_fire'] as const;
 export type ActionId=typeof ACTION_IDS[number];
 export type TerminalReason='exit'|'dead'|'step_limit'|'call_limit'|'timeout';
 export interface EngineState {readonly seed:number;readonly levelId:string}
@@ -25,7 +25,7 @@ export function reset(seed:number,levelId='E1M1'):EngineState {
  m._tremor_agent_reset(seed,1,Number(levelId.slice(3)),2);
  const state=Object.freeze({seed,levelId});modules.set(state,m);return state;
 }
-export interface Observation {objective:string;objective_bearing:number;objective_distance:'near'|'nearby'|'far';terror:'steady'|'shaken'|'terrified'|'breaking';radio_log:string;tic:number;health:number;armor:number;rounds:number;purge:number;weapon:string;keys:string[];aim:'steady'|'shaky'|'very shaky';entities:{bearing_deg:number;distance:number;type:string}[];automap:string;map_cell_units:number;events:string[];summary:string}
+export interface Observation {motion:'blocked'|'moving'|'still';objective:string;objective_bearing:number;objective_distance:'near'|'nearby'|'far';terror:'steady'|'shaken'|'terrified'|'breaking';radio_log:string;tic:number;health:number;armor:number;rounds:number;purge:number;weapon:string;weapons:string[];keys:string[];aim:'steady'|'shaky'|'very shaky';entities:{bearing_deg:number;distance:number;elevation_deg:number;type:string}[];automap:string;map_cell_units:number;heading_deg:number;events:string[];summary:string}
 export function observe(state:EngineState,player_id='player'):Observation {
  if(player_id!=='player')throw Error('Unknown player');const m=moduleOf(state);
  const raw=JSON.parse(m.UTF8ToString(m._tremor_agent_observe())) as Omit<Observation,'summary'>;
@@ -44,5 +44,5 @@ export function step(state:EngineState,playerOrAction:string,action?:string):Ste
  return {state,events:observe(state).events,valid:reason===null,reason};
 }
 export function terminate(state:EngineState,reason:TerminalReason){const code={exit:1,dead:2,step_limit:3,call_limit:4,timeout:5}[reason];moduleOf(state)._tremor_agent_terminate(code);}
-interface EngineOutcome {status:'ongoing'|'terminal';reason:TerminalReason|null;score:number;metrics:{kills_demons:number;kills_humans:number;crew_killed:number;crew_saved:number;reads:number;fired_unread:number;rounds_left:number;final_tremor:number;tics:number}}
-export function outcome(state:EngineState){const m=moduleOf(state),raw=JSON.parse(m.UTF8ToString(m._tremor_agent_outcome())) as EngineOutcome;return {...raw,done:raw.status==='terminal',reachedExit:raw.reason==='exit',dead:raw.reason==='dead',ticks:raw.metrics.tics,crewKilled:raw.metrics.crew_killed,crewSaved:raw.metrics.crew_saved,demonsKilled:raw.metrics.kills_demons,reads:raw.metrics.reads,firedUnread:raw.metrics.fired_unread,finalTremor:raw.metrics.final_tremor};}
+interface EngineOutcome {status:'ongoing'|'terminal';reason:TerminalReason|null;score:number;metrics:{kills_demons:number;kills_humans:number;crew_killed:number;crew_saved:number;reads:number;fired_unread:number;rounds_left:number;final_tremor:number;terror_bucket:Observation['terror'];tics:number}}
+export function outcome(state:EngineState){const m=moduleOf(state),raw=JSON.parse(m.UTF8ToString(m._tremor_agent_outcome())) as EngineOutcome;return {...raw,done:raw.status==='terminal',reachedExit:raw.reason==='exit',dead:raw.reason==='dead',ticks:raw.metrics.tics,crewKilled:raw.metrics.crew_killed,crewSaved:raw.metrics.crew_saved,demonsKilled:raw.metrics.kills_demons,reads:raw.metrics.reads,firedUnread:raw.metrics.fired_unread,finalTremor:raw.metrics.final_tremor,finalTerrorBucket:raw.metrics.terror_bucket};}

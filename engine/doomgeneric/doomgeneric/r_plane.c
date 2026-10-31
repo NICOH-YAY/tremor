@@ -160,7 +160,11 @@ R_MapPlane
 	if (index >= MAXLIGHTZ )
 	    index = MAXLIGHTZ-1;
 
-	ds_colormap = distance<96*FRACUNIT ? colormaps+12*256 : planezlight[index]; /* TREMOR */
+	#ifdef TR_VANILLA_LIGHT
+        ds_colormap = planezlight[index];
+#else
+        ds_colormap = distance<96*FRACUNIT ? colormaps+12*256 : planezlight[index];
+#endif /* TREMOR */
     }
 	
     ds_y = y;
@@ -396,7 +400,11 @@ void R_DrawPlanes (void)
 	    //  i.e. colormaps[0] is used.
 	    // Because of this hack, sky is not affected
 	    //  by INVUL inverse mapping.
-	    dc_colormap = colormaps;
+	    #if defined(TR_VANILLA_LIGHT) || defined(TR_PREVIOUS_LIGHT)
+        dc_colormap = colormaps;
+#else
+        dc_colormap = colormaps+4*256;
+#endif /* TREMOR: night sky. */
 	    dc_texturemid = skytexturemid;
 	    for (x=pl->minx ; x <= pl->maxx ; x++)
 	    {

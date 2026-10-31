@@ -3498,7 +3498,7 @@ function TR_SettingsReady() {
 }
 
 // Imports from the Wasm binary.
-var _tremor_music_song_serial, _tremor_music_render, _tremor_music_rate, _tremor_music_active, _tremor_fear, _tremor_set_gore, _tremor_set_mouse_sensitivity, _tremor_set_volumes, _tremor_bind_key, _tremor_set_screen_shake, _tremor_radio_pop, _tremor_story, _tremor_look, _tremor_center_view, _tremor_comfort, _tremor_preview, _tremor_render_ms, _tremor_arm_turn, _tremor_pressure, _tremor_tic, _tremor_agent_reset, _tremor_agent_step, _tremor_agent_observe, _tremor_agent_outcome, _tremor_agent_terminate, _setThrew, __emscripten_stack_restore, __emscripten_stack_alloc, _emscripten_stack_get_current, memory, __indirect_function_table, wasmMemory;
+var _tremor_music_song_serial, _tremor_music_render, _tremor_music_rate, _tremor_music_active, _tremor_fear, _tremor_set_gore, _tremor_set_mouse_sensitivity, _tremor_set_volumes, _tremor_bind_key, _tremor_set_screen_shake, _tremor_radio_pop, _tremor_story, _tremor_look, _tremor_center_view, _tremor_comfort, _tremor_preview, _tremor_render_ms, _tremor_arm_turn, _tremor_pressure, _tremor_tic, _tremor_radio_history, _tremor_agent_reset, _tremor_agent_step, _tremor_agent_observe, _tremor_agent_outcome, _tremor_agent_terminate, _setThrew, __emscripten_stack_restore, __emscripten_stack_alloc, _emscripten_stack_get_current, memory, __indirect_function_table, wasmMemory;
 
 function assignWasmExports(wasmExports) {
   _tremor_music_song_serial = Module["_tremor_music_song_serial"] = wasmExports["tremor_music_song_serial"];
@@ -3521,6 +3521,7 @@ function assignWasmExports(wasmExports) {
   _tremor_arm_turn = Module["_tremor_arm_turn"] = wasmExports["tremor_arm_turn"];
   _tremor_pressure = Module["_tremor_pressure"] = wasmExports["tremor_pressure"];
   _tremor_tic = Module["_tremor_tic"] = wasmExports["tremor_tic"];
+  _tremor_radio_history = Module["_tremor_radio_history"] = wasmExports["tremor_radio_history"];
   _tremor_agent_reset = Module["_tremor_agent_reset"] = wasmExports["tremor_agent_reset"];
   _tremor_agent_step = Module["_tremor_agent_step"] = wasmExports["tremor_agent_step"];
   _tremor_agent_observe = Module["_tremor_agent_observe"] = wasmExports["tremor_agent_observe"];

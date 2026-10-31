@@ -146,6 +146,7 @@ void P_MovePlayer (player_t* player)
 	
     cmd = &player->cmd;
 	
+    TR_BrowserMouseApplied(cmd->tr_mouse);
     player->mo->angle += (cmd->angleturn<<16);
 
     // Do not let the player control movement
@@ -230,6 +231,7 @@ void P_DeathThink (player_t* player)
 //
 void P_PlayerThink (player_t* player)
 {
+    player->mo->tr_oldangle=player->mo->angle;player->mo->tr_oldviewz=player->viewz;player->mo->tr_oldpitch=tr_pitch;
     player->mo->tr_oldx=player->mo->x;player->mo->tr_oldy=player->mo->y;player->mo->tr_oldz=player->mo->z;player->mo->tr_oldtic=leveltime; /* TREMOR */
     ticcmd_t*		cmd;
     weapontype_t	newweapon;

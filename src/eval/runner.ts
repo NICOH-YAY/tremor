@@ -6,7 +6,7 @@ export async function runEpisode(controller:Controller,options:EpisodeOptions){
  const tracePath=options.tracePath===false?undefined:options.tracePath??`eval/traces/${Date.now()}-${crypto.randomUUID()}.jsonl`;
  const world=reset(options.seed,options.levelId),trace:Record<string,unknown>[]=[];
  const episodeStart=performance.now(),maxDurationMs=options.maxDurationMs??300000;
- const maxSteps=options.maxSteps??600,maxCalls=options.maxCalls??600;let steps=0,calls=0,invalid=0,errors=0,unknownUsageCalls=0,consecutive=0,fallbacks=0,feedback='',tokensIn=0,tokensOut=0,latencyMs=0;
+ const maxSteps=options.maxSteps??1800,maxCalls=options.maxCalls??1800;let steps=0,calls=0,invalid=0,errors=0,unknownUsageCalls=0,consecutive=0,fallbacks=0,feedback='',tokensIn=0,tokensOut=0,latencyMs=0;
  async function record(row:Record<string,unknown>){trace.push(row);if(tracePath)await appendFile(tracePath,JSON.stringify(row)+'\n');}
  if(tracePath){await mkdir(tracePath.replace(/[\\/][^\\/]+$/,''),{recursive:true});await (await import('node:fs/promises')).writeFile(tracePath,'');}
  while(!outcome(world).done){

@@ -108,3 +108,17 @@ extern int tr_radio_pending,tr_last_corpse;
 extern char tr_radio_log[512];
 void TR_ClearRadioQueue(void);
 #endif /* TREMOR_H */
+
+extern char tr_radio_history[16384];
+extern unsigned int tr_briefing_bits;
+
+int TR_KeyColor(int special);
+
+int TR_LineMarker(int special);
+
+void TR_BrowserMouse(int dx);
+int TR_BrowserMouseCommand(void);
+void TR_BrowserMouseApplied(int turn);
+angle_t TR_BrowserMouseView(void);
+
+int TR_DoorOpen(line_t *line);

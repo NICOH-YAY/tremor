@@ -16,6 +16,8 @@ static mobj_t *human(player_t *p,int crew) {
 EMSCRIPTEN_KEEPALIVE int tremor_test(void) {
  player_t *p=&players[0]; thinker_t *th; mobj_t *m,*d,*player_mo; int i,health,n; angle_t aim[8];
  checks=failures=0;
+ sector_t front={0},back={0};line_t doorway={0};front.ceilingheight=128*FRACUNIT;doorway.frontsector=&front;doorway.backsector=&back;
+ CHECK(!TR_DoorOpen(&doorway));back.ceilingheight=56*FRACUNIT;CHECK(TR_DoorOpen(&doorway));
  /* Initial budget uses the map's real post-classification kill total. */
  CHECK(tr_rounds==totalkills+1); CHECK(tr_charges==2);
  n=0;
@@ -84,12 +86,15 @@ EMSCRIPTEN_KEEPALIVE int tremor_test(void) {
  M_ClearRandom(); for(i=0;i<8;i++) CHECK(aim[i]==TR_Aim());
  /* Global resources survive the versioned save player archive. */
  player_mo=p->mo; tr_rounds=17; tr_charges=1; tr_saved=3;
+ strcpy(tr_radio_history,"crew-reveal|Archive sample");tr_briefing_bits=1u<<1;
  save_stream=tmpfile(); CHECK(save_stream!=NULL);
  if(save_stream) {
   P_ArchivePlayers(); rewind(save_stream);
   tr_trauma=tr_rounds=tr_charges=tr_saved=0;
+  tr_radio_history[0]=0;tr_briefing_bits=0;
   P_UnArchivePlayers(); fclose(save_stream); save_stream=NULL; p->mo=player_mo;
   CHECK(tr_trauma==6); CHECK(tr_rounds==17); CHECK(tr_charges==1); CHECK(tr_saved==3);
+  CHECK(!strcmp(TR_RadioLog(),"crew-reveal|Archive sample"));CHECK(tr_briefing_bits==(1u<<1));
  }
  /* New exposure is directional and counted once, including map decorations. */
  for(th=thinkercap.next;th!=&thinkercap;th=th->next)if(th->function.acp1==(actionf_p1)P_MobjThinker)((mobj_t*)th)->tr_seen=1;
@@ -107,6 +112,20 @@ EMSCRIPTEN_KEEPALIVE int tremor_test(void) {
  TR_Radio(2);CHECK(strstr(TR_RadioLog(),"crew-reveal|")!=NULL);
  tr_story_clock+=3150;TR_StoryTick(p);CHECK(strstr(TR_RadioLog(),"crew-death|")!=NULL);
  tr_story_clock+=3150;TR_Radio(1);CHECK(strstr(TR_RadioLog(),"crew-death|")!=NULL);
+ /* Episode transcript survives level briefings, repeats and audio consumption. */
+ int oldmap=gamemap;TR_Radio(-1);gamemap=1;TR_StoryStart();
+ tr_story_clock+=3150;TR_Radio(1);gamemap=2;TR_StoryStart();
+ CHECK(strstr(TR_RadioLog(),"e1m1|")!=NULL);CHECK(strstr(TR_RadioLog(),"e1m2|")!=NULL);
+ CHECK(strstr(TR_RadioLog(),"crew-reveal|")!=NULL);n=strlen(TR_RadioLog());
+ TR_StoryStart();CHECK(strlen(TR_RadioLog())==n);
+ tr_story_clock+=3150;TR_Radio(1);CHECK(strlen(TR_RadioLog())==n);
+ TR_ClearRadioQueue();CHECK(strlen(TR_RadioLog())==n);gamemap=oldmap;
+ /* Immediate mouse presentation reconciles with the recorded tic command. */
+ tr_fraction=FRACUNIT/2;TR_BrowserMouse(4);CHECK(TR_BrowserMouseView()==(angle_t)(-32*65536));
+ n=TR_BrowserMouseCommand();CHECK(n==-32);CHECK(TR_BrowserMouseView()==(angle_t)(-32*65536));
+ TR_BrowserMouseApplied(n);CHECK(TR_BrowserMouseView()==(angle_t)(-16*65536));
+ tr_fraction=FRACUNIT;CHECK(TR_BrowserMouseView()==0);TR_BrowserMouseApplied(0);
+ tremor_set_mouse_sensitivity(0);TR_BrowserMouse(4);n=TR_BrowserMouseCommand();CHECK(n==-16);TR_BrowserMouseApplied(n);TR_BrowserMouseApplied(0);tremor_set_mouse_sensitivity(5);
  /* Actual map thinning, not a second implementation of the probability. */
  for(i=0;i<256;i++)P_SpawnMobj(p->mo->x+1024*FRACUNIT,p->mo->y,ONFLOORZ,MT_CLIP);
  TR_LevelStart();n=0;for(th=thinkercap.next;th!=&thinkercap;th=th->next)if(th->function.acp1==(actionf_p1)P_MobjThinker){m=(mobj_t*)th;if(m->type==MT_CLIP && !(m->flags&MF_DROPPED))++n;}

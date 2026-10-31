@@ -84,3 +84,57 @@ browser binaries/source archive and radio text. Preview regression:
 node engine/build/preview-smoke.mjs. Renderer CPU timing is exported separately
 from scheduling intervals in smoke-result.json; it excludes Canvas/audio.
 Native resolution remains 320x200; see DESIGN.md for incomplete requirements.
+
+
+## Horror follow-up (2026-10-30)
+
+Open with `?debug=1` to expose `window.tremorDebug`: `engine`, `setTerror(n)`
+(0..100), `giveRounds(n)` (sets shared rounds,0..999), `warp(map)` (1..9 or
+E1M1..E1M9, current episode). The wrapper is absent without that query. Its
+EMSCRIPTEN_KEEPALIVE C exports live only in doomgeneric_web.c, a translation unit
+excluded from both production and fixture headless builds. Debug sway/arm sample
+exports are likewise browser-only. Agents cannot invoke them.
+
+`node engine/build/lighting-smoke.mjs` measures the stationary post-wipe E1M1
+viewport; `node engine/build/fear-smoke.mjs` measures browser-only fear offsets.
+The supported raster remains320x200; native640x400 trial failed status-widget
+coordinate assumptions, so no valid hires CPU measurement is claimed. Presentation
+uses integer nearest offscreen pre-scaling then one smooth final draw. Tremor3
+saves add bounded episode transcript and briefing masks; Tremor2 saves are rejected.
+
+
+Verification commands for matched start-room lighting references:
+
+```
+python engine/build/build.py --vanilla-light
+node engine/build/lighting-smoke.mjs engine/build/lighting-vanilla.json --reference --frame
+python engine/build/build.py --previous-light
+node engine/build/lighting-smoke.mjs engine/build/lighting-before.json --previous --frame
+python engine/build/build.py
+node engine/build/lighting-smoke.mjs engine/build/lighting-after.json --frame
+```
+
+The reference builds reproduce vanilla/prior lighting constants within the same
+current renderer. They write ignored reference-engine/previous-engine modules,
+never overwrite shipped production output, and are excluded from source.zip.
+The --frame option writes a PPM alongside JSON; checked-in PNGs were converted
+with Pillow. All reported final comparisons use complete paused frames at tic5.
+
+The no-wait TryRunTics branch now covers the actual old-sync single-player build.
+Per-frame mouse prediction is reconciled through a local ticcmd field, not added
+to serialized demos; canonicalization preserves that local field while recording.
+The real-engine runner waits for simulation tic35, since frame count no longer
+implies that the initial weapon has finished raising. The radio log dialog pauses
+simulation, releases input and exposes the same transcript as public observations.
+The public agent ABI now has36 constant seven-tic actions and a1800-action cap;
+see docs/CONTRACTS.md and the dated evaluation-plan amendment for exact changes.
+
+The final public map distinguishes open `d` from closed `D` doors; human glyphs
+show open doors in grey. `TR_DoorOpen` tests the visible aperture, not hidden keys
+or identity. Agent controls now total36, with two diagonal approach/fire macros.
+Final reports hash controller/interface source at run start as well as engine/WAD
+artifacts; raw action/observation logs are losslessly compressed to JSONL.gz.
+
+Human automap +/− zoom and0 overview keys are forwarded while the map is open,
+so D/S/T glyphs can be inspected at a useful scale. Browser-only
+`tremor_automap_active()` routes those keys without changing custom bindings.

@@ -82,3 +82,43 @@ Doom play. No held-out map is used to select prompts or controller changes.
 The migration's smoke trials on E1M1 are tuning diagnostics, not held-out
 successes. Do not interpret a terminal-reason test or the exit-switch fixture as
 proof that a controller traverses an entire map. Retain failed runs honestly.
+
+
+## Follow-up amendment 2026-10-30 (after declaration; before final rerun)
+
+The declared tuning maps E1M1/E1M2/E1M3, held-out E1M4/E1M5, seeds 17/83,
+players and skill remain unchanged. Controller development used only tuning
+maps and extra E1M1 seed diagnostics. The follow-up's frozen scripted rerun uses
+all 20 declared player/map/seed episodes. No live model runs are authorized here.
+The prior 2026-10-30 report is retained; the new report is dated2026-10-31 UTC
+(October30 local time). No held-out result was used to change these controllers.
+
+Rule/interface changes since declaration: sector-route objective lock selection
+replaces linedef-order selection and prefers normal exits over secret exits;
+lighting/interpolation/radio were updated; public observations now include a257x257
+map at 16 units/cell with remembered visible floor, mapped D/S/T activation and
+key-colour markers, numeric arrow heading, visible elevation and props/barrels,
+HUD weapon inventory, a bounded episode radio transcript and a qualitative
+moving/blocked/still cue. Humans receive the same activation glyphs and radio log.
+World coordinates, hidden actor identities, hidden lines, and exact terror remain
+absent from observations. Fine turns, slow/sprint movement and simultaneous
+turn/move + fire/READ macros expand the constant legal vocabulary to 36 actions.
+All macros still cost seven35Hz tics. Both players get the same interface/actions.
+
+The action/call cap changes from 600 to 1800: six simulated minutes rather than
+120 seconds, to budget separate navigation, aiming, door waits and 35-tic READ/
+PURGE channels. This is an engineering allowance, not a measured human completion
+time. The20-second per-call and five-minute wall-clock caps remain. Completion
+must be reported against this new cap, including every failure; do not increase
+it further to make a failed traversal look successful. Config IDs record the
+change. No claim that the target completion rate has been met is made.
+
+The v4 follow-up adds the open-door `d` cue, scales USE to its64-unit range, bounds
+retries across connected markers, clears location inferences after viewport
+recentring, and adds diagonal approaches while firing (36 total actions). These
+corrections used tuning-map traces. Earlier frozen passes are retained as dated
+first-followup/compatibility reports; the latest20-case report is a new full rerun,
+not a selection of favourable seeds. Held-out results did not inform these fixes.
+Controller/interface source hashes are captured before the final run. Traces are
+losslessly gzipped JSONL, retaining every action and public observation. Repeated
+runs of fixed seeds are not additional independent statistical trials.

@@ -546,7 +546,8 @@ void G_BuildTiccmd (ticcmd_t* cmd, int maketic)
     if (strafe) 
 	side += mousex*2; 
     else 
-	cmd->angleturn -= mousex*0x8; 
+	cmd->angleturn -= mousex*0x8;
+    cmd->tr_mouse=TR_BrowserMouseCommand();cmd->angleturn+=cmd->tr_mouse;
 
     if (mousex == 0)
     {
@@ -1905,7 +1906,8 @@ G_InitNew
 
 
 void G_ReadDemoTiccmd (ticcmd_t* cmd) 
-{ 
+{
+    cmd->tr_mouse=0;
     if (*demo_p == DEMOMARKER) 
     {
 	// end of demo data stream 
@@ -2012,7 +2014,10 @@ void G_WriteDemoTiccmd (ticcmd_t* cmd)
         }
     } 
 	
-    G_ReadDemoTiccmd (cmd);         // make SURE it is exactly the same 
+    /* Canonicalize recorded bytes without discarding local mouse prediction. */
+    short local_mouse = cmd->tr_mouse;
+    G_ReadDemoTiccmd (cmd);         // make SURE it is exactly the same
+    cmd->tr_mouse = local_mouse;
 } 
  
  

@@ -15,6 +15,7 @@
 int tr_kills_demons,tr_kills_humans,tr_crew_killed,tr_reads,tr_fired_unread;
 int tr_keys[3]={'r','f','q'};
 int tr_pitch,tr_sway=100,tr_autoaim=1;
+static int mouse_unbuilt,mouse_pending,mouse_last;
 static int look_pending;
 int tr_terror;
 static int corpse_cursor;
@@ -36,7 +37,7 @@ static void tr_intro(void){}
 static int clamp(int v,int max) { return v<0?0:v>max?max:v; }
 int TR_Human(mobj_t *m) { return m && (m->type==MT_POSSESSED || m->type==MT_SHOTGUY || m->type==MT_CHAINGUY); }
 static void syncammo(player_t *p) { int i; for(i=0;i<NUMAMMO;i++) p->ammo[i]=tr_rounds; }
-void TR_NewGame(void) { TR_Radio(-1); tr_pitch=0; tr_terror=0; tr_trauma=0; tr_kills_demons=tr_kills_humans=tr_crew_killed=tr_reads=tr_fired_unread=0; }
+void TR_NewGame(void) { mouse_unbuilt=mouse_pending=mouse_last=0; TR_Radio(-1); tr_pitch=0; tr_terror=0; tr_trauma=0; tr_kills_demons=tr_kills_humans=tr_crew_killed=tr_reads=tr_fired_unread=0; }
 void TR_MapSpawn(mobj_t *m) {
  if ((m->type==MT_POSSESSED || m->type==MT_SHOTGUY) && P_Random()<TR_CREW_THRESHOLD) {
   m->tr_crew=1; m->flags &= ~MF_COUNTKILL;
@@ -152,7 +153,7 @@ int TR_CheckAmmo(player_t *p) {
 void TR_SpendRound(player_t *p) { mobj_t *target=crosshair(p,MISSILERANGE); if(target && !target->tr_revealed) ++tr_fired_unread; if(tr_rounds>0) --tr_rounds; syncammo(p); TR_Shot(p); }
 angle_t TR_Aim(void) { return (TR_Hit()?0:ANG45+((angle_t)P_Random()<<22)) + (tr_trauma?(angle_t)((P_Random()-P_Random())*tr_trauma*TR_AIM_UNIT):0); }
 fixed_t TR_Sway(void) {
- fixed_t value=FixedMul(tr_trauma*FRACUNIT/3,finesine[(leveltime*311)&FINEMASK])+FixedMul(tr_terror*FRACUNIT/12,finesine[(leveltime*37)&FINEMASK])+kick*FRACUNIT/3;
+ fixed_t value=FixedMul(tr_trauma*FRACUNIT/3,finesine[(leveltime*311)&FINEMASK])+FixedMul(tr_terror*FRACUNIT/12,finesine[((leveltime-1)*37+(tr_fraction*37/FRACUNIT))&FINEMASK])+kick*FRACUNIT/3;
  if(tr_terror>60 && leveltime%211<2)value+=(leveltime&1?1:-1)*tr_terror*FRACUNIT/30;
  return screen_shake?value*tr_sway/100:0;
 }
@@ -257,7 +258,10 @@ int tr_story_clock,tr_radio_last=-TR_RADIO_COOLDOWN,tr_radio_bits;
 int tr_radio_pending;
 #define radio_pending tr_radio_pending
 static char radio_queue[16][512];static int radio_head,radio_tail;
-void TR_QueueRadio(const char *line) {if(radio_tail-radio_head>=16)++radio_head;snprintf(radio_queue[radio_tail++%16],512,"%s",line);}
+char tr_radio_history[16384]; unsigned int tr_briefing_bits;
+#define radio_history tr_radio_history
+#define briefing_bits tr_briefing_bits
+void TR_QueueRadio(const char *line) {size_t used=strlen(radio_history);if(used+strlen(line)+2<sizeof(radio_history)){if(used)strcat(radio_history,"\n");strcat(radio_history,line);}if(radio_tail-radio_head>=16)++radio_head;snprintf(radio_queue[radio_tail++%16],512,"%s",line);}
 EMSCRIPTEN_KEEPALIVE const char *tremor_radio_pop(void) {return radio_head<radio_tail?radio_queue[radio_head++%16]:"";}
 char tr_radio_log[512];
 #define radio_log tr_radio_log
@@ -266,7 +270,7 @@ static fixed_t objective_x,objective_y;
 static const char *radio_ids[]={"","crew-reveal","crew-death","crew-saved","breaking","static-1","static-2","static-3","static-4","static-5","static-6","static-7"};
 static const char *radio_text[]={"","That one's still human. Look before you shoot.","I heard that. I'll keep the channel open.","They're breathing. Thank you for waiting.","Listen to my voice. There is still a way out.","Control to anyone. Is that someone breathing on the line?","There is someone outside this room. They know my name.","Signal dropping. I can still hear you.","Please do not answer the other channel.","The banging stopped. That is worse.","I thought I heard the lift. It was above me.","Keep the receiver close. The walls carry sound here."};
 void TR_Radio(int beat) {
- if(beat<0) {radio_head=radio_tail=radio_pending=0;story_clock=radio_bits=0;radio_last=-TR_RADIO_COOLDOWN;radio_log[0]=0;return;}
+ if(beat<0) {radio_head=radio_tail=radio_pending=0;story_clock=radio_bits=0;radio_last=-TR_RADIO_COOLDOWN;radio_log[0]=0;radio_history[0]=0;briefing_bits=0;return;}
  if(beat<1 || beat>11 || (radio_bits&(1<<beat))) return;
  radio_pending|=1<<beat;
  if(story_clock-radio_last<TR_RADIO_COOLDOWN)return;
@@ -274,35 +278,59 @@ void TR_Radio(int beat) {
  radio_bits|=1<<beat;radio_last=story_clock;
  snprintf(radio_log,sizeof(radio_log),"%s|%s",radio_ids[beat],radio_text[beat]);TR_QueueRadio(radio_log);
 }
-const char *TR_RadioLog(void){return radio_log;}
+const char *TR_RadioLog(void){return radio_history;}
 const char *TR_Objective(void){return objective;}
-static int key_color(int special) {
+int TR_KeyColor(int special) {
  switch(special) {case 26:case 32:case 99:case 133:return 0;case 27:case 34:case 136:case 137:return 1;case 28:case 33:case 134:case 135:return 2;}return -1;
 }
 static int exit_special(int s){return s==11 || s==51 || s==52 || s==124;}
 void TR_StoryTick(player_t *p) {
  const char *colors[]={"blue","yellow","red"};int i,c;thinker_t *th;
  ++story_clock;if(story_clock%7350==0)TR_Radio(5+(story_clock/7350-1)%7);for(int beat=1;beat<=11;beat++)if(radio_pending&(1<<beat))TR_Radio(beat);if(tr_terror>=80) TR_Radio(4);
+ /* Prefer the ordinary exit; optional locked rooms must not become mandatory. */
+ if(leveltime%35 && objective[0])return;
  strcpy(objective,"Reach the exit");
- for(i=0;i<numlines;i++) if(exit_special(lines[i].special)) {objective_x=lines[i].v1->x+lines[i].dx/2;objective_y=lines[i].v1->y+lines[i].dy/2;break;}
- for(i=0;i<numlines;i++) {line_t *l=&lines[i];c=key_color(l->special);if(c<0)continue;
-  if(p->cards[c] || p->cards[c+3]) {
-   /* Door already raised: its sector floor no longer meets its ceiling. */
-   if(l->backsector && l->backsector->ceilingheight>l->backsector->floorheight+56*FRACUNIT)continue;
-   snprintf(objective,sizeof(objective),"Open the %s door",colors[c]);objective_x=l->v1->x+l->dx/2;objective_y=l->v1->y+l->dy/2;return;
-  }
-  for(th=thinkercap.next;th!=&thinkercap;th=th->next) if(th->function.acp1==(actionf_p1)P_MobjThinker) {
-   mobj_t *m=(mobj_t*)th;int color=m->sprite==SPR_BKEY||m->sprite==SPR_BSKU?0:m->sprite==SPR_YKEY||m->sprite==SPR_YSKU?1:m->sprite==SPR_RKEY||m->sprite==SPR_RSKU?2:-1;
-   if(color==c && (m->flags&MF_SPECIAL)) {snprintf(objective,sizeof(objective),"Find the %s keycard",colors[c]);objective_x=m->x;objective_y=m->y;return;}
+ line_t *exitline=NULL;
+ for(i=0;i<numlines;i++)if(lines[i].special==11||lines[i].special==52){exitline=&lines[i];break;}
+ if(!exitline)for(i=0;i<numlines;i++)if(exit_special(lines[i].special)){exitline=&lines[i];break;}
+ if(!exitline)return;
+ objective_x=exitline->v1->x+exitline->dx/2;objective_y=exitline->v1->y+exitline->dy/2;
+ /* The quest planner chooses required locks, not navigation coordinates. Its
+    only output is the same objective and bearing shown by the human TAB HUD. */
+ if(numsectors>4096)return;
+ static int distance[4096],parent[4096],doorline[4096],done[4096];
+ for(i=0;i<numsectors;i++){distance[i]=100000000;parent[i]=-1;doorline[i]=-1;done[i]=0;}
+ for(i=0;i<numlines;i++){line_t *l=&lines[i];if(TR_KeyColor(l->special)<0)continue;
+  sector_t *door=l->backsector;if(door&&door->ceilingheight<=door->floorheight+56*FRACUNIT)doorline[door-sectors]=i;
+ }
+ int start=p->mo->subsector->sector-sectors,finish=exitline->frontsector-sectors;
+ distance[start]=0;
+ for(int pass=0;pass<numsectors;pass++){
+  int at=-1;for(i=0;i<numsectors;i++)if(!done[i]&&(at<0||distance[i]<distance[at]))at=i;
+  if(at<0||distance[at]>=100000000)break;done[at]=1;if(at==finish)break;
+  for(i=0;i<numlines;i++){line_t *l=&lines[i];if(!l->frontsector||!l->backsector)continue;
+   int f=l->frontsector-sectors,b=l->backsector-sectors,to=f==at?b:b==at?f:-1;if(to<0||to==at)continue;
+   if((l->flags&ML_BLOCKING)&&!l->special)continue;
+   int cost=1,d=doorline[to];if(d>=0){int key=TR_KeyColor(lines[d].special);if(!p->cards[key]&&!p->cards[key+3])cost+=1000;}
+   if(distance[at]+cost<distance[to]){distance[to]=distance[at]+cost;parent[to]=at;}
   }
  }
+ int required=-1;for(i=finish;i>=0&&i!=start;i=parent[i])if(doorline[i]>=0)required=doorline[i];
+ if(required<0)return;
+ line_t *l=&lines[required];c=TR_KeyColor(l->special);
+ if(p->cards[c]||p->cards[c+3]){snprintf(objective,sizeof(objective),"Open the %s door",colors[c]);objective_x=l->v1->x+l->dx/2;objective_y=l->v1->y+l->dy/2;return;}
+ for(th=thinkercap.next;th!=&thinkercap;th=th->next)if(th->function.acp1==(actionf_p1)P_MobjThinker){
+  mobj_t *m=(mobj_t*)th;int color=m->sprite==SPR_BKEY||m->sprite==SPR_BSKU?0:m->sprite==SPR_YKEY||m->sprite==SPR_YSKU?1:m->sprite==SPR_RKEY||m->sprite==SPR_RSKU?2:-1;
+  if(color==c&&(m->flags&MF_SPECIAL)){snprintf(objective,sizeof(objective),"Find the %s keycard",colors[c]);objective_x=m->x;objective_y=m->y;return;}
+ }
+
 }
 static const char *briefings[]={"This is Halloran, UAC comms. I locked myself in control when the hangar crew stopped answering. Find the way out; I will stay on this frequency.","You are inside the containment perimeter. They sealed those doors with people still working behind them. Look for a card beside the locked routes.","The treatment plant is running without its operators. Something is moving against the current. Follow the access doors toward the exit.","That station used to report every fault to me. Now every light is green and nobody answers. Find the next passage out.","This is the laboratory sector. We kept the samples cold; that did not keep them quiet. The secured route should take you onward.","The central complex is ahead. I can hear its alarm through the wall of this room. Find the access card and keep moving.","You have reached the computing wing. The terminals are still accepting names from empty desks. Look for the route beyond the locks.","The last facility is beyond this threshold. I cannot promise what waits there. Get to the exit while this channel holds.","This annex was missing from the evacuation plan. There are voices on its local channel, all using the same name. Find a route back out."};
 void TR_StoryStart(void) {
  radio_last=story_clock; /* Leave space for the briefing before rare story beats. */
  snprintf(radio_log,sizeof(radio_log),"e1m%d|%s",gamemap,briefings[(gamemap-1)%9]);
- TR_QueueRadio(radio_log);
- TR_StoryTick(&players[consoleplayer]);
+ if(!(briefing_bits&(1u<<gamemap))){briefing_bits|=1u<<gamemap;TR_QueueRadio(radio_log);}
+ objective[0]=0;TR_StoryTick(&players[consoleplayer]);
 }
 int TR_ObjectiveBearing(player_t *p) {return (int)((double)(int32_t)(R_PointToAngle2(p->mo->x,p->mo->y,objective_x,objective_y)-p->mo->angle)*360.0/4294967296.0);}
 const char *TR_ObjectiveDistance(player_t *p) {int d=P_AproxDistance(objective_x-p->mo->x,objective_y-p->mo->y)/FRACUNIT;return d<128?"near":d<512?"nearby":"far";}
@@ -342,8 +370,16 @@ EMSCRIPTEN_KEEPALIVE void tremor_preview(int phase) {
 #endif
 }
 
-int TR_Light(sector_t *sector) {unsigned int id=(unsigned int)(sector-sectors);return sector->lightlevel-16-((id%8==0 && sector->lightlevel>96 && (((unsigned int)leveltime*1664525u+id*1013904223u)>>24)<40)?32:0);}
-fixed_t TR_ArmY(void) {return tr_sway*(FixedMul(tr_terror*FRACUNIT/14,finesine[(leveltime*74)&FINEMASK])+(tr_terror>50?(M_Random()-128)*tr_terror*8:0))/100;}
+int TR_Light(sector_t *sector) {
+#ifdef TR_VANILLA_LIGHT
+ return sector->lightlevel;
+#elif defined(TR_PREVIOUS_LIGHT)
+ unsigned int id=(unsigned int)(sector-sectors);return sector->lightlevel-16-((id%8==0&&sector->lightlevel>96&&(((unsigned int)leveltime*1664525u+id*1013904223u)>>24)<40)?32:0);
+#else
+ unsigned int id=(unsigned int)(sector-sectors);return sector->lightlevel-16-((sector->lightlevel>96 && (((unsigned int)leveltime*1664525u+id*1013904223u)>>24)<40)?32:0);
+#endif
+}
+fixed_t TR_ArmY(void) {return tr_sway*(FixedMul(tr_terror*FRACUNIT/14,finesine[((leveltime-1)*74+(tr_fraction*74/FRACUNIT))&FINEMASK])+(tr_terror>50?(M_Random()-128)*tr_terror*8:0))/100;}
 static double render_start,render_ms;
 void TR_ProfileStart(void) {render_start=emscripten_get_now();}
 void TR_ProfileEnd(void) {render_ms=emscripten_get_now()-render_start;}
@@ -360,3 +396,22 @@ EMSCRIPTEN_KEEPALIVE int tremor_pressure(void) {int n=0;thinker_t *th;player_t *
 EMSCRIPTEN_KEEPALIVE int tremor_tic(void){return gametic;}
 
 void TR_ClearRadioQueue(void){radio_head=radio_tail=0;}
+
+/* Activation legend shared by the human map and public observation. */
+int TR_LineMarker(int s){
+ switch(s){case 1:case 26:case 27:case 28:case 31:case 32:case 33:case 34:case 117:case 118:return 'D';
+ case 7:case 9:case 11:case 14:case 15:case 18:case 20:case 21:case 23:case 29:case 41:case 71:case 49:case 50:case 51:case 55:case 101:case 102:case 103:case 111:case 112:case 113:case 122:case 127:case 131:case 133:case 135:case 137:case 140:case 42:case 43:case 45:case 60:case 61:case 62:case 63:case 64:case 66:case 67:case 65:case 68:case 69:case 70:case 114:case 115:case 116:case 123:case 132:case 99:case 134:case 136:case 138:case 139:return 'S';default:return s?'T':0;}
+}
+
+void TR_BrowserMouse(int dx){int64_t scaled=-(int64_t)dx*(mouseSensitivity+5)*8/10;int turn=scaled>32760?32760:scaled< -32760?-32760:(int)scaled;mouse_unbuilt+=turn;mouse_pending+=turn;}
+int TR_BrowserMouseCommand(void){int turn=mouse_unbuilt;if(turn>32767)turn=32767;if(turn< -32767)turn=-32767;mouse_unbuilt-=turn;return turn;}
+void TR_BrowserMouseApplied(int turn){mouse_pending-=turn;mouse_last=turn;}
+angle_t TR_BrowserMouseView(void){return (angle_t)((int64_t)mouse_pending*65536+(int64_t)mouse_last*65536*(FRACUNIT-tr_fraction)/FRACUNIT);}
+EMSCRIPTEN_KEEPALIVE const char *tremor_radio_history(void){return tr_radio_history;}
+
+int TR_DoorOpen(line_t *line){
+ if(!line->frontsector||!line->backsector)return 0;
+ fixed_t floor=line->frontsector->floorheight>line->backsector->floorheight?line->frontsector->floorheight:line->backsector->floorheight;
+ fixed_t ceiling=line->frontsector->ceilingheight<line->backsector->ceilingheight?line->frontsector->ceilingheight:line->backsector->ceilingheight;
+ return ceiling-floor>=56*FRACUNIT;
+}

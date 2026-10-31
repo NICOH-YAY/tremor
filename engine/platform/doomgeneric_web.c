@@ -39,3 +39,18 @@ EMSCRIPTEN_KEEPALIVE void tremor_input(int slot,int down) {
 
 
 EMSCRIPTEN_KEEPALIVE int tremor_menu_active(void) { return menuactive || gamestate!=GS_LEVEL; }
+
+/* Browser-only diagnostics. This translation unit is excluded from agent builds. */
+#include "g_game.h"
+EMSCRIPTEN_KEEPALIVE void tremor_debug_terror(int n) { tr_terror=n<0?0:n>100?100:n; }
+EMSCRIPTEN_KEEPALIVE void tremor_debug_rounds(int n) { tr_rounds=n<0?0:n>999?999:n; }
+EMSCRIPTEN_KEEPALIVE void tremor_debug_warp(int map) { if(map>=1 && map<=9)G_DeferedInitNew(gameskill,gameepisode,map); }
+EMSCRIPTEN_KEEPALIVE void tremor_mouse_turn(int dx) {
+ if(gamestate==GS_LEVEL && !menuactive && players[consoleplayer].mo) {
+  if(!demoplayback)TR_BrowserMouse(dx);
+ }
+}
+EMSCRIPTEN_KEEPALIVE double tremor_debug_sway(void) { return (double)TR_Sway()/FRACUNIT; }
+EMSCRIPTEN_KEEPALIVE double tremor_debug_arm_y(void) { return (double)TR_ArmY()/FRACUNIT; }
+
+EMSCRIPTEN_KEEPALIVE int tremor_automap_active(void) { return automapactive; }

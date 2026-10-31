@@ -1,9 +1,11 @@
 {
-  "rendererMeanMs": 0.3409815242494491,
-  "rendererP95Ms": 0.9476999999999975,
-  "frames": 433,
+  "scope": "stationary E1M1, after tic35; excludes Canvas/audio/layout",
+  "rendererMeanMs": 0.31889356223175463,
+  "rendererP95Ms": 0.4183999999995649,
+  "frames": 466,
+  "framesBetweenTics": 187,
   "nonzero": true,
-  "elapsedMs": 10050.4396,
-  "meanIntervalMs": 23.03770787037036,
-  "p95IntervalMs": 31.980599999999868
+  "elapsedMs": 10037.7694,
+  "meanIntervalMs": 17.253059139784952,
+  "p95IntervalMs": 30.91309999999976
 }

@@ -33,6 +33,7 @@ typedef struct
 {
     signed char	forwardmove;	// *2048 for move
     signed char	sidemove;	// *2048 for move
+    short tr_mouse;             // local presentation prediction, never demo data
     short angleturn;            // <<16 for angle delta
     byte chatchar;
     byte buttons;

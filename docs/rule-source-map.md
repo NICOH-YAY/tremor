@@ -54,3 +54,25 @@ Upstream attribution and license locators: [engine provenance](../engine/UPSTREA
 | Interpolation, suit light, cosmetic flicker | design + original code | tremor.c TR_Interpolate / TR_Light; r_things.c R_ProjectSprite; r_plane.c R_MapPlane |
 | Horror sprite transform | design + original code with Freedoom-derived assets | scripts/build-tremor-wad.py build; tremor.c TR_MergeCrewSprites |
 | Public felt state, no exact terror / hidden identity | design + original code | agent_api.c tremor_agent_observe; src/player_interface.ts Observation |
+
+
+## Follow-up rules and public information (2026-10-30)
+
+| Rule / public cue | Locator | Visibility constraint |
+| --- | --- | --- |
+| Required-lock objective chain / normal exit preference | tremor.c TR_StoryTick / TR_KeyColor | Same objective text, bearing and distance bucket on human TAB HUD; no route graph is sent to controllers. |
+| D/S/T and key-colour activation legend | tremor.c TR_LineMarker; am_map.c AM_drawWalls; agent_api.c automap | Only mapped drawable lines; secret markers suppressed; human glyphs share classification. |
+| Visible floor history / map arrow | agent_api.c discover / automap |90-degree view and occlusion; observation cannot discover geometry; no map origin or world coordinates. |
+| Props, barrels and entity elevation | agent_api.c label / tremor_agent_observe | Same FOV and LOS filter as other visible entities; unknown humans remain identity-neutral. |
+| HUD inventory and visible motion result | agent_api.c tremor_agent_step / tremor_agent_observe | Owned weapons, moving/blocked/still; no displacement or collision geometry returned. |
+| Constant combined controls | agent_api.c tremor_agent_step; player_interface.ts ACTION_IDS |36 constant seven-tic macros, including simultaneous movement/turn with fire or READ; no privileged action. |
+| Bounded bot memory and map search | src/agent/baselines.ts | Public map cells,32 prior bearing rays, one remembered supply, bounded visit/block/attempt grids; no engine imports. |
+| Episode transcript and save revision 3 | tremor.c TR_QueueRadio / TR_RadioLog; p_saveg.c P_ArchivePlayers / P_UnArchivePlayers; engine-page.js Radio log | Same bounded history accessible to humans; playback queue independent. |
+| Per-frame mouse prediction and interpolation | d_loop.c TryRunTics; g_game.c G_BuildTiccmd; p_user.c P_MovePlayer; tremor.c TR_BrowserMouse*; r_main.c R_SetupFrame | Presentation prediction is reconciled with recorded tic commands; no simulation-rate change. |
+| Browser-only diagnostics | engine/platform/doomgeneric_web.c; engine-page.js debug query | Setters translation unit excluded from both agent builds; artifact regression enforces absence. |
+| Six-minute simulated action cap / terror reporting | runner.ts; agent_api.c tremor_agent_step / tremor_agent_outcome; scripts/eval.ts |1800 actions/calls; descriptive terror bucket is evaluation-only. |
+
+Open door cue: tremor.c `TR_DoorOpen`, agent_api.c `automap`, and am_map.c glyph
+colour share the56-unit visible aperture test. `d` is open, `D` closed. The
+controller's64-unit USE probe and connected-marker retry bound are in
+baselines.ts `navigate`; this fixes retrying each map pixel and closing open doors.
