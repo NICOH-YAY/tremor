@@ -5,13 +5,14 @@ import json
 
 root = Path(__file__).resolve().parents[2]
 paths = ['public/engine/doom.js', 'public/engine/doom.wasm', 'public/engine/source.zip', 'public/radio/lines.json', 'public/engine-headless/doom.cjs', 'public/engine-headless/doom.wasm', 'public/engine-headless/doom-test.cjs', 'public/engine-headless/doom-test.wasm', 'public/wad/freedoom1.wad', 'public/wad/tremor.wad']
+paths += [p.relative_to(root).as_posix() for base in ['engine/tremor','engine/platform','engine/doomgeneric/doomgeneric'] for p in (root/base).glob('*') if p.suffix in {'.c','.h'}]
 hashes = {}
 for name in paths:
     path = root / name
     if not path.exists():
         continue
     data = path.read_bytes()
-    if path.suffix in {'.js', '.cjs', '.json'}:
+    if path.suffix in {'.js', '.cjs', '.json', '.c', '.h'}:
         normalized = data.replace(b'\r\n', b'\n').replace(b'\r', b'\n')
         if normalized != data:
             path.write_bytes(normalized)

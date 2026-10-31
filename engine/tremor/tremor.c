@@ -19,8 +19,17 @@ int tr_pitch,tr_sway=100,tr_autoaim=1;
 static int mouse_unbuilt,mouse_pending,mouse_last;
 static int look_pending;
 int tr_terror;
-static int corpse_cursor;
+static thinker_t *corpse_next;
+void TR_CorpseRemoved(mobj_t *m){if(corpse_next==&m->thinker)corpse_next=m->thinker.next;}
 int tr_last_corpse;
+#ifndef TR_HEADLESS
+EM_JS(void, tr_hint,(int id),{Module.onHint?.(id);});
+EM_JS(void, tr_damage_direction,(int bearing),{Module.onDamageDirection?.(bearing);});
+#else
+static void tr_hint(int id){}
+static void tr_damage_direction(int bearing){}
+#endif
+
 #define last_corpse tr_last_corpse
 int tr_trauma,tr_rounds,tr_charges,tr_saved,tr_gore=2;
 static mobj_t *read_target,*purge_target;
@@ -30,11 +39,13 @@ extern int mouseSensitivity;
 void P_SetPsprite(player_t *, int, statenum_t);
 #ifndef TR_HEADLESS
 EM_JS(int, tr_has_intro, (), { return Module.onIntro?1:0; });
-EM_ASYNC_JS(void, tr_intro, (), { if(Module.onIntro) await Module.onIntro(); });
+EM_JS(void, tr_intro, (), { if(Module.onIntro){Module.settingsOpen=true;Promise.resolve(Module.onIntro()).finally(()=>{Module.settingsOpen=!!Module.uiPaused?.();});} });
 #else
 static int tr_has_intro(void){return 0;}
 static void tr_intro(void){}
 #endif
+static unsigned int hint_bits;
+static void hint_once(int id){if(!(hint_bits&(1u<<id))){hint_bits|=1u<<id;tr_hint(id);}}
 static int clamp(int v,int max) { return v<0?0:v>max?max:v; }
 int TR_Human(mobj_t *m) { return m && (m->type==MT_POSSESSED || m->type==MT_SHOTGUY || m->type==MT_CHAINGUY); }
 static void syncammo(player_t *p) { int i; for(i=0;i<NUMAMMO;i++) p->ammo[i]=tr_rounds; }
@@ -46,7 +57,7 @@ void TR_MapSpawn(mobj_t *m) {
 }
 void TR_LevelStart(void) {
  int i;
- TR_StoryStart(); tr_terror/=2; corpse_cursor=last_corpse=0;
+ TR_StoryStart(); tr_terror/=2; corpse_next=NULL;last_corpse=0;
  /* TREMOR: thin only map ammunition, before any death drops exist. */
  { thinker_t *th=thinkercap.next; while(th!=&thinkercap) { thinker_t *next=th->next;
  if(th->function.acp1==(actionf_p1)P_MobjThinker) { mobj_t *m=(mobj_t*)th;
@@ -62,7 +73,7 @@ void TR_LevelStart(void) {
 }
 int TR_BlockDamage(mobj_t *source) { return source && source->tr_crew; }
 void TR_Damaged(mobj_t *m) {
- if(m->player) { damaged=1; purge_tics=0; purge_target=NULL; }
+ if(m->player) { if(m->player->attacker)tr_damage_direction((int)((double)(int32_t)(R_PointToAngle2(m->x,m->y,m->player->attacker->x,m->player->attacker->y)-m->angle)*360.0/4294967296.0));else tr_damage_direction(180);damaged=1; purge_tics=0; purge_target=NULL; }
  if(TR_Human(m)) m->tr_cower=TR_COWER_TICS;
 }
 /* Return before the original state machine: a survivor never executes attacks. */
@@ -95,20 +106,23 @@ static mobj_t *crosshair(player_t *p,fixed_t range) {
   && P_CheckSight(p->mo,linetarget)?linetarget:NULL;
 }
 static void corpses(player_t *p) {
- thinker_t *th; int index=0,tests=0,total=0;
- for(th=thinkercap.next;th!=&thinkercap;th=th->next) {
-  mobj_t *m; int dead,doomnum;
-  if(th->function.acp1!=(actionf_p1)P_MobjThinker) continue;
-  m=(mobj_t*)th; ++total; if(index++<corpse_cursor || tests>=TR_TERROR_SCAN) continue;
-  corpse_cursor=index; ++tests; doomnum=m->info->doomednum;
+ thinker_t *th;int tests=0,visited=0;
+ if(!corpse_next)corpse_next=thinkercap.next;
+ while(corpse_next!=&thinkercap && tests<TR_TERROR_SCAN && visited++<64){
+  th=corpse_next;corpse_next=th->next;
+  mobj_t *m;int dead,doomnum;
+  if(th->function.acp1!=(actionf_p1)P_MobjThinker)continue;
+  m=(mobj_t*)th;doomnum=m->info->doomednum;
   dead=(m->flags&MF_CORPSE) || (doomnum>=18&&doomnum<=23) || doomnum==10 || doomnum==12 || doomnum==15 || (doomnum>=59&&doomnum<=63) || (doomnum>=73&&doomnum<=81);
   if(!dead || m->tr_seen || m->player) continue;
-  if(P_AproxDistance(m->x-p->mo->x,m->y-p->mo->y)>TR_TERROR_RANGE || ((int32_t)(R_PointToAngle2(p->mo->x,p->mo->y,m->x,m->y)-p->mo->angle)>(int32_t)ANG45 || (int32_t)(R_PointToAngle2(p->mo->x,p->mo->y,m->x,m->y)-p->mo->angle)<-(int32_t)ANG45) || !P_CheckSight(p->mo,m)) continue;
+  int32_t angle=(int32_t)(R_PointToAngle2(p->mo->x,p->mo->y,m->x,m->y)-p->mo->angle);
+  if(P_AproxDistance(m->x-p->mo->x,m->y-p->mo->y)>TR_TERROR_RANGE || angle>(int32_t)ANG45 || angle<-(int32_t)ANG45)continue;
+  ++tests;if(!P_CheckSight(p->mo,m))continue;
   m->tr_seen=1;
-  tr_terror=clamp(tr_terror+(m->tr_crew && m->tr_death_tic && leveltime-m->tr_death_tic<70?3:m->tr_death_tic && leveltime-m->tr_death_tic<70 && P_AproxDistance(m->x-p->mo->x,m->y-p->mo->y)<TR_TERROR_CLOSE?2:1),100);
+  tr_terror=clamp(tr_terror+(m->tr_death_tic && leveltime-m->tr_death_tic<70 && P_AproxDistance(m->x-p->mo->x,m->y-p->mo->y)<TR_TERROR_CLOSE?2:1),100);
   last_corpse=leveltime;
  }
- if(corpse_cursor>=total) corpse_cursor=0;
+ if(corpse_next==&thinkercap)corpse_next=thinkercap.next;
  if(leveltime-last_corpse>=TR_TERROR_DECAY) {if(tr_terror)--tr_terror;last_corpse=leveltime;}
 }
 const char *TR_TerrorBucket(void) {return tr_terror<25?"steady":tr_terror<50?"shaken":tr_terror<80?"terrified":"breaking";}
@@ -121,12 +135,13 @@ void TR_PlayerThink(player_t *p) {
  if(buttons&64) tr_gore=(buttons>>4)&3; /* Recorded setting changes. */
  if(p->playerstate!=PST_LIVE) return;
  tr_pitch+=(signed char)p->cmd.lookfly; if(p->cmd.lookfly==127)tr_pitch=0; if(tr_pitch>64)tr_pitch=64;if(tr_pitch< -64)tr_pitch=-64;
- corpses(p); TR_StoryTick(p);
+ if(!(hint_bits&1u)&&!(leveltime%7))for(thinker_t *th=thinkercap.next;th!=&thinkercap;th=th->next)if(th->function.acp1==(actionf_p1)P_MobjThinker){mobj_t *v=(mobj_t*)th;int32_t bearing=(int32_t)(R_PointToAngle2(p->mo->x,p->mo->y,v->x,v->y)-p->mo->angle);if(TR_Human(v)&&v->health>0&&!v->tr_revealed&&bearing<=(int32_t)ANG45&&bearing>=-(int32_t)ANG45&&P_CheckSight(p->mo,v)){hint_once(0);break;}}
+ corpses(p); TR_StoryTick(p);if(tr_terror>=25)hint_once(2);if(!tr_rounds)hint_once(3);
  if(kick) --kick;
  if(stun_cooldown) --stun_cooldown;
  syncammo(p);
  if(!tr_rounds && weaponinfo[p->readyweapon].ammo!=am_noammo) p->pendingweapon=wp_fist;
- m=crosshair(p,MISSILERANGE);
+ m=crosshair(p,MISSILERANGE);if(m&&!m->tr_revealed)hint_once(0);
  if((buttons&TR_READ) && m) {
   if(m!=read_target) { read_target=m; read_tics=0; }
   if(++read_tics==TR_READ_TICS) { if(!m->tr_revealed) ++tr_reads; m->tr_revealed=1; if(m->tr_crew) TR_Radio(1); p->message=m->tr_crew?"crew":"possessed"; }
@@ -136,10 +151,10 @@ void TR_PlayerThink(player_t *p) {
   stun_cooldown=TR_STUN_COOLDOWN;
   if(m) { m->tr_stun=TR_STUN_TICS; m->momx=m->momy=0; S_StartSound(p->mo,sfx_punch); }
  }
- if(!damaged && (buttons&TR_PURGE) && m && m->tr_stun>0 && !m->tr_crew && tr_charges>0) {
+ if(!damaged && (buttons&TR_PURGE) && m && m->tr_stun>0 && tr_charges>0) {
   if(purge_target!=m) { purge_target=m; purge_tics=0; }
   if(++purge_tics>=TR_PURGE_TICS) {
-   TR_Radio(3); TR_QueueRadio("crew-ammo|Take these. Get out of here."); --tr_charges; ++tr_saved; TR_Ammo(p,3); m->tr_crew=1; m->tr_revealed=1; p->message="Take these. Get out of here. +3 rounds"; m->target=NULL;
+   TR_Radio(3); TR_QueueRadio("crew-ammo|Take these. Get out of here."); --tr_charges; if(!m->tr_crew)++tr_saved; TR_Ammo(p,3); m->tr_crew=1; m->tr_revealed=1; p->message="They're breathing. +3 rounds"; m->target=NULL;
    if(m->flags&MF_COUNTKILL) { m->flags &= ~MF_COUNTKILL; --totalkills; }
    purge_target=NULL; purge_tics=0;
   }
@@ -164,35 +179,38 @@ int TR_Gib(mobj_t *s,mobj_t *t) {
  if(!s || !s->player) return 0;
  if(t->tr_melee_hit) return 1;
  return tr_gore==2 && t->tr_shotgun_hit
-  && P_AproxDistance(t->x-s->x,t->y-s->y)<TR_CLOSE_RANGE && P_Random()<TR_SHOTGUN_GIB_THRESHOLD;
+  && P_AproxDistance(t->x-s->x,t->y-s->y)<TR_CLOSE_RANGE && M_Random()<TR_SHOTGUN_GIB_THRESHOLD;
 }
 void TR_Kill(mobj_t *s,mobj_t *t) {
- int i,n,decoration; mobj_t *b;
+ int i,n,decoration,gameplay_rng; mobj_t *b;extern int prndindex;
  if(t->player || (!(t->flags&MF_COUNTKILL) && !t->tr_crew && t->type!=MT_SKULL)) return;
  if(s && s->player && s->player->health>0) {
   player_t *p=s->player;
   if(TR_Human(t)) { ++tr_kills_humans; if(t->tr_crew) ++tr_crew_killed; } else ++tr_kills_demons;
+  if(TR_Human(t))hint_once(1);
   if(TR_Human(t)) tr_trauma=clamp(tr_trauma+1,TR_MAX_TRAUMA);
-  p->health=clamp(p->health+(TR_Human(t)?TR_HUMAN_HEAL:TR_DEMON_HEAL),TR_HEALTH_CAP); s->health=p->health;
+  if(p->health<TR_HEALTH_CAP) p->health=clamp(p->health+(TR_Human(t)?TR_HUMAN_HEAL:TR_DEMON_HEAL),TR_HEALTH_CAP); s->health=p->health;
   if(P_AproxDistance(t->x-s->x,t->y-s->y)<TR_CLOSE_RANGE) p->damagecount=TR_KILL_FLASH_TICS;
  }
- if(t->tr_crew) TR_Radio(2);
+ if(TR_Human(t)) TR_Radio(2);
  t->tr_death_tic=leveltime;
- if(!t->tr_crew && P_Random()<TR_AMMO_DROP) { b=P_SpawnMobj(t->x,t->y,ONFLOORZ,MT_CLIP); b->flags|=MF_DROPPED; }
+ if(P_Random()<TR_AMMO_DROP) { b=P_SpawnMobj(t->x,t->y,ONFLOORZ,MT_CLIP); b->flags|=MF_DROPPED; }
  if(tr_gore!=2) return;
- n=TR_BLOOD_MIN+P_Random()%TR_BLOOD_VARIATION;
+ gameplay_rng=prndindex; /* P_SpawnMobj consumes a lastlook byte; isolate cosmetic spawns too. */
+ n=TR_BLOOD_MIN+M_Random()%TR_BLOOD_VARIATION;
  for(i=0;i<n;i++) {
   b=P_SpawnMobj(t->x,t->y,t->z+24*FRACUNIT,MT_BLOOD);
-  b->momx=(P_Random()-128)*2048; b->momy=(P_Random()-128)*2048; b->momz=(2+P_Random()%5)*FRACUNIT;
+  b->momx=(M_Random()-128)*2048; b->momy=(M_Random()-128)*2048; b->momz=(2+M_Random()%5)*FRACUNIT;
  }
  /* Existing WAD decorations: pools of blood / brains (thing 79/80/81). */
- decoration=79+P_Random()%3;
+ decoration=79+M_Random()%3;
  for(i=0;i<NUMMOBJTYPES;i++) if(mobjinfo[i].doomednum==decoration) {
   /* Episode-1 IWADs need not contain Doom-II decoration sprites. */
   state_t *state=&states[mobjinfo[i].spawnstate];
-  if(sprites[state->sprite].numframes>(state->frame&FF_FRAMEMASK)) P_SpawnMobj(t->x,t->y,ONFLOORZ,i);
+  if(sprites[state->sprite].numframes>(state->frame&FF_FRAMEMASK)){b=P_SpawnMobj(t->x,t->y,ONFLOORZ,i);b->tr_seen=1;}
   break;
  }
+ prndindex=gameplay_rng;
 }
 /* A palette-index translation retains sector shading and uses the IWAD palette. */
 byte *TR_RedMap(byte *map) {
@@ -268,7 +286,7 @@ char tr_radio_log[512];
 #define radio_log tr_radio_log
 static char objective[80],story_json[1024];
 static fixed_t objective_x,objective_y;
-static int route_clock=-1;
+static int route_clock=-1,route_lattice_ready;
 static const char *radio_ids[]={"","crew-reveal","crew-death","crew-saved","breaking","static-1","static-2","static-3","static-4","static-5","static-6","static-7"};
 static const char *radio_text[]={"","That one's still human. Look before you shoot.","I heard that. I'll keep the channel open.","They're breathing. Thank you for waiting.","Listen to my voice. There is still a way out.","Control to anyone. Is that someone breathing on the line?","There is someone outside this room. They know my name.","Signal dropping. I can still hear you.","Please do not answer the other channel.","The banging stopped. That is worse.","I thought I heard the lift. It was above me.","Keep the receiver close. The walls carry sound here."};
 void TR_Radio(int beat) {
@@ -290,7 +308,10 @@ void TR_StoryTick(player_t *p) {
  const char *colors[]={"blue","yellow","red"};int i,c;thinker_t *th;
  ++story_clock;if(story_clock%7350==0)TR_Radio(5+(story_clock/7350-1)%7);for(int beat=1;beat<=11;beat++)if(radio_pending&(1<<beat))TR_Radio(beat);if(tr_terror>=80) TR_Radio(4);
  /* Prefer the ordinary exit; optional locked rooms must not become mandatory. */
- if(leveltime%35 && objective[0])return;
+ static unsigned long signature; unsigned long current=(unsigned long)(p->mo->subsector->sector-sectors)+1;
+ for(int j=0;j<NUMCARDS;j++)current=current*33+p->cards[j];
+ for(int j=0;j<numsectors;j++)current=current*33+(unsigned long)sectors[j].floorheight+(unsigned long)sectors[j].ceilingheight;
+ if(objective[0] && signature==current)return;signature=current;
  strcpy(objective,"Reach the exit");
  line_t *exitline=NULL;
  for(i=0;i<numlines;i++)if(lines[i].special==11||lines[i].special==52){exitline=&lines[i];break;}
@@ -302,14 +323,14 @@ void TR_StoryTick(player_t *p) {
  if(numsectors>4096)return;
  static int distance[4096],parent[4096],doorline[4096],done[4096],dependency[4096];
  for(i=0;i<numsectors;i++){distance[i]=100000000;parent[i]=-1;doorline[i]=-1;done[i]=0;dependency[i]=-1;}
- for(i=0;i<numlines;i++){line_t *l=&lines[i];if(TR_LineMarker(l->special)=='D'&&l->backsector)doorline[l->backsector-sectors]=i;}
+ for(i=0;i<numlines;i++){line_t *l=&lines[i];if(TR_LineMarker(l->special)=='D'&&(l->flags&ML_TWOSIDED)&&l->backsector>=sectors&&l->backsector<sectors+numsectors)doorline[l->backsector-sectors]=i;}
  int start=p->mo->subsector->sector-sectors,finish=exitline->frontsector-sectors;
  distance[start]=0;
  for(int pass=0;pass<numsectors;pass++){
   int at=-1;for(i=0;i<numsectors;i++)if(!done[i]&&(at<0||distance[i]<distance[at]))at=i;
   if(at<0||distance[at]>=100000000)break;done[at]=1;if(at==finish)break;
   sector_t *from=&sectors[at];
-  for(int j=0;j<from->linecount;j++){line_t *l=from->lines[j];if(!l->frontsector||!l->backsector||(l->flags&ML_BLOCKING))continue;
+  for(int j=0;j<from->linecount;j++){line_t *l=from->lines[j];if(!(l->flags&ML_TWOSIDED)||l->frontsector<sectors||l->frontsector>=sectors+numsectors||l->backsector<sectors||l->backsector>=sectors+numsectors||(l->flags&(ML_BLOCKING|ML_SECRET)))continue;
    int f=l->frontsector-sectors,b=l->backsector-sectors,to=f==at?b:f;if(to==at)continue;
    sector_t *dest=&sectors[to];int cost=1,dep=-1,d=doorline[to],key=d>=0?TR_KeyColor(lines[d].special):-1;
    if(key>=0&&!p->cards[key]&&!p->cards[key+3]){cost+=10000;dep=d;}
@@ -335,7 +356,7 @@ void TR_StoryTick(player_t *p) {
 }
 
 static const char *briefings[]={"This is Halloran, UAC comms. I locked myself in control when the hangar crew stopped answering. Find the way out; I will stay on this frequency.","You are inside the containment perimeter. They sealed those doors with people still working behind them. Look for a card beside the locked routes.","The treatment plant is running without its operators. Something is moving against the current. Follow the access doors toward the exit.","That station used to report every fault to me. Now every light is green and nobody answers. Find the next passage out.","This is the laboratory sector. We kept the samples cold; that did not keep them quiet. The secured route should take you onward.","The central complex is ahead. I can hear its alarm through the wall of this room. Find the access card and keep moving.","You have reached the computing wing. The terminals are still accepting names from empty desks. Look for the route beyond the locks.","The last facility is beyond this threshold. I cannot promise what waits there. Get to the exit while this channel holds.","This annex was missing from the evacuation plan. There are voices on its local channel, all using the same name. Find a route back out."};
-void TR_StoryStart(void) {
+void TR_StoryStart(void) { route_lattice_ready=0;
  radio_last=story_clock; /* Leave space for the briefing before rare story beats. */
  snprintf(radio_log,sizeof(radio_log),"e1m%d|%s",gamemap,briefings[(gamemap-1)%9]);
  if(!(briefing_bits&(1u<<gamemap))){briefing_bits|=1u<<gamemap;TR_QueueRadio(radio_log);}
@@ -352,16 +373,24 @@ static int route_parent[ROUTE_MAX],route_queue[ROUTE_MAX];
 static fixed_t route_floor[ROUTE_MAX];
 static void route_update(player_t *p,int depth) {
  if(depth>=4||!p->mo)return;
- if(route_clock==leveltime/7)return;route_clock=leveltime/7;
+#ifdef TR_HEADLESS
+ int interval=7; /* Every headless macro requests the public cue. */
+#else
+ int interval=automapactive?7:35;
+#endif
+ if(route_clock==leveltime/interval)return;route_clock=leveltime/interval;
  route_x=objective_x;route_y=objective_y;
  int w=bmapwidth*8,h=bmapheight*8,n=w*h;
  if(w<1||h<1||n>ROUTE_MAX||numsectors>4096)return;
  double ox=(double)bmaporgx/FRACUNIT,oy=(double)bmaporgy/FRACUNIT;
- memset(route_solid,0,n);memset(route_lock,0,n);memset(route_pending,0,n);
+ memset(route_pending,0,n);
+ static int lattice_cards=-1;int cardbits=0;for(int j=0;j<NUMCARDS;j++)if(p->cards[j])cardbits|=1<<j;
+ if(!route_lattice_ready || cardbits!=lattice_cards){lattice_cards=cardbits;
+ memset(route_solid,0,n);memset(route_lock,0,n);
  for(int i=0;i<numlines;i++){
   line_t *l=&lines[i];
   int key=TR_KeyColor(l->special),locked=key>=0&&!p->cards[key]&&!p->cards[key+3];
-  if(l->backsector&&!(l->flags&ML_BLOCKING)&&!locked)continue;
+  if(l->backsector&&!(l->flags&(ML_BLOCKING|ML_SECRET))&&!locked)continue;
   double ax=(double)l->v1->x/FRACUNIT,ay=(double)l->v1->y/FRACUNIT;
   double dx=(double)l->dx/FRACUNIT,dy=(double)l->dy/FRACUNIT,len=dx*dx+dy*dy;
   int x0=(int)( (fmin(ax,ax+dx)-18-ox)/16),x1=(int)((fmax(ax,ax+dx)+18-ox)/16);
@@ -369,12 +398,14 @@ static void route_update(player_t *p,int depth) {
   for(int y=y0;y<=y1;y++)for(int x=x0;x<=x1;x++)if(x>=0&&y>=0&&x<w&&y<h){
    double px=ox+x*16+8-ax,py=oy+y*16+8-ay,t=len?(px*dx+py*dy)/len:0;
    if(t<0)t=0;if(t>1)t=1;
-   if((px-t*dx)*(px-t*dx)+(py-t*dy)*(py-t*dy)<16*16){if(locked)route_lock[y*w+x]=key+1;else route_solid[y*w+x]=1;}
+   if((px-t*dx)*(px-t*dx)+(py-t*dy)*(py-t*dy)<16*16){if(locked&&!(l->flags&ML_SECRET))route_lock[y*w+x]=key+1;else route_solid[y*w+x]=1;}
   }
  }
+ }
  static unsigned char manual[4096];memset(manual,0,sizeof(manual));
- for(int i=0;i<numlines;i++)if(TR_LineMarker(lines[i].special)=='D'&&lines[i].backsector&&lines[i].backsector-sectors<4096)manual[lines[i].backsector-sectors]=1;
- for(int v=0;v<n;v++){route_parent[v]=-1;sector_t *sec=R_PointInSubsector((fixed_t)((ox+(v%w)*16+8)*FRACUNIT),(fixed_t)((oy+(v/w)*16+8)*FRACUNIT))->sector;route_floor[v]=sec->floorheight;route_sector[v]=sec-sectors;route_cost[v]=100000000;}
+ for(int i=0;i<numlines;i++)if(TR_LineMarker(lines[i].special)=='D'&&(lines[i].flags&ML_TWOSIDED)&&lines[i].backsector>=sectors&&lines[i].backsector<sectors+numsectors)manual[lines[i].backsector-sectors]=1;
+ for(int v=0;v<n;v++){route_parent[v]=-1;sector_t *sec=route_lattice_ready?&sectors[route_sector[v]]:R_PointInSubsector((fixed_t)((ox+(v%w)*16+8)*FRACUNIT),(fixed_t)((oy+(v/w)*16+8)*FRACUNIT))->sector;route_floor[v]=sec->floorheight;route_sector[v]=sec-sectors;route_cost[v]=100000000;}
+ route_lattice_ready=1;
  int sx=((p->mo->x-bmaporgx)/FRACUNIT)/16,sy=((p->mo->y-bmaporgy)/FRACUNIT)/16,start=sy*w+sx;
  if(start<0||start>=n)return;
  int head=0,tail=1,queued=1,best=start;double bestd=1e30;
@@ -437,7 +468,12 @@ static void route_update(player_t *p,int depth) {
 
 
 }
-int TR_ObjectiveBearing(player_t *p) {route_update(p,0);return (int)((double)(int32_t)(R_PointToAngle2(p->mo->x,p->mo->y,route_x,route_y)-p->mo->angle)*360.0/4294967296.0);}
+void TR_RefreshRoute(player_t *p){route_update(p,0);}
+int TR_ObjectiveBearing(player_t *p) {
+#ifndef TR_HEADLESS
+route_update(p,0);
+#endif
+return (int)((double)(int32_t)(R_PointToAngle2(p->mo->x,p->mo->y,route_x,route_y)-p->mo->angle)*360.0/4294967296.0);}
 const char *TR_ObjectiveDistance(player_t *p) {int d=P_AproxDistance(objective_x-p->mo->x,objective_y-p->mo->y)/FRACUNIT;return d<128?"near":d<512?"nearby":"far";}
 EMSCRIPTEN_KEEPALIVE const char *tremor_story(void) {
  player_t *p=&players[consoleplayer];route_update(p,0);snprintf(story_json,sizeof(story_json),"%s|%d|%s|%s",objective,TR_ObjectiveBearing(p),TR_ObjectiveDistance(p),radio_log);return story_json;
@@ -520,3 +556,17 @@ int TR_DoorOpen(line_t *line){
  fixed_t ceiling=line->frontsector->ceilingheight<line->backsector->ceilingheight?line->frontsector->ceilingheight:line->backsector->ceilingheight;
  return ceiling-floor>=56*FRACUNIT;
 }
+
+/* Text-only Freedoom override; no Dehacked gameplay mutations are applied. */
+#include "dstrings.h"
+char *TR_String(const char *text){
+ if(numlumps && W_CheckNumForName("FREEDOOM")>=0){
+  static const struct {const char *original,*replacement;} strings[]={
+#include "freedoom_strings.h"
+  {NULL,NULL}};
+  for(int i=0;strings[i].original;i++)if(!strcmp(text,strings[i].original))return (char*)strings[i].replacement;
+ }
+ return (char*)text;
+}
+
+void TR_InvalidateStory(void){objective[0]=0;route_clock=-1;route_lattice_ready=0;corpse_next=NULL;read_target=purge_target=NULL;read_tics=purge_tics=0;}

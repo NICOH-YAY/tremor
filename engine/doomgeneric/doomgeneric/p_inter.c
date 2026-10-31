@@ -807,7 +807,7 @@ P_DamageMobj
         (source->player->readyweapon==wp_fist || source->player->readyweapon==wp_chainsaw);
     target->tr_shotgun_hit = source && source==inflictor && source->player &&
         (source->player->readyweapon==wp_shotgun || source->player->readyweapon==wp_supershotgun);
-    if (target->health > 0 && (target->flags & MF_SHOOTABLE)) TR_Damaged(target);
+    if (target->health > 0 && (target->flags & MF_SHOOTABLE)) { if(target->player)target->player->attacker=source;TR_Damaged(target); }
     if ( !(target->flags & MF_SHOOTABLE) )
 	return;	// shouldn't happen...
 		

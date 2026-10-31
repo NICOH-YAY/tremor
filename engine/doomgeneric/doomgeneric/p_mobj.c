@@ -576,6 +576,7 @@ int		iquetail;
 
 void P_RemoveMobj (mobj_t* mobj)
 {
+    TR_CorpseRemoved(mobj);
     if ((mobj->flags & MF_SPECIAL)
 	&& !(mobj->flags & MF_DROPPED)
 	&& (mobj->type != MT_INV)

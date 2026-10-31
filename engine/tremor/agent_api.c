@@ -17,6 +17,16 @@ extern gameaction_t gameaction;
 void R_ExecuteSetViewSize(void);
 extern int tr_kills_demons,tr_kills_humans,tr_crew_killed,tr_reads,tr_fired_unread;
 static int initialized,tics,steps,terminal,motion;
+static int exit_hops[4096],initial_hops;
+static void progress_reset(void){
+ initial_hops=0;if(numsectors>4096)return;for(int i=0;i<numsectors;i++)exit_hops[i]=-1;
+ int queue[4096],head=0,tail=0;
+ for(int i=0;i<numlines;i++)if(lines[i].special==11||lines[i].special==52){int v=lines[i].frontsector-sectors;if(v>=0&&v<numsectors&&exit_hops[v]<0){exit_hops[v]=0;queue[tail++]=v;}}
+ while(head<tail){int v=queue[head++];sector_t *sec=&sectors[v];for(int i=0;i<sec->linecount;i++){line_t *l=sec->lines[i];if(!(l->flags&ML_TWOSIDED)||(l->flags&(ML_SECRET|ML_BLOCKING))||!l->backsector)continue;int f=l->frontsector-sectors,b=l->backsector-sectors,u=f==v?b:f;if(u<0||u>=numsectors||exit_hops[u]>=0)continue;exit_hops[u]=exit_hops[v]+1;queue[tail++]=u;}}
+ int start=players[0].mo->subsector->sector-sectors;if(start>=0&&start<numsectors)initial_hops=exit_hops[start];
+}
+static int route_progress(void){int v=players[0].mo->subsector->sector-sectors;if(terminal==1)return 100;if(initial_hops<=0||v<0||v>=numsectors||exit_hops[v]<0)return 0;int percent=100*(initial_hops-exit_hops[v])/initial_hops;return percent<0?0:percent>99?99:percent;}
+
 #define SIDE 257
 #define CELL 16
 static int map_ox,map_oy;
@@ -36,11 +46,12 @@ EMSCRIPTEN_KEEPALIVE void tremor_agent_reset(int seed,int episode,int map,int sk
  }
  gametic=0;memset(commands,0,sizeof(commands));netcmds=commands;
  G_InitNew((skill_t)(skill<0?0:skill>4?4:skill),episode,map);
- players[0].message=NULL;map_ox=(int)floor((double)players[0].mo->x/FRACUNIT/CELL)-SIDE/2;map_oy=(int)floor((double)players[0].mo->y/FRACUNIT/CELL)-SIDE/2;memset(open_cells,0,sizeof(open_cells));R_RenderPlayerView(&players[0]);discover(&players[0]);
+ players[0].message=NULL;map_ox=(int)floor((double)players[0].mo->x/FRACUNIT/CELL)-SIDE/2;map_oy=(int)floor((double)players[0].mo->y/FRACUNIT/CELL)-SIDE/2;memset(open_cells,0,sizeof(open_cells));R_RenderPlayerView(&players[0]);discover(&players[0]);TR_RefreshRoute(&players[0]);progress_reset();
 }
 static void check_terminal(void){if(players[0].health<=0)terminal=2;else if(gameaction==ga_completed||gamestate!=GS_LEVEL)terminal=1;}
 EMSCRIPTEN_KEEPALIVE int tremor_agent_step(int action){
  if(terminal)return 0;
+ nmessages=0;
  fixed_t oldx=players[0].mo->x,oldy=players[0].mo->y;ticcmd_t c={0};
  switch(action){
  case 0:c.forwardmove=25;break;case 1:c.forwardmove=-25;break;
@@ -76,7 +87,8 @@ EMSCRIPTEN_KEEPALIVE int tremor_agent_step(int action){
   if(gamestate==GS_LEVEL){R_RenderPlayerView(&players[0]);if(i==STEP_TICS-1)discover(&players[0]);}
  }
  motion=(c.forwardmove||c.sidemove)?(P_AproxDistance(players[0].mo->x-oldx,players[0].mo->y-oldy)<4*FRACUNIT?1:2):0;
- if(++steps>=1800&&!terminal)terminal=3;
+ TR_RefreshRoute(&players[0]);
+ if(++steps>=600&&!terminal)terminal=3;
  return 1;
 }
 static const char *label(mobj_t *m){
@@ -137,19 +149,19 @@ EMSCRIPTEN_KEEPALIVE const char *tremor_agent_observe(void){
 }
 EMSCRIPTEN_KEEPALIVE const char *tremor_agent_outcome(void){
  used=0;const char *reasons[]={"null","\"exit\"","\"dead\"","\"step_limit\"","\"call_limit\"","\"timeout\""};
- add("{\"status\":\"%s\",\"reason\":%s,\"score\":%d,\"metrics\":{\"kills_demons\":%d,\"kills_humans\":%d,\"crew_killed\":%d,\"crew_saved\":%d,\"reads\":%d,\"fired_unread\":%d,\"rounds_left\":%d,\"final_tremor\":%d,\"terror_bucket\":\"%s\",\"tics\":%d}}",terminal?"terminal":"ongoing",reasons[terminal],terminal==1?100:0,tr_kills_demons,tr_kills_humans,tr_crew_killed,tr_saved,tr_reads,tr_fired_unread,tr_rounds,tr_trauma,TR_TerrorBucket(),tics);return json;
+ add("{\"status\":\"%s\",\"reason\":%s,\"score\":%d,\"metrics\":{\"route_progress_pct\":%d,\"final_health\":%d,\"kills_demons\":%d,\"kills_humans\":%d,\"crew_killed\":%d,\"crew_saved\":%d,\"reads\":%d,\"fired_unread\":%d,\"rounds_left\":%d,\"final_tremor\":%d,\"terror_bucket\":\"%s\",\"tics\":%d}}",terminal?"terminal":"ongoing",reasons[terminal],terminal==1?100:0,route_progress(),players[0].health>0?players[0].health:0,tr_kills_demons,tr_kills_humans,tr_crew_killed,tr_saved,tr_reads,tr_fired_unread,tr_rounds,tr_trauma,TR_TerrorBucket(),tics);return json;
 }
 EMSCRIPTEN_KEEPALIVE void tremor_agent_terminate(int reason){if(!terminal&&reason>=3&&reason<=5)terminal=reason;}
 
 #ifdef TR_AGENT_TEST
 #include "p_inter.h"
 // Test fixtures are absent from the production artifact and controller interface.
-EMSCRIPTEN_KEEPALIVE void tremor_agent_fixture(int crew){
+EMSCRIPTEN_KEEPALIVE void tremor_agent_fixture(int crew,int stun){
  thinker_t *th=thinkercap.next;
  while(th!=&thinkercap){thinker_t *next=th->next;if(th->function.acp1==(actionf_p1)P_MobjThinker){mobj_t *m=(mobj_t*)th;if(!m->player)P_RemoveMobj(m);}th=next;}
  player_t *p=&players[0];p->mo->angle=0;
  mobj_t *m=P_SpawnMobj(p->mo->x+48*FRACUNIT,p->mo->y,ONFLOORZ,MT_POSSESSED);
- m->tr_crew=crew;m->tr_stun=1000;m->flags&=~MF_COUNTKILL;
+ m->tr_crew=crew;m->tr_stun=stun;m->flags&=~MF_COUNTKILL;
 }
 EMSCRIPTEN_KEEPALIVE void tremor_agent_test_cower(void){for(thinker_t *th=thinkercap.next;th!=&thinkercap;th=th->next)if(th->function.acp1==(actionf_p1)P_MobjThinker){mobj_t *m=(mobj_t*)th;if(TR_Human(m)){m->tr_crew=m->tr_revealed=1;m->tr_cower=35;m->frame=6;}}}
 EMSCRIPTEN_KEEPALIVE int tremor_agent_test_exit_fixture(void){

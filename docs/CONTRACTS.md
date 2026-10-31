@@ -1,159 +1,99 @@
-# Real-engine contracts ? 2026-10-30
+# Current real-engine contracts - 2026-10-31
 
-`src/player_interface.ts` is the active five-operation API. State is an opaque
-frozen handle to a private per-episode WASM instance, never passed to a controller.
-Node 24 is required; `public/engine-headless/doom.cjs` and `doom.wasm` are shipped.
-The `.cjs` factory's options are initialized synchronously with
-WASM_ASYNC_COMPILATION=0; a runtime flag assertion protects that assumption.
+Node 24. src/player_interface.ts owns five operations. Each reset creates an
+independent synchronous WASM instance privately held in WeakMap. No handle is
+provided to controllers; in-process imports are not a security sandbox.
 
-- `reset(seed, levelId='E1M1')` accepts safe integer seed and E1M1?E1M9,
-  skill index2, `/freedoom1.wad` plus `/tremor.wad`. Low eight seed bits select
-  the deterministic P_Random table start before map spawn.
-- `observe(state, player_id='player')` returns fresh public JSON plus a summary
-  containing every field. Entities have bearing_deg (left positive), distance in
-  Doom units and type; 90? cone plus P_CheckSight. Unread humans are always
-  `unknown figure`, without IDs or hidden kind. Numeric trauma/kill counters are
-  confined to outcome, which controllers never receive. Map is 25x25 north-up,
-  cell size64, centered on the player cell, with >^<v heading. # is a seen solid
-  line, . a seen two-sided line, ? no mapped line; ? can also be open space.
-  This is a line map, not an occupancy grid. No hidden exit/door tags are exposed.
-- `legal_actions(state, player_id='player')` always returns the same 17 IDs:
-  forward, back, strafe_left, strafe_right, turn_left_small, turn_left_large,
-  turn_right_small, turn_right_large, fire, use, read, stun, purge, wait,
-  weapon_fist, weapon_pistol, weapon_shotgun. No range, identity, inventory,
-  charge or terminal filtering. Unknown observe player IDs throw.
-- `step(state, player_id, action)` (two-argument shorthand also retained) returns
-  state, last five displayed events, valid and reason. Unknown player/action
-  returns `unknown player`/`unknown action`; valid macros after termination return
-  `episode terminal`. Invalid actions run idle for the same interval. Known
-  attempts are accepted even if mechanically ineffective. A live action advances
-  exactly seven G_Ticker calls; remaining tics use neutral input after death/exit. Use is edge-triggered: wait
-  or another action releases it. Read/purge must be continuous for 35 tics.
-- `outcome(state)` includes ongoing/terminal, reason, score and evaluator-only
-  metrics: kills_demons, kills_humans, crew_killed, crew_saved, reads,
-  fired_unread, rounds_left, final_tremor, tics. Compatibility summary aliases
-  support the runner/report. Terminal reasons: exit, dead, step_limit, call_limit,
-  timeout. A natural ending takes precedence over a later limit. C enforces600
-  actions; runner may impose a smaller step budget and owns calls/timeouts.
+- reset(seed,levelId='E1M1'): safe integer, E1M1-E1M9, seed&255 selects RNG start
+  before spawn. Skill 2, bundled Freedoom and Tremor WADs.
+- observe(state,player_id='player'): detached JSON; unknown player throws. Fields:
+  tic,health,armor,rounds(shared HUD budget),purge(charges),weapon,weapons,keys,
+  aim(steady/shaky/very shaky trauma),terror(steady<25/shaken<50/terrified<80/
+  breaking),motion(moving/blocked/still),heading_deg,map_cell_units=16,automap,
+  entities,objective,objective_bearing,objective_distance,radio_log,events,summary.
+  Summary serializes every other field. Exact trauma/terror/kills are outcome-only;
+  numeric rounds/charges are legitimate public resources. Initial rounds deliberately
+  disclose hostile count+1. Observation does not advance time/RNG/planning.
+- legal_actions(state,player_id='player'): constant 40 IDs below even at terminal;
+  unknown player/state throws. No identity/inventory/range filtering.
+- step(state,player_id,action): two-argument shorthand retained. Live action advances
+  exactly 7 G_Ticker calls; neutral tics finish terminal macro. Unknown action/player
+  returns valid=false with reason and idles 7 tics. Known ineffective attempts valid.
+  Terminal attempts do not advance. Events are up to 5 displayed messages this step,
+  cleared at its start; radio is separate persistent history.
+- outcome(state): ongoing/terminal, reason, score(exit 100 else 0), evaluator kills,
+  crew killed/saved,reads,fired_unread,rounds,trauma,terror,tics,final health and
+  route_progress_pct. No outcome passed to controllers.
 
-Headless initialization skips D_DoomLoop. Software R_RenderPlayerView updates
-ML_MAPPED at reset and after every tic, without canvas or audio. JSON generation is synchronous;
-observing does not change gameplay RNG or simulation time. `hu_stuff.c / HU_Ticker`
-forwards only messages actually displayed to the player, with JSON escaping;
-there are no raw kill/AI events. Each module's resources are GC-owned; parallel
-state handles never share engine globals. Test-only exports live in separate
-`doom-test.cjs/.wasm` artifacts, never the course API or production WASM.
+Entities expose bearing_deg(positive left),distance(Doom units),elevation_deg,type;
+90-degree horizontal cone plus P_CheckSight. Unread humans share unknown figure,
+no IDs. Full READ/PURGE are deliberate reveals; STUN and interrupted PURGE feedback
+match identities. Human corpse fear/drop rules identical. Map 257x257 north-up,
+16 units/cell, recenters near edge, no world origin/coordinates. ? unknown, . seen
+floor, # mapped barrier,D/d closed/open manual door(56 unit aperture),S switch,T
+crossing,b/y/r closed locks,>^<v player. Mapped drawable lines only, no secret
+activation markers. Human map intentionally shares activation classification.
 
-`runEpisode` retains step/call/timeout/trace/fallback accounting. It passes cloned
-observations, legal IDs and validation feedback only. Failed calls consume budget;
-three illegal decisions produce a separately labelled wait. A rejected/slow call
-never becomes a model move. Outcome metrics are withheld until the episode ends.
+Objective is designed full-geometry guidance shown identically to human TAB and
+agents: it reveals unseen dependencies. Secret lines block lattice. Bearing is
+a smoothed waypoint up to 256 units ahead; distance to quest target near<128,
+nearby<512,far. No graph/coordinates/actor identities leave planner. Not a universal
+lift/teleporter solver. Radio transcript 16KB, separate playback queue.
 
----
+All actions cost 7 tics(0.2s). Fine/small/medium/large turns~2/10/45/90 degrees.
+Forward/back 25,strafe 24,slow 12,sprint 50 command units/tic. Compound actions hold
+both controls. USE edge-triggered; other action releases. READ/PURGE35continuous
+tics. Constant append-only C ABI order:
 
-## Superseded TypeScript prototype contracts
+0. `forward` (7 tics)
+1. `back` (7 tics)
+2. `strafe_left` (7 tics)
+3. `strafe_right` (7 tics)
+4. `turn_left_small` (7 tics)
+5. `turn_left_large` (7 tics)
+6. `turn_right_small` (7 tics)
+7. `turn_right_large` (7 tics)
+8. `fire` (7 tics)
+9. `use` (7 tics)
+10. `read` (7 tics)
+11. `stun` (7 tics)
+12. `purge` (7 tics)
+13. `wait` (7 tics)
+14. `weapon_fist` (7 tics)
+15. `weapon_pistol` (7 tics)
+16. `weapon_shotgun` (7 tics)
+17. `turn_left_fine` (7 tics)
+18. `turn_right_fine` (7 tics)
+19. `forward_slow` (7 tics)
+20. `advance_fire` (7 tics)
+21. `strafe_left_fire` (7 tics)
+22. `strafe_right_fire` (7 tics)
+23. `back_fire` (7 tics)
+24. `sprint` (7 tics)
+25. `turn_left_small_fire` (7 tics)
+26. `turn_right_small_fire` (7 tics)
+27. `turn_left_fine_fire` (7 tics)
+28. `turn_right_fine_fire` (7 tics)
+29. `turn_left_small_read` (7 tics)
+30. `turn_right_small_read` (7 tics)
+31. `turn_left_fine_read` (7 tics)
+32. `turn_right_fine_read` (7 tics)
+33. `advance_read` (7 tics)
+34. `approach_left_fire` (7 tics)
+35. `approach_right_fire` (7 tics)
+36. `turn_left_medium` (7 tics)
+37. `turn_right_medium` (7 tics)
+38. `advance_left` (7 tics)
+39. `advance_right` (7 tics)
 
-Everything below documents the historical simulation only. It is not the active
-play/evaluation contract. Claims about excluding id code are historical; the real
-engine includes credited GPL upstream source.
+Runner 600 actions/calls,20s/call,300s/episode. Failed calls count with no gameplay
+step. Errors sanitized; invalid streak survives errors. Three invalid decisions
+produce labelled wait fallback, never a model move. Replays mocked. Natural ending
+wins over later limit. Reasons exit/dead/step_limit/call_limit/timeout.
 
-# Tremor integration contracts
-
-Node 24+, TypeScript, Vite and npm. PowerShell can use npm.cmd. Commands: npm ci, npm run dev (5191), npm test, npm run typecheck, npm run build, npm run eval, npm run eval:live. Vite base is './'. No id code, assets or level layouts are included. Integrator may now edit any merged module; original ownership is recorded in AGENTS.md.
-
-## Shared data and units
-
-src/sim/types.ts is authoritative. Coordinates/radii are tiles, velocity tiles/tic, angles and turn commands radians. TICRATE=35. Positive angles rotate toward positive Y; positive strafe is right. Movement axes clamp to [-1,1], turn is radians per tic. Player circle radius .22. Map cells are row-major, zero floor and positive wall texture IDs. Doors override the underlying cell; sealed doors or openAmount < .85 block. Optional map.light is brightness 0..1 (renderer also accepts a map encoded 0..255). createWorld clones maps, spawns and radio; resets never mutate LevelDef.
-
-World owns all simulation state and seeded RNG; mechanics never use wall-clock time, DOM or Math.random. All entity data values are primitive. Entity IDs are unique within the current world. Core supplies transient reading/stunRequested/purgeRequested flags. World.useHeld implements rising-edge door use, including across agent macros. Idle or movement releases use.
-
-## Simulation lifecycle
-
-Done worlds do not advance. tick clears events, increments tic, applies movement/cooldowns, advances doors, handles door-use edges, selects the nearest aimed living figure, assigns flags, fires, runs living brains in entity order, then rule onTic hooks in registry order. It dispatches newly revealed transitions and onRead exactly once; scheduled radio, map keys, entity supplies, closet release and proximity triggers follow. Finally health is clamped at zero, death takes precedence over exit, expired projectile corpses are pruned and the event log retains the last 100 events.
-
-Core shots use SHOT_DAMAGE=40 exported from types.ts, seeded tremor spread, eight-tic cooldown, and the nearest ray/circle intersection before walls. Pickups and fireballs are excluded from shot/read targets. onFire runs before damage (collar breaks refund SHOT_DAMAGE); hit follows damage. Core lethal hits mark dead, update player crew/demon counters, emit kill and dispatch onKill. Possessed count as crew. Monster-on-monster deaths emit kill without player counters, trauma or healing hooks. hurtPlayer clamps at zero immediately, ignores damage once dead, and applies armor absorption first. A final world clamp preserves the public invariant including terminal states. Zero-health players cannot consume supplies to revive.
-
-Recognition owns progress/revealed; core owns read event/counter and hook dispatch. Stun/purge enforce timers, cooldowns, range, interruption and charges in mercy.ts. A stun emits stun; a cure emits cured. Collar release emits collarBreak, never a fake zero-damage hit. Fireball spawns emit fireball and bursts emit explosion; monster acquisition emits alert. Dead fireballs linger eight tics and are pruned by core independently of new projectile spawns. Corpses use data.diedAt.
-
-## Content lifecycle
-
-Map keys collect within .5 tiles. Entity pickups use kind:'pickup', data.item:'medkit'|'ammo'|'purge' (also 'red'|'blue' keys), collect within .55, then health=0/state='dead'. Medkits add 25 capped at 100 and remain if full; ammo adds 10 capped at 200 and remains if full; purge adds one. Key collection releases the red-tagged Hangar closet: unseal/open nearby non-sealable door, alert hound, consume its closet tag once. The closet_red proximity marker is once-only content metadata.
-
-Plain unsealed doors open with use and remain open. Sealable B-2 use closes/seals; a subsequent press unseals and opens. Door events carry coordinates and state; sealed is authoritative on the Door. Crew flee/cower and do not follow the player. Quarantine order2 requires order1 and order3 requires order2; early proximity does not consume the trigger. Scheduled radio fires at exact integer tics, proximity text once. Exits trigger within .5 tiles. Hangar then Quarantine form the story; per-level reset restores supplies, keys and RNG; story transitions carry trauma and retries restore the level entry tremor. endText(world) produces intermission prose; the human UI has no score/statistics panel.
-
-## Rendering, human input and audio
-
-Raycaster(canvas) implements Renderer; resize gets output dimensions. render receives World read-only, previous player pose, interpolation alpha and reused RenderView. Rendering/cosmetics must not mutate World or consume simulation RNG. Internal height is 270, width follows aspect (320..640); typical 480x270. Canvas upscales with smoothing disabled and pixelated CSS. World light is read by core.
-
-Main supplies flash/recoil 0..1, shake in internal pixels (typically 0..6), weaponSway -1..1, bob=player.bob. Effects decay by frame delta. Player/entity positions interpolate; entity angle is not interpolated. Crosshair uses continuous time sinusoids scaled by tremor, read progress draws an arc and reveal draws a brief crew/possessed/demon label. Static supply HUD updates only when values change; overlay normally clears only its previous crosshair region, with full redraw for damage/pickup/death effects. Main reuses command, pose and view objects. Renderer reuses image/depth/sprite buffers; per-tic histories allocate, not per-pixel.
-
-Title art fills the window. Click begins Hangar (or valid ?level=id demo). End cards Continue to Quarantine then title. Death fades red and Try again resets the current level. Esc pauses with Resume, saved sensitivity slider, Restart and Quit. Blur/pointer-lock loss pauses; keyboard turning works without lock. Run is default. Pause consumes no simulation time.
-
-AudioBus.play(name,source,listener) receives every event with a source: entity position for IDs, door coordinates, noise position or player for local events. Main maps fire->shotgun, playerHurt->hurt, cured->purge, collarBreak->zap, explosion->fireball, alert->alert_kind; other names pass through. Moving players emit step, bus rate-limits it. Audio unlock, spatial attenuation/pan and unsupported-context handling belong to the original procedural bus. Radio text is displayed briefly at the bottom.
-
-## Controller boundary
-
-src/player_interface.ts exports reset(seed,levelId), observe(world,player_id), legal_actions(world,player_id), step(world,player_id,action), outcome(world). Legacy two-argument step is retained. reset defaults to test_room for harness compatibility; browser explicitly requests hangar. Invalid levels/players throw where documented in implementation; unknown action IDs return validation feedback from step.
-
-Controllers receive detached observations and IDs only, never authoritative World. Observation includes pose, supplies, keys, qualitative aim, last five whitelisted events, seen automap and living figures within 120-degree FOV/line of sight. Unread identity is unknown figure; stunned is a visible identity-neutral state; a shared event whitelist suppresses hidden activity and raw kill/read/hit metadata. Pickup/projectile entities are excluded from figure/read lists. Seen map is host-side WeakMap state. Exit is visible only once its cell has been seen. Constant legal vocabulary avoids identity leakage even at terminal state; invalid uses consume idle simulation time. Purge attempts are accepted without hidden-state validation; stunned crew and Possessed both channel and spend a charge.
-
-STEP_TICS=7 (0.2 s). ACTION_IDS: turn_left_small, turn_left_large, turn_right_small, turn_right_large, forward, back, strafe_left, strafe_right, fire, read, stun, purge, use, wait. Small turns total 35 degrees, large 90. Terminal worlds stop early. outcome reports terminal reason, exit score 100 (otherwise 0) and independent evaluator metrics. These scores/trauma numbers never appear in the human HUD.
-
-Runner caps episodes at 400 actions/400 controller calls and 20 s per call and five minutes wall-clock per episode by default. Errors are separate from illegal actions; unknownUsageCalls marks missing usage. Failed calls count, timeouts terminate, three invalid decisions cause a separately labelled fallback wait. No fallback counts as a model move. History is K=8; observation-only is a separate player. Baselines use only these observations, bound engagement attempts, recover blocked strafes and seek keys before doors. Their optional-door heuristic is specific to these maps. Situation suite and seeds remain fixed in src/eval/suite.ts; story checks are additional integration coverage.
-
-## Verification limits
-
-Tests cover deterministic rules, meaningful health regression, targeting, supplies, sealing, closet, ordered radio, projectile removal, hidden-information boundary, action legality, terminal path, episode limits, mocked UI lifecycle, seven-level baseline completion and 480x270 CPU raster budget. Baselines finish all seven levels at seeds 17/83 within 400 actions. Node raster-plus-simulation benchmark is below 6 ms averaged per level; fallback textures are used and browser canvas upload/DOM/audio are excluded. Integration evidence is in eval/integration-*.json. Actual pointer lock, audio and visual QA were not exercised: the integration session has no available browser surface. No live model trials or Pages deployment are claimed.
-
-Environment note: direct npm run eval was attempted but this sandbox reports uv_os_get_passwd ENOMEM inside tsx before the CLI starts. Baseline evidence was therefore generated by tests/baseline.test.ts calling the same runEpisode and baseline controllers, with no mocked decisions. No live credentials or paid model calls were used.
-
-
-## Public-interface follow-up (2026-10-30; supersedes map/action descriptions above)
-
-Observation remains the only controller input, alongside the constant legal
-list and validation feedback. No state handle, WASM module, outcome, hidden
-identity or world coordinates are passed. `heading_deg` numerically transcribes
-the visible map arrow. Entity `elevation_deg` is its angular position above/below
-the view; entities still require90-degree FOV and LOS. Visible solid decorations
-and explosive barrels are included. `weapons` is owned HUD inventory. `motion`
-is `moving`, `blocked` or `still`, inferred from the visible result of movement,
-without revealing collision geometry or position.
-
-Automap is257x257, north-up,16 Doom units/cell. It has a player arrow, mapped
-barriers `#`, remembered visible floor `.`, unknown `?`, closed manual doors `D`, open passages `d`, use
-switches `S`, walkover activations `T`, and closed key locks `b/y/r`. It recenters
-near its viewport edge, clearing local floor history; no origin/world coordinates
-are exposed. Floor discovery samples the same90-degree camera cone with geometric
-occlusion; it runs in step/reset, never observe. Only ML_MAPPED, drawable lines
-are returned. Secret lines do not acquire activation/lock markers. Human automap
-shows D/S/T glyphs and key colours from the same classification. These are visible
-map pixels, not a hidden navigation mesh. Bots may hypothesize routes through `?`
-but must discover/collide with the real level through ordinary actions.
-
-`radio_log` is the bounded16KB episode transcript; humans can open Radio log
-below the game view. A separate destructive playback queue cannot erase history.
-Story masks persist across levels and in Tremor 3 saves. Earlier saves are rejected.
-
-There are 36 actions; ACTION_IDS in player_interface.ts is the append-only C ABI.
-Small turns now total10 degrees, fine turns2 and large turns90. Added slow forward,
-sprint and combined movement/turning with fire/READ model simultaneous human
-controls. None depends on hidden identity, resources or geometry for legality.
-The default1800-action/call cap is six simulated minutes; per-call20 seconds and
-wall-clock five minutes still apply. The declaration amendment documents the change.
-Outcome adds final `terror_bucket` for evaluation; it is never supplied to players.
-
-Final follow-up correction: open-door state is derived from visible aperture and
-shared with the human map (open door glyphs are grey). Controllers do not USE open
-passages. USE probes cover64 units regardless of map pixel size, and denied-door
-retry memory groups connected visible markers. Recentered viewports clear inferred
-bearing/supply locations. The last two added controls combine forward+strafe+fire,
-matching diagonal human approaches. All 36 actions remain public and identity-neutral.
-
-## Route follow-up (2026-10-31; supersedes straight-line cue /36-action count)
-
-The40-action ABI appends medium left/right turns (45 degrees) and forward with
-small left/right turns (10 degrees). The seven-tic interval and all1800-step
-budgets remain unchanged. Objective bearing is now the shared human TAB route
-waypoint, up to 256 units ahead; objective distance remains to the current quest
-target. Geometry and dependencies are private planner inputs, not controller
-fields. The planner uses no monster/crew positions or identities.
+Progress is evaluator-only sector-hop distance proxy toward normal exit,0-99,
+100 only at exit; ignores locks/heights, not a traversability proof. objectivesReached
+counts distinct key types collected plus a completed level exit; switch-only subtasks are not counted. Final
+health/kills/moral metrics apply to all players. Tremor 3 saves persist identities,
+resources,trauma,radio/corpse flags; partial channels reset on load. Browser pitch
+is clamped Y-shear. legacy/ is excluded from every active pipeline.

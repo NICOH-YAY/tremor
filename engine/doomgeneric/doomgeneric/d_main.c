@@ -306,6 +306,8 @@ void D_Display (void)
 	return;
     }
     
+    // Browser transitions present the completed frame without a blocking wipe.
+    I_FinishUpdate();return;
     // wipe update
     wipe_EndScreen(0, 0, SCREENWIDTH, SCREENHEIGHT);
 

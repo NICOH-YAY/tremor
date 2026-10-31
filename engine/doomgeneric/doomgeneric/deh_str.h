@@ -35,7 +35,8 @@ void DEH_AddStringReplacement(char *from_text, char *to_text);
 
 #else
 
-#define DEH_String(x) (x)
+char *TR_String(const char *text);
+#define DEH_String(x) TR_String(x)
 #define DEH_printf printf
 #define DEH_fprintf fprintf
 #define DEH_snprintf snprintf

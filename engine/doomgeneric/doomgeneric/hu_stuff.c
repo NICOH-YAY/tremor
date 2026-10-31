@@ -363,6 +363,7 @@ void HU_Start(void)
 
     s = DEH_String(s);
     
+    s=DEH_String(s);
     while (*s)
 	HUlib_addCharToTextLine(&w_title, *(s++));
 

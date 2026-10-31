@@ -10,16 +10,15 @@
 EM_JS(void, blit, (unsigned char *p), { Module.onFrame?.(p); });
 void DG_Init(void) {}
 static double paused_ms;
-EM_ASYNC_JS(double, settings_wait, (), { const t=performance.now(); if(!Module.settingsOpen)return 0; while(Module.settingsOpen) await new Promise(r=>setTimeout(r,20)); return performance.now()-t; });
 void DG_DrawFrame(void) { blit((unsigned char*)DG_ScreenBuffer); }
-void DG_SleepMs(uint32_t ms) { emscripten_sleep(ms); }
+void DG_SleepMs(uint32_t ms) { (void)ms; }
 uint32_t DG_GetTicksMs(void) { return (uint32_t)(emscripten_get_now()-paused_ms); }
 void DG_SetWindowTitle(const char *s) {}
 int DG_GetKey(int *pressed,unsigned char *key) { return 0; }
 EMSCRIPTEN_KEEPALIVE void web_key(int key,int down) { event_t e={0};e.type=down?ev_keydown:ev_keyup;e.data1=key;e.data2=key<128?key:0;D_PostEvent(&e); }
 EMSCRIPTEN_KEEPALIVE void web_mouse(int buttons,int dx) { event_t e={0};e.type=ev_mouse;e.data1=buttons;e.data2=dx;D_PostEvent(&e); }
 EM_JS(int, settings_is_open, (), { return Module.settingsOpen?1:0; });
-static void tick(void) { if(settings_is_open())paused_ms+=settings_wait();doomgeneric_Tick(); }
+static void tick(void) { static double last;double now=emscripten_get_now();if(settings_is_open()){if(last)paused_ms+=now-last;last=now;return;}if(last){paused_ms+=now-last;last=0;}doomgeneric_Tick(); }
 int main(int argc,char **argv) { static int entered; if(entered)return 0;entered=1;doomgeneric_Create(argc,argv); emscripten_set_main_loop(tick,0,1); return 0; }
 
 EMSCRIPTEN_KEEPALIVE void web_read_mouse(int down) { static int heldkey; if(down) heldkey=tr_keys[0]; web_key(heldkey,down); }
@@ -54,3 +53,6 @@ EMSCRIPTEN_KEEPALIVE double tremor_debug_sway(void) { return (double)TR_Sway()/F
 EMSCRIPTEN_KEEPALIVE double tremor_debug_arm_y(void) { return (double)TR_ArmY()/FRACUNIT; }
 
 EMSCRIPTEN_KEEPALIVE int tremor_automap_active(void) { return automapactive; }
+
+EMSCRIPTEN_KEEPALIVE int tremor_charges(void){return tr_charges;}
+EMSCRIPTEN_KEEPALIVE int tremor_rounds(void){return tr_rounds;}

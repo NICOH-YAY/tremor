@@ -26,13 +26,16 @@ for(const player of players){
  // Large public automap histories compress well; retain every action/observation.
  await writeFile(tracePath+'.gz',gzipSync(readFileSync(tracePath),{level:1}));
  await unlink(tracePath);
- results.push({...result,split:SUITE.tuning.some(id=>id===levelId)?'tuning':'held-out',tracePath:tracePath+'.gz'});console.log(`${player} ${levelId} ${seed}: ${result.reason}`);
+ results.push({...result,split:SUITE.tuning.some(id=>id===levelId)?'tuning':SUITE.seen.some(id=>id===levelId)?'seen':'held-out',tracePath:tracePath+'.gz'});console.log(`${player} ${levelId} ${seed}: ${result.reason}`);
  }}
 await mkdir('eval/results',{recursive:true});
-let revision='unknown';try{revision=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();}catch{}
+let revision='unknown';try{revision=execFileSync('git',['-c','safe.directory='+process.cwd(),'rev-parse','HEAD'],{encoding:'utf8'}).trim();}catch{}
 const artifacts=Object.fromEntries(['public/engine-headless/doom.cjs','public/engine-headless/doom.wasm','public/wad/freedoom1.wad','public/wad/tremor.wad'].map(path=>[path,createHash('sha256').update(readFileSync(path)).digest('hex')]));
-const report={artifacts,controllerSources,date,runId,configId:'tremor-engine-v6-survival-route40-600-k8',gameVersion:'doomgeneric-tremor-2026-10-30',revision,workingTree:'uncommitted changes may apply',model:'gemini-3.5-flash-lite',config:{stepTics:7,maxSteps:600,maxCalls:600,timeoutMs:20000,historyK:8},suite:SUITE,skipped,pricing:'price to verify on the Vertex pricing page on run date',results};
-await writeFile(`eval/results/${date}-results.json`,JSON.stringify(report,null,2));
+let workingTree='unknown';try{workingTree=execFileSync('git',['-c','safe.directory='+process.cwd(),'status','--porcelain'],{encoding:'utf8'}).trim()?'dirty':'clean';}catch{}
+const config={stepTics:7,maxSteps:600,maxCalls:600,timeoutMs:20000,maxDurationMs:300000,historyK:8};
+const configId=createHash('sha256').update(JSON.stringify({config,suite:SUITE,controllerSources,artifacts})).digest('hex');
+const report={artifacts,controllerSources,date,runId,configId,gameVersion:artifacts['public/engine-headless/doom.wasm'],revision,workingTree,model:'gemini-3.5-flash-lite',config,suite:SUITE,skipped,pricing:'Live pricing unverified; model trials pending. Scripted controllers cost $0 in model API fees.',results};
+await writeFile(`eval/results/${date}-${runId}-results.json`,JSON.stringify(report,null,2));
 const table=['| Player | Case | Split | Seed | Completion | Reason | Steps | Illegal | Calls | Crew killed/saved | Reads | Fired unread | Trauma / terror | ms | Tokens in/out | Est. cost |','|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|',...results.map(r=>`| ${r.player} | ${r.levelId} | ${r.split} | ${r.seed} | ${r.reachedExit} | ${r.reason} | ${r.steps} | ${r.illegalActions} | ${r.modelCalls} | ${r.crewKilled}/${r.crewSaved} | ${r.reads} | ${r.firedUnread} | ${r.finalTremor} / ${r.finalTerrorBucket} | ${Math.round(r.latencyMs)} | ${r.tokensIn}/${r.tokensOut} | ${r.estimatedCost===null?'unverified':r.estimatedCost} |`)];
-await writeFile(`eval/results/${date}-table.md`,`${date}; ${revision}\n\n${table.join('\n')}\n\nSkipped: ${skipped.join(', ')||'none'}. Cost: ${report.pricing}.\n`);
+await writeFile(`eval/results/${date}-${runId}-table.md`,`${date}; ${revision}\n\n${table.join('\n')}\n\nSkipped: ${skipped.join(', ')||'none'}. Cost: ${report.pricing}.\n`);
 

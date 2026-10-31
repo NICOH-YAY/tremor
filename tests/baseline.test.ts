@@ -15,7 +15,7 @@ test('baselines distinguish unread humans and bound short-range combat',async()=
  o.entities[0].type='corpse';expect((await careful.decide(o,[...ACTION_IDS],'',signal)).action).toBe('forward');
 });
 
-test('navigation uses a closed marker within64 units and leaves an open passage alone',async()=>{
+test('navigation uses a closed marker within 64 units and leaves an open passage alone',async()=>{
  const o=observe(reset(17));o.entities=[];o.tic=7;o.weapon='fist';o.heading_deg=0;o.map_cell_units=16;o.objective_bearing=0;o.objective_distance='far';
  const rows=Array.from({length:13},()=>Array(13).fill('.'));rows[6][6]='>';rows[6][10]='D';o.automap=rows.map(r=>r.join('')).join('\n');
  expect((await baseline().decide(o,[...ACTION_IDS])).action).toBe('use');
@@ -27,7 +27,7 @@ test('navigation uses a closed marker within64 units and leaves an open passage 
 test.each([17,83])('careful baseline completes E1M1 seed%i within the declared step limit',async(seed)=>{
  const {runEpisode}=await import('../src/eval/runner');
  const result=await runEpisode(baseline(true),{seed,levelId:'E1M1',maxSteps:600,maxCalls:600,tracePath:false});
- expect(result.reason).toBe('exit');expect(result.reachedExit).toBe(true);
+ expect(result.reason).toBe('exit');expect(result.objectivesReached).toBeGreaterThanOrEqual(1);expect(result.reachedExit).toBe(true);
  expect(result.steps).toBeLessThanOrEqual(600);expect(result.illegalActions).toBe(0);
 },30000);
 

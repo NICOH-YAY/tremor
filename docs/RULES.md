@@ -1,0 +1,15 @@
+# Rules
+
+Reach each level exit; the browser episode ends at E1M8 (E1M9 is optional). Death lets you restart the level. Hold TAB for the shared geometry route arrow, which excludes secret passages. It is designed guidance through unseen geometry.
+
+WASD move; mouse/arrows turn; mouse Y or PgUp/PgDn look; End centers; Ctrl/click fires; E/Space uses; Shift runs; 1-7 weapons; R/right mouse READ; F STUN; Q PURGE; ? pauses for help. Settings rebind controls. Pitch clamps to +/-32 degrees; READ/STUN/PURGE follow pitch like shots. Fists deal 10x ordinary Doom fist damage.
+
+Some humans are crew (spawn probability 90/256 for pistol/shotgun humans); crew never attack. Hold READ on an aimed human for 35 tics (1 second) to reveal identity. STUN works within 64 units for 70 tics (2 seconds), cooldown 35 tics. Hold PURGE within 64 units on a stunned human for 35 uninterrupted tics. Damage, loss of aim, release or stun expiry interrupts it. Completion consumes 1 of 2 charges per level and gives +3 rounds; both hidden identities become revealed crew. A possessed human is cured. Repeated crew purges still cost a charge.
+
+All firearms share rounds. Each level starts with hostile count +1 rounds and fists/pistol; that HUD budget intentionally reveals the starting hostile count. Weapon pickups add no rounds. Map ammo survives with probability 64/256 (25%); dropped ammo gives 1, small pickups 2, boxes 4 rounds; backpacks give 8 (four grants of 2). Every eligible human/demon death has the same 31/256 (12.11%) drop chance. Empty guns switch to fists.
+
+Player kills heal 15 for humans or 10 for demons, up to 100; health already above 100 stays untouched. Inherited health bonuses/spheres can reach 200. Killing any human adds aim trauma, capped at 6 for the episode, with random angular jitter proportional to trauma (TR_AIM_UNIT=16384 binary-angle units per random-byte delta per trauma). Trauma never decays. Crew cower 35 tics near visible demons within 192 units or gunfire within 512.
+
+Fear is 0-100. Each corpse seen within 1024 units, +/-45 degrees and line of sight counts once: +1, or +2 if less than 70 tics old and closer than 256 units, identically for crew and possessed. At most 8 sight tests/tic. Fear buckets: steady <25, shaken 25-49, terrified 50-79, breaking 80-100. Hit success declines from 100% to 77/256 (30.08%); incoming damage rises linearly to 1.6x (1.0x at fear 0). Fear loses 1 after every 350 tics without new exposure and halves on level entry. Do not stare at bodies.
+
+Halloran gives one briefing per map and rare once-per-episode beats, at least 3150 tics (90 seconds) apart. Read the Radio log for the 16KB transcript. First-time HUD hints are separate from radio. Gore, grain, horror music, weapon sway, brightness and autoaim are adjustable. Saves use Tremor 3 and browser storage; partial READ/PURGE resets on load. The inherited intermission kill percentage is combat bookkeeping, not a moral score.

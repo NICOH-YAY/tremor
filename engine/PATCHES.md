@@ -112,7 +112,7 @@ There is no numeric terror HUD. The public felt states are steady (<25), shaken
 of anyone else's identity. Gameplay rolls use P_Random. Rendering/audio do not.
 
 At full fear, each firearm ray has a 77/256 success threshold; failed shots go
-45?135 degrees wide. Fists whiff without damage. Existing trauma offsets stack.
+45-135 degrees wide. Fists whiff without damage. Existing trauma offsets stack.
 Incoming damage rises linearly to 1.6x, before normal armor handling. Shared rounds
 still start at enemies+1. Map ammo survives with probability 64/256; small pickups
 give two, boxes four, death clips one. Non-crew deaths drop a clip at 31/256.
@@ -159,3 +159,12 @@ piano with oscillators; no sampled piano, reversed monster layers or separately
 mixed whisper stingers. Canvas composite paint cost and audible mix remain unverified.
 No browser/apps were available from UI inventory, so Brave pointer-lock, CPU-only
 Canvas timing and an episode playthrough could not be verified.
+
+## Codex session codex-doom12 (2026-10-31)
+Completed purge parity, identity-neutral corpse/drop/radio, cosmetic RNG, above100
+healing, pitch-aware interaction aim, secret route barriers, cached/demand route,
+corpse cursor removal hook, event-driven quest planning, step events,600cap,
+shipped C suite, LF/source manifest, no Asyncify/synchronous pause/direct wipes,
+hold TAB, text-only Freedoom BEX replacements, directional hurt/HUD hint exports,
+load invalidation. Original upstream history/screenshots retained. Prior notes
+about P_Random hyper blood are superseded: gore now uses M_Random.

@@ -122,3 +122,9 @@ void TR_BrowserMouseApplied(int turn);
 angle_t TR_BrowserMouseView(void);
 
 int TR_DoorOpen(line_t *line);
+
+void TR_RefreshRoute(player_t *p);
+
+void TR_CorpseRemoved(mobj_t *m);
+
+void TR_InvalidateStory(void);

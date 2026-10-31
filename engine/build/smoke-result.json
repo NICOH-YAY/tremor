@@ -1,11 +1,11 @@
 {
   "scope": "stationary E1M1, after tic35; excludes Canvas/audio/layout",
-  "rendererMeanMs": 0.31889356223175463,
-  "rendererP95Ms": 0.4183999999995649,
-  "frames": 466,
-  "framesBetweenTics": 187,
+  "rendererMeanMs": 0.1931011450381904,
+  "rendererP95Ms": 0.2745999999988271,
+  "frames": 524,
+  "framesBetweenTics": 211,
   "nonzero": true,
-  "elapsedMs": 10037.7694,
-  "meanIntervalMs": 17.253059139784952,
-  "p95IntervalMs": 30.91309999999976
+  "elapsedMs": 10034.4434,
+  "meanIntervalMs": 17.16376252390057,
+  "p95IntervalMs": 31.061100000000124
 }

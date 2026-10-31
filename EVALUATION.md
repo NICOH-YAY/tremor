@@ -1,113 +1,74 @@
-# Scripted baseline survival follow-up — 2026-10-31 UTC
+# Evaluation - 2026-10-31
 
-The requested credible-completion target is **not achieved**. The frozen scripted
-run exits **4/20 episodes**: 14 deaths and two step limits. Careful exits **2/6
-tuning episodes (33.3%)**, below the requested 4/6. Completion has not improved
-from the previous 4/20 report. These controllers remain weak navigation/combat
-baselines; the changes do not establish rubric 4b completion credibility.
+Current engine, skill index 2, 40 constant seven-tic actions. Tuning E1M1-E1M3; seen E1M4/E1M5; fresh model held-out E1M6/E1M7 frozen 2026-10-31 before model trials. Two RNG starts 17/83 per map/player. Seeds change only the low-eight-bit RNG table start: modulo-256 equivalent seeds are identical, not different levels.
 
-The declared maps, seeds and skill are unchanged: tuning E1M1–E1M3, held-out
-E1M4–E1M5, seeds 17/83, skill index 2. This session restores the user-requested
-**600 action / 600 call** budget, superseding the earlier 1800-budget amendment.
-Each action remains seven 35Hz tics; per-call timeout is 20 seconds and episode
-wall time is five minutes. The runner imposes 600 before the unchanged engine's
-1800-action ceiling. No C source changed and no headless rebuild was needed.
-Comparisons with the previous 1800-action report do not isolate controller effects.
+Report: [full JSON](eval/results/2026-10-31-2026-10-31T05-54-45-516Z-results.json). Run ID: `2026-10-31T05-54-45-516Z`. HEAD: `c6316ff03972c0a2aaf8ccdf44386357e660a674`. Working tree: **dirty**; this is not clean committed-tree evidence. Codex was forbidden to commit; Claude must commit then rerun the frozen command. Controller/artifact hashes and computed configuration ID are in the JSON.
+Configuration: `c5337d427eec768ce4379a1e402abca5b9ca071df7e67cf70a9520bc11c0791a`. Limits: 600 actions, 600 calls, 20 seconds/call, five minutes/episode. Natural exit/death precedes later limits.
 
-## Frozen results
+Command: `npm run eval -- --players baseline_aggressive,baseline_careful --cases all`. Default `npm run eval` also explicitly skips model players without --live. No live numbers fabricated.
 
-Config `tremor-engine-v6-survival-route40-600-k8`, 2026-10-31 UTC. The
-[JSON report](eval/results/2026-10-31-results.json) records source/artifact hashes,
-exact per-episode metrics, revision, budgets and lossless trace paths. The
-[per-seed table](eval/results/2026-10-31-table.md) labels tuning and held-out rows.
-Counts below are exits / deaths / step limits, two starts per cell.
+| Player | Exits/trials | Deaths | Step/call limits | Timeouts | Illegal | Errors | Calls | Decision latency total ms | Tokens in/out | API cost USD (2026-10-31) |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| baseline_aggressive | 2/14 | 10 | 2/0 | 0 | 0 | 0 | 3037 | 239.8 | 0/0 | 0 (scripted, no API) |
+| baseline_careful | 2/14 | 10 | 2/0 | 0 | 0 | 0 | 3427 | 255.8 | 0/0 | 0 (scripted, no API) |
+| model-history | **pending live run** | pending | pending | pending | pending | pending | pending | pending | pending | pending; price unverified |
+| model-obs-only | **pending live run** | pending | pending | pending | pending | pending | pending | pending | pending | pending; price unverified |
 
-| Split | Level | Aggressive | Careful |
-| --- | --- | --- | --- |
-| Tuning | E1M1 | 2 / 0 / 0 | 2 / 0 / 0 |
-| Tuning | E1M2 | 0 / 2 / 0 | 0 / 2 / 0 |
-| Tuning | E1M3 | 0 / 1 / 1 | 0 / 1 / 1 |
-| Held-out | E1M4 | 0 / 2 / 0 | 0 / 2 / 0 |
-| Held-out | E1M5 | 0 / 2 / 0 | 0 / 2 / 0 |
+Latency above is controller decision time, not engine episode/frame cost. Model transport failures may have unknown billed usage. No live cost estimate or pricing assertion is made. No statistical claim from two fixed seeds. Both baselines use only public observations; careful may fire unread below 90 health. E1M1 success does not establish whole-suite competence.
 
-| Player | Exits | Deaths | Limits | Crew killed / saved | Reads | Fired unread |
-| --- | ---: | ---: | ---: | --- | ---: | ---: |
-| Aggressive | 2 | 7 | 1 | 20 / 0 | 0 | 19 |
-| Careful | 2 | 7 | 1 | 1 / 2 | 34 | 0 |
+| Player | Tuning exits | Seen exits | Held-out exits |
+|---|---|---|---|
+| baseline_aggressive | 2/6 | 0/4 | 0/4 |
+| baseline_careful | 2/6 | 0/4 | 0/4 |
 
-Zero illegal actions and controller errors were reported. There were no call
-limits, timeouts or live model invocations. Both model conditions were explicitly
-skipped by `npm run eval`; scripted model calls, tokens and API costs are zero.
-Final terror stayed steady in all episodes. Trauma is separately recorded.
-Careful's one crew death despite zero fired-unread shows that recognition does
-not prevent every crew casualty (for example intervening figures can be hit).
-The result alone does not establish the precise cause of that casualty.
+Secondary metrics are present for every trial. Route progress is an evaluator-only sector-hop distance-to-exit proxy (0-99, exit=100), ignoring locks/heights; objectives reached counts distinct key types collected plus completed exit; switch-only subtasks are not counted. These limitations prevent overstating navigation success.
 
-## Tuning evidence and changes
+| Player | Map/seed | Split | Outcome | Steps | Route % | Objectives | Health | Kills human/demon | Crew killed/saved | Reads | Fired unread | End terror |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| baseline_aggressive | E1M1/17 | tuning | exit | 115 | 100 | 1 | 71 | 3/1 | 1/0 | 0 | 0 | steady |
+| baseline_aggressive | E1M1/83 | tuning | exit | 114 | 100 | 1 | 69 | 3/0 | 2/0 | 0 | 0 | steady |
+| baseline_aggressive | E1M2/17 | tuning | dead | 285 | 0 | 0 | 0 | 6/2 | 2/0 | 0 | 6 | steady |
+| baseline_aggressive | E1M2/83 | tuning | step_limit | 600 | 0 | 0 | 100 | 5/2 | 3/0 | 0 | 4 | steady |
+| baseline_aggressive | E1M3/17 | tuning | dead | 283 | 50 | 0 | 0 | 6/0 | 1/0 | 0 | 5 | steady |
+| baseline_aggressive | E1M3/83 | tuning | step_limit | 600 | 29 | 0 | 85 | 6/0 | 3/0 | 0 | 4 | steady |
+| baseline_aggressive | E1M4/17 | seen | dead | 289 | 0 | 0 | 0 | 1/3 | 1/0 | 0 | 0 | steady |
+| baseline_aggressive | E1M4/83 | seen | dead | 177 | 0 | 0 | 0 | 0/2 | 0/0 | 0 | 0 | steady |
+| baseline_aggressive | E1M5/17 | seen | dead | 68 | 33 | 0 | 0 | 3/0 | 2/0 | 0 | 0 | steady |
+| baseline_aggressive | E1M5/83 | seen | dead | 111 | 26 | 0 | 0 | 4/0 | 1/0 | 0 | 0 | steady |
+| baseline_aggressive | E1M6/17 | held-out | dead | 81 | 16 | 0 | 0 | 5/1 | 0/0 | 0 | 4 | steady |
+| baseline_aggressive | E1M6/83 | held-out | dead | 86 | 16 | 0 | 0 | 2/2 | 1/0 | 0 | 2 | steady |
+| baseline_aggressive | E1M7/17 | held-out | dead | 98 | 43 | 0 | 0 | 0/4 | 0/0 | 0 | 0 | steady |
+| baseline_aggressive | E1M7/83 | held-out | dead | 130 | 37 | 0 | 0 | 0/3 | 0/0 | 0 | 0 | steady |
+| baseline_careful | E1M1/17 | tuning | exit | 140 | 100 | 1 | 11 | 1/0 | 0/0 | 2 | 0 | steady |
+| baseline_careful | E1M1/83 | tuning | exit | 108 | 100 | 1 | 78 | 1/1 | 0/0 | 1 | 0 | steady |
+| baseline_careful | E1M2/17 | tuning | dead | 582 | 0 | 0 | 0 | 8/2 | 1/0 | 2 | 7 | steady |
+| baseline_careful | E1M2/83 | tuning | dead | 361 | 0 | 0 | 0 | 4/2 | 1/0 | 3 | 1 | steady |
+| baseline_careful | E1M3/17 | tuning | step_limit | 600 | 29 | 0 | 50 | 10/0 | 1/0 | 0 | 7 | steady |
+| baseline_careful | E1M3/83 | tuning | step_limit | 600 | 29 | 0 | 94 | 5/0 | 1/0 | 3 | 3 | steady |
+| baseline_careful | E1M4/17 | seen | dead | 62 | 17 | 0 | 0 | 0/0 | 0/0 | 1 | 0 | steady |
+| baseline_careful | E1M4/83 | seen | dead | 177 | 0 | 0 | 0 | 0/2 | 0/0 | 0 | 0 | steady |
+| baseline_careful | E1M5/17 | seen | dead | 46 | 33 | 0 | 0 | 1/0 | 0/0 | 0 | 0 | steady |
+| baseline_careful | E1M5/83 | seen | dead | 143 | 26 | 0 | 0 | 4/4 | 0/0 | 1 | 0 | steady |
+| baseline_careful | E1M6/17 | held-out | dead | 118 | 16 | 0 | 0 | 3/2 | 0/0 | 1 | 2 | steady |
+| baseline_careful | E1M6/83 | held-out | dead | 262 | 50 | 0 | 0 | 6/3 | 1/0 | 4 | 2 | steady |
+| baseline_careful | E1M7/17 | held-out | dead | 98 | 43 | 0 | 0 | 0/4 | 0/0 | 0 | 0 | steady |
+| baseline_careful | E1M7/83 | held-out | dead | 130 | 37 | 0 | 0 | 0/3 | 0/0 | 0 | 0 | steady |
 
-Only E1M1–E1M3 informed policy selection. The requested E1M2/E1M3 diagnostics
-used `scripts/trace-baseline.ts` at seeds 17/83. Original careful seed17 died
-at 93 actions on E1M2 with 80 rounds, and at 112 on E1M3 with 74 rounds.
-Public traces show stationary recognition, repeated tracking turns, health loss
-without an in-view target, and close engagements while additional figures enter
-the view. Ammunition exhaustion and a terror spiral do not explain those runs.
+Representative complete public-observation/action traces (gzipped JSONL; raw traces remain gitignored). A model trace is pending a live trial:
 
-The careful policy now recognizes within 384 units, tracks with fine-turn READ
-macros, aims before spending rounds, closes when rounds are scarce, and backs
-away while firing at close range with a gun. Both policies retain bounded visible
-health/armor/weapon detours and now consider visible ammunition when low, switch
-to fists when empty, and ignore corpses. Safe-route memory uses only public map
-arrow cells; a damaged, blocked player facing a crowd can turn back along that
-trail. Recentering clears the trail. Retreat is bounded and aborts on blockage;
-it attempts to break sight but does not guarantee cover. Repeated map-cell visits
-trigger a bounded lateral recovery. Existing route guidance and door/switch USE
-remain. No observation fields, hidden identities, map/seed dispatch, coordinates,
-privileged setters, C code or assets were added.
+- [exit: baseline_aggressive E1M1/17](eval/traces-sample/baseline-success.jsonl.gz), SHA-256 `8a9d7f6c9b53ca1bbe862e3d687499040285ce2960e6933577ced73407cf7274`.
+- [dead: baseline_aggressive E1M2/17](eval/traces-sample/baseline-death.jsonl.gz), SHA-256 `fc252edc54cec804652e949343375aac2361b8e47d18c9c322223a28a220873f`.
+- [step_limit: baseline_aggressive E1M2/83](eval/traces-sample/baseline-limit.jsonl.gz), SHA-256 `e51fe9992ded7752db00eb2274a1fdf58edecede23dc48e6aa867ddb23ca9251`.
 
-Development compared broader combat, pistol use, sprinting, shorter recognition,
-fine-turn recognition, moving READ, supply priority, close stun, retreat thresholds
-and repeated-cell recovery. Several survival variants regressed E1M1. A trial
-reached E1M2 seed17 action284 with five reads and one saved crew but still died;
-another survived E1M2 seed83 to 600 without exiting. These are failed development
-trials, not successes or additional independent evaluation samples. An initial
-full rerun exposed aggressive's E1M1 regression; its original close-combat branch
-was restored using those tuning rows and verified at 111/125 actions. A fresh
-20-episode run produced the table above. Held-out results selected no changes.
+| Date | Declaration/amendment | Prior results seen? |
+|---|---|---|
+| 2026-10-30 | Real-engine suite replaced TS cases | TS results superseded |
+| 2026-10-30 | 600 raised to 1800 for navigation/channel allowance | Development diagnostics |
+| 2026-10-31 | Survival follow-up restored 600; C reconciled to same ceiling | Baseline development/results |
+| 2026-10-31 | E1M4/E1M5 marked seen; E1M6/E1M7 frozen before model trials | E1M4/E1M5 already inspected |
 
-E1M2 is still a combat failure: final careful dies at actions124/140 with rounds
-remaining, despite four reads each. The bounded recognition/combat policy cannot
-reliably identify and neutralize the encountered group before losing health.
-E1M3 seed17 dies at115 after three reads and one successful purge. Seed83 instead
-survives600, READs nine figures and repeatedly returns toward the same route-switch
-objective. Lateral recovery does not complete that activation. The public cue and
-local recovery do not provide a reliable activation traversal for this policy.
-These observations **do not prove either map unwinnable by a heuristic**. They
-identify failures of this implementation within the requested budget; a general
-solution and the 4/6 target remain unfinished.
+Full declaration history: [EVALUATION-PLAN](docs/EVALUATION-PLAN.md). No controller/prompt changes used E1M6/E1M7 outcomes. Review-driven engine corrections rerun all cases, not selected successful seeds.
 
-## Verification and reproduction
+Validation: 43 active Vitest tests / 9 files; 508 compiled C checks, no failures; typecheck/build/engine:test pass. [Five kinds](tests/README.md). [Every finding response](docs/reviews/review-response-2026-10-31.md). [Two skill invocations](docs/SKILL-INVOCATIONS.md).
 
-`npm test`: 126 passing. Production-module completion regression now covers both
-E1M1 seeds17/83 within600 actions/calls from normal spawn, using the actual careful
-controller. Additional checks cover retreat toward remembered safe cells and
-scarce/empty-round behavior. Existing public-observation, opaque-state, identity
-non-leakage, action-vocabulary and engine boundary tests remain green.
-
-Typecheck and build pass; build retains the existing unresolved `./art/title.jpg`
-warning. `npm run engine:test`: 470 checks, zero failures. The artifact manifest
-was refreshed with `engine/build/artifacts.py` and every hash was verified against
-shipped bytes, including LF-normalized text. No C changes, headless rebuild,
-interactive human-play verification, commit or push is claimed.
-
-```sh
-npm run eval
-TRACE_SEED=17 node --import ./scripts/typescript-loader.mjs scripts/trace-baseline.ts E1M2
-```
-
-On PowerShell use `$env:TRACE_SEED=17` before the trace command and `npm.cmd` if
-execution policy blocks npm.ps1. Diagnostics are gitignored public JSONL and
-map snapshots under `eval/diagnostics/`; final episode traces are lossless
-JSONL.gz under `eval/traces/`, referenced by the report. The previous report is
-retained as [pre-survival JSON](eval/results/2026-10-31-pre-survival-results.json)
-and [table](eval/results/2026-10-31-pre-survival-table.md). Earlier prototype
-successes remain superseded and are not production-engine completion evidence.
+Software-render mean 0.230 to 0.193 ms/frame; p95 0.338 to 0.275 ms. 200 headless wait+observe steps 1290 to 771 ms. Excludes Canvas/DOM/audio and is not a target-Brave measurement. No browser was exposed by UI tools. Visual/audible fixes and a full human episode still need playtesting. Live comparisons, clean committed rerun, personal agent-team account, peer notes and recording remain submission work.

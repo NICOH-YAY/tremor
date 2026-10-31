@@ -148,6 +148,7 @@ void F_StartFinale (void)
     // Do dehacked substitutions of strings
   
     finaletext = DEH_String(finaletext);
+    if(W_CheckNumForName("FREEDOOM")>=0)finaletext="THE SIGNAL CLEARS.\n\nYOU FOUND THE WAY OUT.\nSOMEONE IS STILL BREATHING.\n\nTREMOR - END OF EPISODE";
     finaleflat = DEH_String(finaleflat);
     
     finalestage = F_STAGE_TEXT;

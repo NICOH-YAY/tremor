@@ -1,116 +1,112 @@
-# Rule/source map ? real-engine amendment 2026-10-30
+# Current rule/source map - 2026-10-31
 
-Active engine source is `engine/doomgeneric/doomgeneric/` (doomgeneric's adaptation
-of id Software's GPL linuxdoom code). **code** means inherited implementation,
-with Tremor hook changes identified separately; **design** means original Tremor
-rules. Locators are file + function, not unstable line numbers. The original
-[TypeScript map](rule-source-map-ts-superseded.md) is superseded.
+Legend: code=inherited executable rule; manual=player-facing manual;
+observed=measured evidence, not guarantee; assumed=declared equivalence/approximation;
+design=original adaptation, rationale DESIGN.md / DECISIONS.md. Locators file+symbol.
+Upstream engine locators below are in engine/doomgeneric/doomgeneric/.
 
-| Rule | Label | Engine locator / original source | Active adaptation |
-| --- | --- | --- | --- |
-| 35Hz fixed simulation | code | `doomdef.h / TICRATE`; `g_game.c / G_Ticker`; linuxdoom equivalents | Agent calls the same ticker directly; browser keeps real-time scheduling. |
-| Walk, run, strafe, turn, momentum | code | `p_user.c / P_MovePlayer, P_Thrust`; `g_game.c / G_BuildTiccmd` | Browser input uses ordinary commands; agent walks with 25 forward / 24 strafe. |
-| Friction, gravity and actor movement | code | `p_mobj.c / P_XYMovement, P_ZMovement, P_MobjThinker` | Doom fixed-point physics, sector heights and blocking retained. |
-| Collision, sliding, stairs, line use | code | `p_map.c / P_TryMove, P_SlideMove, P_UseLines` | No grid-raycaster replacement. |
-| Hitscan occlusion and autoaim | code | `p_map.c / P_AimLineAttack, P_LineAttack` | Tremor aim offset added in weapon attack hooks. |
-| Weapon timing, firing and switching | code | `p_pspr.c / P_MovePsprites, A_FirePistol, A_FireShotgun, A_Punch, P_CheckAmmo` | Ordinary weapons/timing; shared ammunition and stronger fists are design rows below. |
-| Health, armor, damage and death | code | `p_inter.c / P_DamageMobj, P_KillMobj, P_GiveBody` | Crew damage blocked, kill healing added; health pickups retain Doom cap up to 200. |
-| Pickups, ammo and inventory | code | `p_inter.c / P_TouchSpecialThing, P_GiveWeapon, P_GiveAmmo` | Ammo pickups do not refill Tremor's fixed per-level budget. |
-| Normal/keyed doors | code | `p_doors.c / T_VerticalDoor, EV_DoLockedDoor, EV_VerticalDoor` | Original keys, timing, use and monster behavior. |
-| Floors, lifts, ceilings and hazards | code | `p_floor.c / T_MoveFloor`; `p_plats.c / T_PlatRaise`; `p_ceilng.c / T_MoveCeiling`; `p_spec.c / P_PlayerInSpecialSector` | Original loaded-map sector rules. |
-| Switches, exits and level transitions | code | `p_switch.c / P_UseSpecialLine`; `p_spec.c / P_CrossSpecialLine`; `g_game.c / G_ExitLevel, G_DoCompleted` | Agent stops at pending completion; browser continues ordinary intermissions. |
-| Monster sight, chase, attacks, pain | code | `p_enemy.c / A_Look, A_Chase, A_PosAttack, A_TroopAttack, A_SargAttack`; `info.c / states, mobjinfo` | Crew short-circuits hostile think; stunned humans freeze. |
-| Alerts and infighting | code | `p_enemy.c / P_NoiseAlert`; `p_inter.c / P_DamageMobj` | Crew additionally cower from nearby visible demons/gunfire. |
-| Missiles and explosions | code | `p_mobj.c / P_SpawnMissile`; `p_map.c / PIT_CheckThing, P_RadiusAttack` | Doom collision, damage and species rules retained. |
-| Visibility and automap discovery | code | `p_sight.c / P_CheckSight`; `r_segs.c / R_StoreWallRange`; `am_map.c / AM_drawWalls` | Adapter uses LOS + 90? FOV and only ML_MAPPED lines. |
-| Demo-style deterministic RNG | code | `m_random.c / P_Random, M_ClearRandom` | Headless reset starts the 256-entry RNG at seed & 255 before spawning; browser uses original reset. |
-| Human classification and harmless crew | design | `engine/tremor/tremor.c / TR_MapSpawn, TR_Think, TR_BlockDamage`; `tremor.h / TR_CREW_THRESHOLD` | POSS/SPOS classify at spawn with P_Random <90. Crew never attack/damage player. |
-| Recognition | design | `engine/tremor/tremor.c / TR_PlayerThink, crosshair`; `tremor.h / TR_READ_TICS` | 35 continuous aimed tics reveal crew/possessed; 90? observer never reports hidden identities. |
-| Permanent human-kill aim instability | design | `engine/tremor/tremor.c / TR_Kill, TR_Aim, TR_Sway`; `tremor.h / TR_MAX_TRAUMA, TR_AIM_UNIT` | Any human kill by the player increases trauma to six; demon kills do not. Qualitative aim only in observation. |
-| Kill healing | design | `engine/tremor/tremor.c / TR_Kill`; `tremor.h / TR_HUMAN_HEAL, TR_DEMON_HEAL, TR_HEALTH_CAP` | Player kills restore 15 human / 10 demon health, capped at 100. |
-| Shared finite ammunition | design | `engine/tremor/tremor.c / TR_LevelStart, TR_CheckAmmo, TR_SpendRound`; `p_inter.c / P_GiveAmmo` | Starts post-classification enemies +1. Firearms spend one shared round, never negative; zero switches to fists. |
-| Stun and purge | design | `engine/tremor/tremor.c / TR_PlayerThink, TR_Damaged`; `tremor.h / TR_STUN_TICS, TR_PURGE_TICS, TR_PURGE_CHARGES` | Nearby humans stun for 70 tics with 35-tic cooldown; purge takes 35 uninterrupted close tics, two charges/level, reveals saved crew. |
-| Strong fists, impact and hyper gore | design | `engine/tremor/tremor.c / TR_Impact, TR_Gib, TR_Kill, TR_Shot`; `p_pspr.c / A_Punch` | Tenfold fist damage; optional render effects. Gore decoration sprites must exist in loaded IWAD. |
-| Crew and revealed possessed visuals | design | `r_things.c / R_ProjectSprite`; `engine/tremor/tremor.c / TR_RedMap, TR_MergeCrewSprites` | Original crew A/B art, faint identified-possessed red tint; actual display frame validated. |
-| Audio output | design | `engine/platform/sound_web.c`; `music_web.c / tremor_music_render`; `engine/vendor/nuked-opl3/opl3.c` | Original Web Audio DMX + MUS/MIDI bridge, licensed Nuked OPL3; Node target starts -nosound. |
-| Agent macros, observation and score | design | `engine/tremor/agent_api.c / tremor_agent_reset, tremor_agent_step, tremor_agent_observe, tremor_agent_outcome`; `src/player_interface.ts` | 7 tics, 17 macros, public-only JSON; exit=100 else0; constant validation. See CONTRACTS and DECISIONS. |
-| Episode/call limits, fallback, model memory | design | `src/eval/runner.ts / runEpisode`; `src/agent/model_player.ts / modelPlayer` | 600 steps/calls, timeout, labelled fallback, K=8 vs obs-only; no world/tools reach controllers. |
+| Rule | Label | Numbers/behavior | Locator |
+|---|---|---|---|
+| Timing | code |35Hz | doomdef.h TICRATE;g_game.c G_Ticker |
+| Movement/collision | code | forward 25/run 50,strafe 24,step 24 units | g_game.c G_BuildTiccmd;p_user.c P_MovePlayer;p_map.c P_TryMove |
+| Health/armor | code | stim 10/medkit 25 cap 100;bonuses/spheres cap 200;armor absorbs 1/3 or 1/2 | p_inter.c P_TouchSpecialThing/P_GiveBody/P_DamageMobj |
+| Weapons/missiles/AI | code | inherited state-tic/damage tables | info.c states/mobjinfo;p_pspr.c A_*;p_enemy.c A_Chase/P_NoiseAlert;p_map.c P_LineAttack/P_RadiusAttack |
+| Keys/exits/hazards | code | key specials 26/27/28/32/33/34 etc;exit 11/51/52/124 | p_doors.c EV_DoLockedDoor;p_switch.c P_UseSpecialLine;p_spec.c P_CrossSpecialLine/P_PlayerInSpecialSector;g_game.c G_DoCompleted |
+| Controls/player manual | manual | exact control/channels | docs/RULES.md;index.html how-to-play |
+| Freedoom-for-Doom data | assumed | engine rules equivalent, layouts/art differ | engine/UPSTREAM.md;public/wad/FREEDOOM-LICENSE.txt |
+| Observation FOV | assumed |90degree horizontal cone+LOS approximates screen knowledge | agent_api.c tremor_agent_observe/discover |
+| Crew fraction | observed |90/256=35.15625% full RNG threshold; not exact each map | tremor.c TR_MapSpawn;seed tests |
+| CPU cost | observed | measured scope excludes Canvas/audio | review-response-2026-10-31.md;engine/build/session-*-browser.json |
+| TR_CREW_THRESHOLD | design | `90` P_Random byte <90: 35.16% of POSS/SPOS. | `engine/tremor/tremor.h TR_CREW_THRESHOLD`; `tremor.c`; [rationale](DESIGN.md) |
+| TR_READ_TICS | design | `35` Continuous crosshair identification. | `engine/tremor/tremor.h TR_READ_TICS`; `tremor.c`; [rationale](DESIGN.md) |
+| TR_STUN_TICS | design | `70` Same freeze for either human identity. | `engine/tremor/tremor.h TR_STUN_TICS`; `tremor.c`; [rationale](DESIGN.md) |
+| TR_STUN_COOLDOWN | design | `35` Prevent indefinite stun by holding F. | `engine/tremor/tremor.h TR_STUN_COOLDOWN`; `tremor.c`; [rationale](DESIGN.md) |
+| TR_PURGE_TICS | design | `35` Uninterrupted close contact. | `engine/tremor/tremor.h TR_PURGE_TICS`; `tremor.c`; [rationale](DESIGN.md) |
+| TR_PURGE_CHARGES | design | `2` Reset each level. | `engine/tremor/tremor.h TR_PURGE_CHARGES`; `tremor.c`; [rationale](DESIGN.md) |
+| TR_MAX_TRAUMA | design | `6` Episode lifetime; never displayed. | `engine/tremor/tremor.h TR_MAX_TRAUMA`; `tremor.c`; [rationale](DESIGN.md) |
+| TR_HUMAN_HEAL | design | `15`  | `engine/tremor/tremor.h TR_HUMAN_HEAL`; `tremor.c`; [rationale](DESIGN.md) |
+| TR_DEMON_HEAL | design | `10`  | `engine/tremor/tremor.h TR_DEMON_HEAL`; `tremor.c`; [rationale](DESIGN.md) |
+| TR_HEALTH_CAP | design | `100`  | `engine/tremor/tremor.h TR_HEALTH_CAP`; `tremor.c`; [rationale](DESIGN.md) |
+| TR_MELEE_MULTIPLIER | design | `10` Berserk-strength fists without a powerup. | `engine/tremor/tremor.h TR_MELEE_MULTIPLIER`; `tremor.c`; [rationale](DESIGN.md) |
+| TR_SHOTGUN_GIB_THRESHOLD | design | `192` 75% at close range in hyper mode. | `engine/tremor/tremor.h TR_SHOTGUN_GIB_THRESHOLD`; `tremor.c`; [rationale](DESIGN.md) |
+| TR_IMPACT_TICS | design | `6` Render-only melee shake duration. | `engine/tremor/tremor.h TR_IMPACT_TICS`; `tremor.c`; [rationale](DESIGN.md) |
+| TR_SHOT_KICK_TICS | design | `3` Render-only firearm kick duration. | `engine/tremor/tremor.h TR_SHOT_KICK_TICS`; `tremor.c`; [rationale](DESIGN.md) |
+| TR_KILL_FLASH_TICS | design | `8` Near kill red flash; not actual damage. | `engine/tremor/tremor.h TR_KILL_FLASH_TICS`; `tremor.c`; [rationale](DESIGN.md) |
+| TR_AIM_UNIT | design | `16384` Binary angle units per random-byte delta / trauma. | `engine/tremor/tremor.h TR_AIM_UNIT`; `tremor.c`; [rationale](DESIGN.md) |
+| TR_CLOSE_RANGE | design | `(128*FRACUNIT)` Kill flash / shotgun gib range. | `engine/tremor/tremor.h TR_CLOSE_RANGE`; `tremor.c`; [rationale](DESIGN.md) |
+| TR_FEAR_RANGE | design | `(192*FRACUNIT)` Visible demons cause cowering. | `engine/tremor/tremor.h TR_FEAR_RANGE`; `tremor.c`; [rationale](DESIGN.md) |
+| TR_GUN_FEAR_RANGE | design | `(512*FRACUNIT)` Nearby gunfire makes crew cower. | `engine/tremor/tremor.h TR_GUN_FEAR_RANGE`; `tremor.c`; [rationale](DESIGN.md) |
+| TR_COWER_TICS | design | `35`  | `engine/tremor/tremor.h TR_COWER_TICS`; `tremor.c`; [rationale](DESIGN.md) |
+| TR_BLOOD_MIN | design | `8`  | `engine/tremor/tremor.h TR_BLOOD_MIN`; `tremor.c`; [rationale](DESIGN.md) |
+| TR_BLOOD_VARIATION | design | `9` Inclusive burst range 8..16. | `engine/tremor/tremor.h TR_BLOOD_VARIATION`; `tremor.c`; [rationale](DESIGN.md) |
+| TR_READ | design | `1`  | `engine/tremor/tremor.h TR_READ`; `tremor.c`; [rationale](DESIGN.md) |
+| TR_STUN | design | `2`  | `engine/tremor/tremor.h TR_STUN`; `tremor.c`; [rationale](DESIGN.md) |
+| TR_PURGE | design | `4`  | `engine/tremor/tremor.h TR_PURGE`; `tremor.c`; [rationale](DESIGN.md) |
+| TR_TERROR_RANGE | design | `(1024*FRACUNIT)`  | `engine/tremor/tremor.h TR_TERROR_RANGE`; `tremor.c`; [rationale](DESIGN.md) |
+| TR_TERROR_CLOSE | design | `(256*FRACUNIT)`  | `engine/tremor/tremor.h TR_TERROR_CLOSE`; `tremor.c`; [rationale](DESIGN.md) |
+| TR_TERROR_SCAN | design | `8` At most eight LOS tests per player tic. | `engine/tremor/tremor.h TR_TERROR_SCAN`; `tremor.c`; [rationale](DESIGN.md) |
+| TR_TERROR_DECAY | design | `350` One point after ten seconds without exposure. | `engine/tremor/tremor.h TR_TERROR_DECAY`; `tremor.c`; [rationale](DESIGN.md) |
+| TR_AMMO_KEEP | design | `64` 64/256 map ammunition survives. | `engine/tremor/tremor.h TR_AMMO_KEEP`; `tremor.c`; [rationale](DESIGN.md) |
+| TR_HIT_LOSS | design | `179` At terror 100: 77/256 = 30.08% successful rolls. | `engine/tremor/tremor.h TR_HIT_LOSS`; `tremor.c`; [rationale](DESIGN.md) |
+| TR_DAMAGE_EXTRA | design | `6` 0..60 percent extra incoming damage. | `engine/tremor/tremor.h TR_DAMAGE_EXTRA`; `tremor.c`; [rationale](DESIGN.md) |
+| TR_RADIO_COOLDOWN | design | `3150` Ninety seconds, episode clock. | `engine/tremor/tremor.h TR_RADIO_COOLDOWN`; `tremor.c`; [rationale](DESIGN.md) |
+| TR_AMMO_DROP | design | `31` 31/256 deaths drop one round. | `engine/tremor/tremor.h TR_AMMO_DROP`; `tremor.c`; [rationale](DESIGN.md) |
+| Fear | design | +1/body or+2 fresh<70 tics/close<256;cap 100;all humans equal;+/-45cone | tremor.c corpses;RULES.md |
+| Fear effects | design | buckets<25/<50/<80/otherwise;hit 256 to 77/256;damage 1.0 to 1.6x | TR_TerrorBucket/TR_Hit/TR_Damage |
+| Decay/carry | design |1/350 tics without exposure;halve on entry | corpses/TR_LevelStart |
+| Ammo | design | hostile count+1;drop 1/small 2/box 4;31/256 death drops;64/256 map keep;+3purge | TR_LevelStart/TR_Kill/TR_Ammo;p_inter.c P_GiveAmmo |
+| Purge | design | full 35 tics spends 1, reveals crew,+3either identity;interrupt equal | TR_PlayerThink/TR_Damaged;tests/agent.test.ts full channel |
+| Kill effects | design | human trauma+1 cap 6;heal 15/10 below 100 only | TR_Kill/TR_Aim;p_inter.c P_DamageMobj |
+| Pitch | design | +/-32 degrees, aimed interactions match shots | TR_PlayerThink/crosshair/TR_PitchSlope;p_map.c P_LineAttack |
+| Map | design |257x257,16 unit cells;shared D/d/S/T,b/y/r;no secret markers | agent_api.c automap/discover;am_map.c AM_drawWalls |
+| Route | design |16 unit lattice,256 unit waypoint,secret barriers;near<128/nearby<512/far | route_update/TR_StoryTick/TR_ObjectiveDistance |
+| Radio/save | design |16KB transcript,once/map briefing,3150 tic cooldown;Tremor 3;partial channels reset | TR_QueueRadio/TR_Radio/TR_StoryStart;p_saveg.c |
+| Runner | design |600 actions/calls,7 tics,20s/call,300s total,K8/obs-only;exit 100else0 | runner.ts runEpisode;agent_api.c |
+| UI/effects | design |320x200 at 4:3;pre-scale<=3;story 4Hz | engine-page.js;horror.js;settings-store.js;DESIGN.md |
 
-Rationale for original rules: [active design](DESIGN.md), [decisions amendment](DECISIONS.md).
-Upstream attribution and license locators: [engine provenance](../engine/UPSTREAM.md).
+##40-action ABI
 
+All rows 7 tics;turns fine 2/small 10/medium 45/large 90 degrees. Compound holds both inputs.
 
-## Horror adaptation rule locators (2026-10-30)
-
-| Rule | Origin | Locator |
-| --- | --- | --- |
-| Corpse-sight terror, once per body, slow decay, carryover | design + original code | engine/tremor/tremor.h TR_TERROR_*; tremor.c corpses / TR_LevelStart |
-| Fear hit threshold and damage scaling | design + original code | tremor.c TR_Hit / TR_Damage / TR_Aim; p_pspr.c A_Punch; p_inter.c P_DamageMobj |
-| Rare map ammo, death drops, mercy rounds | design + original code | tremor.c TR_LevelStart / TR_Kill / TR_PlayerThink / TR_Ammo; p_inter.c P_GiveAmmo |
-| Map-derived objectives and public bearing | design + original code | tremor.c TR_StoryTick / key_color / exit_special; agent_api.c tremor_agent_observe |
-| Episode radio, ninety-second cooldown | design + original code | tremor.c TR_Radio / TR_QueueRadio; public/radio/lines.json; public/horror.js speak |
-| Paused objective preview | design + original code | tremor.c tremor_preview / TR_PreviewView; r_main.c R_RenderPlayerView; public/horror.js preview |
-| Y-shear freelook and recorded pitch | design + original code | g_game.c G_BuildTiccmd and demo read/write; r_main.c R_SetupFrame; p_map.c P_LineAttack; p_mobj.c P_SpawnPlayerMissile |
-| Interpolation, suit light, cosmetic flicker | design + original code | tremor.c TR_Interpolate / TR_Light; r_things.c R_ProjectSprite; r_plane.c R_MapPlane |
-| Horror sprite transform | design + original code with Freedoom-derived assets | scripts/build-tremor-wad.py build; tremor.c TR_MergeCrewSprites |
-| Public felt state, no exact terror / hidden identity | design + original code | agent_api.c tremor_agent_observe; src/player_interface.ts Observation |
-
-
-## Follow-up rules and public information (2026-10-30)
-
-| Rule / public cue | Locator | Visibility constraint |
-| --- | --- | --- |
-| Required-lock objective chain / normal exit preference | tremor.c TR_StoryTick / TR_KeyColor | Same objective text, bearing and distance bucket on human TAB HUD; no route graph is sent to controllers. |
-| D/S/T and key-colour activation legend | tremor.c TR_LineMarker; am_map.c AM_drawWalls; agent_api.c automap | Only mapped drawable lines; secret markers suppressed; human glyphs share classification. |
-| Visible floor history / map arrow | agent_api.c discover / automap |90-degree view and occlusion; observation cannot discover geometry; no map origin or world coordinates. |
-| Props, barrels and entity elevation | agent_api.c label / tremor_agent_observe | Same FOV and LOS filter as other visible entities; unknown humans remain identity-neutral. |
-| HUD inventory and visible motion result | agent_api.c tremor_agent_step / tremor_agent_observe | Owned weapons, moving/blocked/still; no displacement or collision geometry returned. |
-| Constant combined controls | agent_api.c tremor_agent_step; player_interface.ts ACTION_IDS |36 constant seven-tic macros, including simultaneous movement/turn with fire or READ; no privileged action. |
-| Bounded bot memory and map search | src/agent/baselines.ts | Public map cells,32 prior bearing rays, one remembered supply, bounded visit/block/attempt grids; no engine imports. |
-| Episode transcript and save revision 3 | tremor.c TR_QueueRadio / TR_RadioLog; p_saveg.c P_ArchivePlayers / P_UnArchivePlayers; engine-page.js Radio log | Same bounded history accessible to humans; playback queue independent. |
-| Per-frame mouse prediction and interpolation | d_loop.c TryRunTics; g_game.c G_BuildTiccmd; p_user.c P_MovePlayer; tremor.c TR_BrowserMouse*; r_main.c R_SetupFrame | Presentation prediction is reconciled with recorded tic commands; no simulation-rate change. |
-| Browser-only diagnostics | engine/platform/doomgeneric_web.c; engine-page.js debug query | Setters translation unit excluded from both agent builds; artifact regression enforces absence. |
-| Six-minute simulated action cap / terror reporting | runner.ts; agent_api.c tremor_agent_step / tremor_agent_outcome; scripts/eval.ts |1800 actions/calls; descriptive terror bucket is evaluation-only. |
-
-Open door cue: tremor.c `TR_DoorOpen`, agent_api.c `automap`, and am_map.c glyph
-colour share the56-unit visible aperture test. `d` is open, `D` closed. The
-controller's64-unit USE probe and connected-marker retry bound are in
-baselines.ts `navigate`; this fixes retrying each map pixel and closing open doors.
-
-## Public route rule ? 2026-10-31 UTC
-
-`engine/tremor/tremor.c: TR_StoryTick / route_update / TR_ObjectiveBearing`
-replaces the straight-line objective arrow with a waypoint up to 256 units down
-a route on a 16-unit lattice over the level blockmap bounds. Walls have16-unit
-player clearance; sectors supply floor/ceiling heights. Weighted traversal avoids
-damaging floors and large drops, and resolves missing cards and tagged switch
-dependencies. Closed manual doors are planned as USE passages, never assumed
-already open. Unsupported height/ceiling transitions are excluded. Smoothing
-checks intermediate cells instead of cutting corners.
-
-The cue refreshes every seven tics (rather than the proposed35): tracing showed
-that holding a short corner waypoint for a full second caused overshoot and
-reversal. Search storage is bounded; dependency recursion is capped at four.
-Moving actors never affect route construction. This is an original planner,
-not copied engine navigation code. It is not a universal lift/teleporter solver.
-
-`agent_api.c` serializes only the resulting public objective text, relative
-bearing and existing distance bucket. `tremor_story` supplies the identical
-bearing to `public/horror.js`'s TAB arrow. Distance remains to the final current
-objective, not to the intermediate waypoint. No graph, path, coordinates,
-actor IDs, unread identity or hidden combat state reach controllers.
-
-`agent_api.c: tremor_agent_step` / `player_interface.ts: ACTION_IDS` append four
-constant macros: left/right 45-degree turns and forward+left/right 10-degree
-turns. All 40 IDs cost seven tics and are legal regardless of geometry/identity.
-These are combinations of controls humans already have.
-
-## 2026-10-31 controller-only survival follow-up
-
-No public observation fields, action macros or hidden inputs were added. The
-controller stores public automap arrow cells and prior health, discards local
-memory on viewport recentering, and uses visible supply labels, HUD inventory,
-entity bearing/range and the existing shared route cue. This memory is controller
-logic, not a new engine rule. The evaluation runner now imposes the requested600
-steps/calls; the C artifact's1800 ceiling remains unchanged. See EVALUATION.md for
-failed tuning attempts and the honest unmet completion target.
+| ABI | Action | Tics |
+|---|---|---|
+| 0 | `forward` | 7 |
+| 1 | `back` | 7 |
+| 2 | `strafe_left` | 7 |
+| 3 | `strafe_right` | 7 |
+| 4 | `turn_left_small` | 7 |
+| 5 | `turn_left_large` | 7 |
+| 6 | `turn_right_small` | 7 |
+| 7 | `turn_right_large` | 7 |
+| 8 | `fire` | 7 |
+| 9 | `use` | 7 |
+| 10 | `read` | 7 |
+| 11 | `stun` | 7 |
+| 12 | `purge` | 7 |
+| 13 | `wait` | 7 |
+| 14 | `weapon_fist` | 7 |
+| 15 | `weapon_pistol` | 7 |
+| 16 | `weapon_shotgun` | 7 |
+| 17 | `turn_left_fine` | 7 |
+| 18 | `turn_right_fine` | 7 |
+| 19 | `forward_slow` | 7 |
+| 20 | `advance_fire` | 7 |
+| 21 | `strafe_left_fire` | 7 |
+| 22 | `strafe_right_fire` | 7 |
+| 23 | `back_fire` | 7 |
+| 24 | `sprint` | 7 |
+| 25 | `turn_left_small_fire` | 7 |
+| 26 | `turn_right_small_fire` | 7 |
+| 27 | `turn_left_fine_fire` | 7 |
+| 28 | `turn_right_fine_fire` | 7 |
+| 29 | `turn_left_small_read` | 7 |
+| 30 | `turn_right_small_read` | 7 |
+| 31 | `turn_left_fine_read` | 7 |
+| 32 | `turn_right_fine_read` | 7 |
+| 33 | `advance_read` | 7 |
+| 34 | `approach_left_fire` | 7 |
+| 35 | `approach_right_fire` | 7 |
+| 36 | `turn_left_medium` | 7 |
+| 37 | `turn_right_medium` | 7 |
+| 38 | `advance_left` | 7 |
+| 39 | `advance_right` | 7 |

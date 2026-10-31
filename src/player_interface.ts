@@ -31,7 +31,7 @@ export function observe(state:EngineState,player_id='player'):Observation {
  const raw=JSON.parse(m.UTF8ToString(m._tremor_agent_observe())) as Omit<Observation,'summary'>;
  return {...raw,summary:JSON.stringify(raw)};
 }
-export function legal_actions(_state:EngineState,_player_id='player'):ActionId[]{return [...ACTION_IDS];}
+export function legal_actions(state:EngineState,player_id='player'):ActionId[]{if(player_id!=='player')throw Error('Unknown player');moduleOf(state);return [...ACTION_IDS];}
 export interface StepResult {state:EngineState;events:string[];valid:boolean;reason:string|null}
 export function step(state:EngineState,action:string):StepResult;
 export function step(state:EngineState,player_id:string,action:string):StepResult;
@@ -44,5 +44,5 @@ export function step(state:EngineState,playerOrAction:string,action?:string):Ste
  return {state,events:observe(state).events,valid:reason===null,reason};
 }
 export function terminate(state:EngineState,reason:TerminalReason){const code={exit:1,dead:2,step_limit:3,call_limit:4,timeout:5}[reason];moduleOf(state)._tremor_agent_terminate(code);}
-interface EngineOutcome {status:'ongoing'|'terminal';reason:TerminalReason|null;score:number;metrics:{kills_demons:number;kills_humans:number;crew_killed:number;crew_saved:number;reads:number;fired_unread:number;rounds_left:number;final_tremor:number;terror_bucket:Observation['terror'];tics:number}}
+interface EngineOutcome {status:'ongoing'|'terminal';reason:TerminalReason|null;score:number;metrics:{route_progress_pct:number;final_health:number;kills_demons:number;kills_humans:number;crew_killed:number;crew_saved:number;reads:number;fired_unread:number;rounds_left:number;final_tremor:number;terror_bucket:Observation['terror'];tics:number}}
 export function outcome(state:EngineState){const m=moduleOf(state),raw=JSON.parse(m.UTF8ToString(m._tremor_agent_outcome())) as EngineOutcome;return {...raw,done:raw.status==='terminal',reachedExit:raw.reason==='exit',dead:raw.reason==='dead',ticks:raw.metrics.tics,crewKilled:raw.metrics.crew_killed,crewSaved:raw.metrics.crew_saved,demonsKilled:raw.metrics.kills_demons,reads:raw.metrics.reads,firedUnread:raw.metrics.fired_unread,finalTremor:raw.metrics.final_tremor,finalTerrorBucket:raw.metrics.terror_bucket};}

@@ -3216,6 +3216,38 @@ var __emscripten_system = command => {
 
 var _emscripten_get_now = () => performance.now();
 
+var _emscripten_date_now = () => Date.now();
+
+var nowIsMonotonic = 1;
+
+var checkWasiClock = clock_id => clock_id >= 0 && clock_id <= 3;
+
+var INT53_MAX = 9007199254740992;
+
+var INT53_MIN = -9007199254740992;
+
+var bigintToI53Checked = num => (num < INT53_MIN || num > INT53_MAX) ? NaN : Number(num);
+
+function _clock_time_get(clk_id, ignored_precision, ptime) {
+  ignored_precision = bigintToI53Checked(ignored_precision);
+  if (!checkWasiClock(clk_id)) {
+    return 28;
+  }
+  var now;
+  // all wasi clocks but realtime are monotonic
+  if (clk_id === 0) {
+    now = _emscripten_date_now();
+  } else if (nowIsMonotonic) {
+    now = _emscripten_get_now();
+  } else {
+    return 52;
+  }
+  // "now" is in ms, and wasi times are in ns.
+  var nsec = Math.round(now * 1e6);
+  HEAP64[((ptime) >> 3)] = BigInt(nsec);
+  return 0;
+}
+
 var getHeapMax = () => // Stay one Wasm page short of 4GB: while e.g. Chrome is able to allocate
 // full 4GB Wasm memories, the size will wrap back to 0 bytes in Wasm side
 // for any code that deals with heap sizes, which would require special
@@ -3351,12 +3383,6 @@ function _fd_read(fd, iov, iovcnt, pnum) {
     return e.errno;
   }
 }
-
-var INT53_MAX = 9007199254740992;
-
-var INT53_MIN = -9007199254740992;
-
-var bigintToI53Checked = num => (num < INT53_MIN || num > INT53_MAX) ? NaN : Number(num);
 
 function _fd_seek(fd, offset, whence, newOffset) {
   offset = bigintToI53Checked(offset);
@@ -3498,7 +3524,7 @@ function TR_SettingsReady() {
 }
 
 // Imports from the Wasm binary.
-var _tremor_music_song_serial, _tremor_music_render, _tremor_music_rate, _tremor_music_active, _tremor_fear, _tremor_set_gore, _tremor_set_mouse_sensitivity, _tremor_set_volumes, _tremor_bind_key, _tremor_set_screen_shake, _tremor_radio_pop, _tremor_story, _tremor_look, _tremor_center_view, _tremor_comfort, _tremor_preview, _tremor_render_ms, _tremor_arm_turn, _tremor_pressure, _tremor_tic, _tremor_radio_history, _tremor_agent_reset, _tremor_agent_step, _tremor_agent_observe, _tremor_agent_outcome, _tremor_agent_terminate, _tremor_agent_fixture, _tremor_agent_test_cower, _tremor_agent_test_exit_fixture, _tremor_agent_enemy_count, _tremor_agent_test_crew_damage, _tremor_agent_test_kill, _setThrew, __emscripten_stack_restore, __emscripten_stack_alloc, _emscripten_stack_get_current, memory, __indirect_function_table, wasmMemory;
+var _tremor_music_song_serial, _tremor_music_render, _tremor_music_rate, _tremor_music_active, _tremor_fear, _tremor_set_gore, _tremor_set_mouse_sensitivity, _tremor_set_volumes, _tremor_bind_key, _tremor_set_screen_shake, _tremor_radio_pop, _tremor_story, _tremor_look, _tremor_center_view, _tremor_comfort, _tremor_preview, _tremor_render_ms, _tremor_arm_turn, _tremor_pressure, _tremor_tic, _tremor_radio_history, _tremor_agent_reset, _tremor_agent_step, _tremor_agent_observe, _tremor_agent_outcome, _tremor_agent_terminate, _tremor_agent_fixture, _tremor_agent_test_cower, _tremor_agent_test_exit_fixture, _tremor_agent_enemy_count, _tremor_agent_test_crew_damage, _tremor_agent_test_kill, _tremor_test, _setThrew, __emscripten_stack_restore, __emscripten_stack_alloc, _emscripten_stack_get_current, memory, __indirect_function_table, wasmMemory;
 
 function assignWasmExports(wasmExports) {
   _tremor_music_song_serial = Module["_tremor_music_song_serial"] = wasmExports["tremor_music_song_serial"];
@@ -3533,6 +3559,7 @@ function assignWasmExports(wasmExports) {
   _tremor_agent_enemy_count = Module["_tremor_agent_enemy_count"] = wasmExports["tremor_agent_enemy_count"];
   _tremor_agent_test_crew_damage = Module["_tremor_agent_test_crew_damage"] = wasmExports["tremor_agent_test_crew_damage"];
   _tremor_agent_test_kill = Module["_tremor_agent_test_kill"] = wasmExports["tremor_agent_test_kill"];
+  _tremor_test = Module["_tremor_test"] = wasmExports["tremor_test"];
   _setThrew = wasmExports["setThrew"];
   __emscripten_stack_restore = wasmExports["_emscripten_stack_restore"];
   __emscripten_stack_alloc = wasmExports["_emscripten_stack_alloc"];
@@ -3552,6 +3579,7 @@ var wasmImports = {
   /** @export */ __syscall_rmdir: ___syscall_rmdir,
   /** @export */ __syscall_unlinkat: ___syscall_unlinkat,
   /** @export */ _emscripten_system: __emscripten_system,
+  /** @export */ clock_time_get: _clock_time_get,
   /** @export */ emscripten_get_now: _emscripten_get_now,
   /** @export */ emscripten_resize_heap: _emscripten_resize_heap,
   /** @export */ exit: _exit,

@@ -32,3 +32,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 For a list of contributors to the Freedoom project, see the file
 CREDITS.
+
+Contributor credits: https://github.com/freedoom/freedoom/blob/v0.13.0/CREDITS
+Tremor recolours are modified Freedoom derivatives retaining these BSD terms.

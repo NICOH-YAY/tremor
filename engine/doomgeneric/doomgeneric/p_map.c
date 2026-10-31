@@ -1086,6 +1086,7 @@ P_AimLineAttack
     // can't shoot outside view angles
     topslope = 100*FRACUNIT/160;	
     bottomslope = -100*FRACUNIT/160;
+    if(t1->player && (tr_pitch || !tr_autoaim))topslope=bottomslope=TR_PitchSlope();
     
     attackrange = distance;
     linetarget = NULL;

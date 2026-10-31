@@ -1,10 +1,19 @@
 # Tremor ownership
 
-All implementation is original. Do not copy id Software/linuxdoom code or assets.
+Codex is sole code editor; Claude plans, reviews and commits. Codex must not commit.
+Active engine is GPL doomgeneric plus original Tremor patches, with BSD Freedoom
+data. Retain upstream notices, licenses, screenshots and provenance. No proprietary
+IWAD assets. See engine/UPSTREAM.md and THIRD-PARTY.md.
 
-- Renderer worker owns `src/render/`.
-- Mechanics worker owns `src/sim/enemies/` and `src/sim/rules/`.
-- Content worker owns `src/levels/` and `src/audio/`.
-- Integrator (Codex) owns everything else, especially `src/sim/types.ts`, world, geometry, interface, main, configuration and tests.
+Rules: engine/tremor/. Platform: engine/platform/. Mark inherited engine patches.
+Course API: src/player_interface.ts. Controllers: src/agent/. Runner: src/eval/.
+legacy/ is historical only and excluded. No worker ownership applies now.
+C/TS action ABI is append-only: update agent_api.c and ACTION_IDS together.
+Controllers get detached public Observation, legal IDs and validation, never the
+private WASM handle or evaluator outcome. This is not a code-import sandbox.
 
-Workers only add/replace files in their area, plus one registration line per new module in `src/sim/registry.ts` or `src/levels/index.ts`. Existing stub registrations need no changes. Do not edit shared contracts on worker branches; report needed additions to the integrator. Keep imports through shared types; avoid dependencies on another worker's implementation. Registrations must be additive to ease merges. See `docs/CONTRACTS.md` for lifecycle and units. Run typecheck, tests and build before handoff. Work on separate branches; integrator merges them later.
+Invoke tremor-level-check before/after rule changes; log truthful results.
+Run npm test, npm run typecheck, npm run build, npm run engine:test.
+C changes require browser/headless/fixture rebuilds and LF artifact hashes.
+Live evaluation requires --live; never fabricate outcomes, pricing or testimony.
+Keep README, title/help, RULES, contracts and rule map synchronized.

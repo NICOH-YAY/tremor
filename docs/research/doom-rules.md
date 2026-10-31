@@ -30,7 +30,7 @@ Caveats:
 | Thrust | On the ground only, `P_Thrust` adds `forwardmove*2048` along facing and `sidemove*2048` at 90 degrees to momentum (fixed point, 65536 = 1 unit). Run forward adds about 1.56 units/tic/tic. | code | `L/p_user.c` `P_MovePlayer`, `P_Thrust` | Same acceleration model: input adds momentum, no direct velocity set. |
 | Friction | Each tic, momentum x and y are multiplied by 0xe800/65536, which is about 0.906. Momentum is zeroed under `STOPSPEED` 0x1000 (about 0.06 units/tic) when no input. Momentum is clamped to 30 units per axis (`MAXMOVE`). | code | `L/p_mobj.c` `P_XYMovement`, `FRICTION`, `STOPSPEED`; `L/p_local.h` `MAXMOVE` | Use 0.90625 per tic and the same stop threshold. |
 | Top speed | Terminal speed from thrust/(1-friction): about 16.7 units/tic running forward, about 14.2 for pure strafe at 40. Strafe-running (forward 50 + side 40) gives about 21.3 (28% faster than running). | derived (code values) + observed | Derivation from the two rows above; Doomworld analysis https://www.doomworld.com/forum/post/1015471 (via search snippet) | Strafe-running is allowed and not nerfed. This is what gives the Doom feel. Do not clamp diagonal speed. |
-| Diagonal engine quirk | Forward and side thrust add as vectors with no normalisation. Speed runs (SR40/SR50) exploit it. The wiki's 70.7 units/tic figure ignores friction. | observed | https://doomwiki.org/wiki/SR50 (search snippet, conflicting figure noted) | Keep unnormalised thrust (cheap, faithful). Do not copy the SR50 numbers. |
+| Diagonal engine quirk | Forward and side thrust add as vectors with no normalisation. Speed runs (SR 40/SR 50) exploit it. The wiki's 70.7 units/tic figure ignores friction. | observed | https://doomwiki.org/wiki/SR50 (search snippet, conflicting figure noted) | Keep unnormalised thrust (cheap, faithful). Do not copy the SR 50 numbers. |
 | Player size | Radius 16, height 56, eye height 41 (`VIEWHEIGHT`). | code | `L/info.c` MT_PLAYER; `L/p_local.h` `PLAYERRADIUS`, `VIEWHEIGHT` | Circle collider of radius 16 on a map where 1 unit is Doom's. |
 | Wall sliding | A blocked move traces and slides along the wall (`P_SlideMove`), up to 3 retries, then a stairstep fallback (try y, then x). | code | `L/p_map.c` `P_SlideMove` | Axis-separated slide on the grid. Simplified. |
 | Use range | 64 units trace along facing; first special line hit is activated. A blocking non-special line plays an "oof". | code | `L/p_local.h` `USERANGE`; `L/p_map.c` `P_UseLines` | Use key reaches 64 units. |
@@ -112,7 +112,7 @@ Tremor use: Possessed, Ember and Hound take these roles with numbers rounded or 
 |---|---|---|---|---|
 | M_Random table | A fixed 256-entry byte table `rndtable`. `P_Random()` increments an index (masked with 0xff) and returns `rndtable[index]`. It is not a PRNG: the same calls give the same sequence, which is how Doom demos stay in sync. | code | `L/m_random.c` `rndtable`, `P_Random`, `M_Random`, `M_ClearRandom` | We do not copy the table (it is a data table from the release). |
 | Two cursors | `prndindex` (gameplay) and `rndindex` (menu/cosmetic) are separate, so cosmetic randomness cannot desync the game. | code | `L/m_random.c` | Tremor: two seeded streams, a `gameRng` for sim and a `fxRng` for cosmetics. Cosmetic calls never consume the sim stream. |
-| Determinism | Tremor uses a seeded integer generator (e.g. mulberry32) in place of the table. Same seed + same action list gives the same episode. Required by `reset(seed)` and by replay tests. | design | DESIGN "Fixed-step deterministic sim" | Adaptation: sequence differs from Doom's, determinism is the same property. |
+| Determinism | Tremor uses a seeded integer generator (e.g. mulberry 32) in place of the table. Same seed + same action list gives the same episode. Required by `reset(seed)` and by replay tests. | design | DESIGN "Fixed-step deterministic sim" | Adaptation: sequence differs from Doom's, determinism is the same property. |
 | Triangular error | `P_Random()-P_Random()` gives a bell-shaped error in -255..255, then shifted into an angle. | code | `L/p_pspr.c`, `L/p_enemy.c` | Use `rand8()-rand8()` for all spread. |
 
 ## 8. Intermission as "score"
@@ -127,7 +127,7 @@ Tremor use: Possessed, Ember and Hound take these roles with numbers rounded or 
 What makes Doom's movement and combat fast and smooth, with sources:
 
 - Momentum plus low friction. Run is 50 units of thrust, friction keeps 90.6% per tic, so you reach about 16.7 units/tic but stop within a few tics. Source: `g_game.c` tables, `p_mobj.c` `FRICTION`, derived (section 2).
-- Strafe-running is not penalised, so diagonal movement is faster (about 28% over straight running). Source: Doomworld analysis and doomwiki SR40/SR50 pages (observed).
+- Strafe-running is not penalised, so diagonal movement is faster (about 28% over straight running). Source: Doomworld analysis and doomwiki SR 40/SR 50 pages (observed).
 - No reload, no aim-down-sights delay: fire rate is the state-table cycle (pistol 19 tics, shotgun 44). Source: `info.c` states, `p_pspr.c` `A_ReFire`.
 - First shot accurate, held fire sprays. Rewards tap-firing. Source: `p_pspr.c` `A_FirePistol` (`!player->refire`).
 - Head bob capped at 16 units, driven by speed squared; weapon sway uses the same `bob` plus a time-based sine. Source: `p_user.c` `MAXBOB`, `P_CalcHeight`; `p_pspr.c` `A_WeaponReady`.

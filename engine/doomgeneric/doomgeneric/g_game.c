@@ -1585,7 +1585,8 @@ void G_DoLoadGame (void)
     P_UnArchivePlayers (); 
     P_UnArchiveWorld (); 
     P_UnArchiveThinkers (); 
-    P_UnArchiveSpecials (); 
+    P_UnArchiveSpecials ();
+    TR_InvalidateStory(); /* TREMOR: next tic replans loaded objective, no stale35-tic wait. */
  
     if (!P_ReadSaveGameEOF())
 	I_Error ("Bad savegame");

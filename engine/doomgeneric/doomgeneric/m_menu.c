@@ -1161,6 +1161,7 @@ static char *M_SelectEndMessage(void)
         endmsg = doom2_endmsg;
     }
 
+    if(W_CheckNumForName("FREEDOOM")>=0)return "Leave the base?";
     return endmsg[gametic % NUM_QUITMESSAGES];
 }
 

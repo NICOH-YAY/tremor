@@ -648,12 +648,7 @@ AM_Responder
             mtof_zoommul = M_ZOOMIN;
             ftom_zoommul = M_ZOOMOUT;
         }
-        else if (key == key_map_toggle)
-        {
-            bigstate = 0;
-            viewactive = true;
-            AM_Stop ();
-        }
+        else if (key == key_map_toggle) { rc=true; }
         else if (key == key_map_maxzoom)
         {
             bigstate = !bigstate;
@@ -709,6 +704,7 @@ AM_Responder
         rc = false;
         key = ev->data1;
 
+        if (key == key_map_toggle) { bigstate=0;viewactive=true;AM_Stop();return true; }
         if (key == key_map_east)
         {
             if (!followplayer) m_paninc.x = 0;

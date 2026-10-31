@@ -38,6 +38,6 @@ Five kinds, all green: rule invariants; legal and illegal actions; a terminal ou
 - Update Week 3 thread + README scope statement since the game changed.
 
 2026-10-31 follow-up: 4b now has genuine E1M1 normal-spawn exits and a passing
-completion regression. The50% tuning-map target remains unmet; see EVALUATION.md.
-For2c, route guidance is the same public TAB cue for humans and agents, and the
+completion regression. The 50% tuning-map target remains unmet; see EVALUATION.md.
+For 2c, route guidance is the same public TAB cue for humans and agents, and the
 constant vocabulary / unread-identity equivalence tests remain required.

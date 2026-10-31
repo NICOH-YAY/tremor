@@ -1,5 +1,41 @@
 # Declared evaluation plan
 
+Current freeze: 2026-10-31, Codex session codex-doom 12, before any model trial.
+Tuning: E1M1/E1M2/E1M3. Seen: E1M4/E1M5 (baseline results already inspected;
+no longer clean held-out). Fresh held-out: E1M6/E1M7. No controller/prompt tuning
+may use these fresh held-out results. Two RNG starts, 17/83, per player/map.
+Players: aggressive, careful, Vertex model-history K=8 and model-obs-only.
+All use public observations and 40 constant seven-tic actions, skill index 2.
+Limits: 600 actions, 600 calls, 20 seconds/call, five minutes/episode.
+Failed calls count; three invalid decisions (errors do not reset this streak)
+produce a labelled wait. Timeouts terminate. Exit=100, all other scores=0.
+Live model rows remain pending until --live is explicitly executed.
+Report completion, limits, illegal actions, latency, tokens, dated cost, progress,
+objectives, final health, kills, crew killed/saved, reads, fired_unread and terror.
+Seeds are 8-bit RNG table starts; seeds congruent modulo 256 are identical.
+
+| Date | Amendment | Results already seen? |
+|---|---|---|
+| 2026-10-30 | TS suite replaced with real-engine E1M1-E1M5 | TS evidence superseded |
+| 2026-10-30 | 600 raised to 1800 for navigation/channel allowance | Development diagnostics existed |
+| 2026-10-31 | Survival follow-up restored 600 | Baseline tuning/results existed |
+| 2026-10-31 | Codex reconciles C ceiling to declared 600; freezes E1M6/E1M7 | E1M4/E1M5 seen; no live model trials |
+
+Hypotheses: careful reading reduces fired_unread/crew deaths; mercy saves crew
+at a step cost; K=8 memory improves navigation against observation-only.
+No significance claim from two seeds. Fixed-seed reruns are not independent trials.
+
+Secondary objective count is distinct key types collected plus a completed exit.
+Switch-only subtasks are excluded. Route percent is a sector-hop distance proxy,
+not a proof of traversability. This clarifies the 2026-10-31 secondary metric after
+baseline diagnostics; no model trials or controller retuning used these metrics.
+
+## History
+
+The following is retained as a superseded declaration record, not current rules.
+
+# Declared evaluation plan
+
 Declared 2026-10-30, before controller tuning or suite execution.
 
 Tuning cases: s1_corridor, s2_collar, s3_triage. Held-out cases: h1_dark,
@@ -90,12 +126,12 @@ The declared tuning maps E1M1/E1M2/E1M3, held-out E1M4/E1M5, seeds 17/83,
 players and skill remain unchanged. Controller development used only tuning
 maps and extra E1M1 seed diagnostics. The follow-up's frozen scripted rerun uses
 all 20 declared player/map/seed episodes. No live model runs are authorized here.
-The prior 2026-10-30 report is retained; the new report is dated2026-10-31 UTC
-(October30 local time). No held-out result was used to change these controllers.
+The prior 2026-10-30 report is retained; the new report is dated 2026-10-31 UTC
+(October 30 local time). No held-out result was used to change these controllers.
 
 Rule/interface changes since declaration: sector-route objective lock selection
 replaces linedef-order selection and prefers normal exits over secret exits;
-lighting/interpolation/radio were updated; public observations now include a257x257
+lighting/interpolation/radio were updated; public observations now include a 257x257
 map at 16 units/cell with remembered visible floor, mapped D/S/T activation and
 key-colour markers, numeric arrow heading, visible elevation and props/barrels,
 HUD weapon inventory, a bounded episode radio transcript and a qualitative
@@ -103,29 +139,29 @@ moving/blocked/still cue. Humans receive the same activation glyphs and radio lo
 World coordinates, hidden actor identities, hidden lines, and exact terror remain
 absent from observations. Fine turns, slow/sprint movement and simultaneous
 turn/move + fire/READ macros expand the constant legal vocabulary to 36 actions.
-All macros still cost seven35Hz tics. Both players get the same interface/actions.
+All macros still cost seven 35Hz tics. Both players get the same interface/actions.
 
 The action/call cap changes from 600 to 1800: six simulated minutes rather than
 120 seconds, to budget separate navigation, aiming, door waits and 35-tic READ/
 PURGE channels. This is an engineering allowance, not a measured human completion
-time. The20-second per-call and five-minute wall-clock caps remain. Completion
+time. The 20-second per-call and five-minute wall-clock caps remain. Completion
 must be reported against this new cap, including every failure; do not increase
 it further to make a failed traversal look successful. Config IDs record the
 change. No claim that the target completion rate has been met is made.
 
-The v4 follow-up adds the open-door `d` cue, scales USE to its64-unit range, bounds
+The v4 follow-up adds the open-door `d` cue, scales USE to its 64-unit range, bounds
 retries across connected markers, clears location inferences after viewport
 recentring, and adds diagonal approaches while firing (36 total actions). These
 corrections used tuning-map traces. Earlier frozen passes are retained as dated
-first-followup/compatibility reports; the latest20-case report is a new full rerun,
+first-followup/compatibility reports; the latest 20-case report is a new full rerun,
 not a selection of favourable seeds. Held-out results did not inform these fixes.
 Controller/interface source hashes are captured before the final run. Traces are
 losslessly gzipped JSONL, retaining every action and public observation. Repeated
 runs of fixed seeds are not additional independent statistical trials.
 
-## Amendment ? 2026-10-31 UTC: shared route guidance
+## Amendment - 2026-10-31 UTC: shared route guidance
 
-The v5 public-route40 config replaces the straight-line human/agent objective
+The v5 public-route 40 config replaces the straight-line human/agent objective
 bearing with a shared geometry-derived waypoint, and adds four constant human
 control combinations (40 total). Quest planning considers heights and activation
 dependencies. The route prefers safe floor over damaging floor and large drops.
@@ -138,16 +174,16 @@ evaluation samples. The final report reruns the full declared suite once.
 ## Survival follow-up — 2026-10-31 UTC
 
 The current session explicitly restores 600 actions and 600 controller calls,
-with unchanged E1M1–E1M3 tuning / E1M4–E1M5 held-out maps, seeds17/83, skill2,
+with unchanged E1M1–E1M3 tuning / E1M4–E1M5 held-out maps, seeds 17/83, skill 2,
 seven-tic actions, 20-second call and five-minute episode limits. This supersedes
 all earlier 1800-budget statements for the current report; it does not move the
 suite or increase a budget to obtain success. The runner and diagnostic harness
-impose600; the unchanged C artifact retains its higher internal safety ceiling.
+impose 600; the unchanged C artifact retains its higher internal safety ceiling.
 
 Current config: `tremor-engine-v6-survival-route40-600-k8`. No new observation or
 human-control rule was added. Controller tuning used only tuning maps, including
 failed repeated development trials. An initial full run's aggressive E1M1 failure
 was corrected from tuning-map evidence by restoring its original close-combat
-branch, then all20 episodes were rerun. Held-out results selected no changes.
-Final careful tuning completion is2/6, below4/6. See dated EVALUATION.md for the
+branch, then all 20 episodes were rerun. Held-out results selected no changes.
+Final careful tuning completion is 2/6, below 4/6. See dated EVALUATION.md for the
 full failures and split-labelled report; no live model trials were run.

@@ -49,7 +49,7 @@ audio playback. Story beats and map briefings occur once per episode; transcript
 and masks persist in Tremor 3 saves. Tremor 2 saves are rejected. Humans can open
 the same transcript through Radio log below the view.
 
-Fear sample: terror0 camera/weapon offsets and fear overlay alphas are0.
+Fear sample: terror 0 camera/weapon offsets and fear overlay alphas are 0.
 At terror 100 with the default 70% sway profile: sway 1.8997
 world units, approximately 1.336 degrees yaw and half
 that world-unit vertical movement; weapon Y -2.7560 native units;
@@ -75,7 +75,7 @@ a valid CPU sample. No working hires setting or hires performance claim is made;
 
 Computer-use inventory returned no browsers or apps in this session. Interactive
 Chrome paint, pointer lock, audible output and IndexedDB reload remain unverified.
-No native radio MP3 recordings, filtered speech synthesis, sampled/reversed score
+No native radio MP 3 recordings, filtered speech synthesis, sampled/reversed score
 layers or wall-traversal acoustic solver were added. Suit light remains a floor
 colormap adjustment. The quest planner is topological, not proof of physical
 reachability/lift dependencies on arbitrary IWADs. Bot completion remains 0/20;
