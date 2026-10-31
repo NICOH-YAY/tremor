@@ -63,7 +63,7 @@ Upstream engine locators below are in engine/doomgeneric/doomgeneric/.
 | Route | design |16 unit lattice,256 unit waypoint,secret barriers;near<128/nearby<512/far | route_update/TR_StoryTick/TR_ObjectiveDistance |
 | Radio/save | design |16KB transcript,once/map briefing,3150 tic cooldown;Tremor 3;partial channels reset | TR_QueueRadio/TR_Radio/TR_StoryStart;p_saveg.c |
 | Runner | design |600 actions/calls,7 tics,20s/call,300s total,K8/obs-only;exit 100else0 | runner.ts runEpisode;agent_api.c |
-| UI/effects | design |320x200 at 4:3;pre-scale<=3;story 4Hz | engine-page.js;horror.js;settings-store.js;DESIGN.md |
+| UI/effects | design |320x200 at 4:3;pre-scale<=3;story 4Hz | engine-page.js;horror.js;music.js;settings-store.js;DESIGN.md |
 
 | Model encoding | design | Lossless row RLE and K8 reverse deltas; no cropped known cells | src/agent/prompt.ts; CONTRACTS.md Lossless model prompt encoding; tests/model-player.test.ts |
 

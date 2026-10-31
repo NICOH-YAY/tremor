@@ -3,7 +3,7 @@ import {test,expect,vi} from 'vitest';
 import {readFileSync} from 'node:fs';
 import {validateIWAD} from '../public/startup.js';
 import {spawnSync} from 'node:child_process';
-test('public JS parses (Vite copies these assets without parsing)',()=>{for(const name of ['engine-page','horror','settings-ui','settings-store','startup']){const r=spawnSync(process.execPath,['--check',`public/${name}.js`],{encoding:'utf8'});expect(r.status,r.stderr).toBe(0);}});
+test('public JS parses (Vite copies these assets without parsing)',()=>{for(const name of ['music','engine-page','horror','settings-ui','settings-store','startup']){const r=spawnSync(process.execPath,['--check',`public/${name}.js`],{encoding:'utf8'});expect(r.status,r.stderr).toBe(0);}});
 test('title/help initialize and repeated invalid WAD loads allocate no audio context',async()=>{
  document.body.innerHTML=readFileSync('index.html','utf8').split('<body>')[1].split('</body>')[0].replace(/<script[\s\S]*?<\/script>/g,'');
  vi.stubGlobal('requestAnimationFrame',vi.fn());vi.stubGlobal('ResizeObserver',class{observe(){}});

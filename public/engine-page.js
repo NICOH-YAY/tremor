@@ -1,3 +1,4 @@
+import {musicMix,createOPLStream} from './music.js';
 import {createIntroGate, requestCanvasLock, validateIWAD} from './startup.js';
 import {createHorror} from './horror.js';
 import {setupSettings} from './settings-ui.js';
@@ -7,7 +8,7 @@ const raster=document.createElement('canvas');raster.width=320;raster.height=200
 let displayRect=canvas.getBoundingClientRect();new ResizeObserver(()=>{displayRect=canvas.getBoundingClientRect();}).observe(canvas);
 const image=ctx.createImageData(320,200), pixels=new Uint32Array(image.data.buffer);let engine,enginePromise,starting=false;
 const introGate=createIntroGate(document.querySelector('#intro'),document.querySelector('#continue'),()=>{release();horror?.intro();},()=>canvas.focus());
-let masterGain,musicNode,musicGain,horror,monsterReverb,musicConnected=false;
+let masterGain,musicNode,musicGain,horror,monsterReverb,musicConnected=false,musicBus,musicFilter;
 const audio={context:null,channels:new Map(),buffers:new Map(),
  params(c,v,s){const ch=this.channels.get(c);if(ch){ch.gain.gain.value=v/127*(ch.boost||1);ch.pan.pan.value=(s-127)/127;}},
  stop(c){const ch=this.channels.get(c);if(ch){ch.source.stop();ch.cleanup?.();this.channels.delete(c);}},
@@ -22,12 +23,12 @@ async function start(file){if(starting)return;starting=true;document.querySelect
  try{const bytes=file?new Uint8Array(await file.arrayBuffer()):await download(new URL('./wad/freedoom1.wad',import.meta.url));
  validateIWAD(bytes);
  const modBytes=await download(new URL('./wad/tremor.wad',import.meta.url));
- audio.context=new AudioContext();masterGain=audio.context.createGain();masterGain.connect(audio.context.destination);await audio.context.resume();audio.mutter(true);audio.impact(0,false,true);audio.impact(0,true,true);horror=createHorror(raster,audio.context,masterGain,canvas);
+ audio.context=new AudioContext();masterGain=audio.context.createGain();masterGain.connect(audio.context.destination);await audio.context.resume();audio.mutter(true);audio.impact(0,false,true);audio.impact(0,true,true);musicBus=audio.context.createDynamicsCompressor();musicBus.threshold.value=-16;musicBus.knee.value=12;musicBus.ratio.value=3;musicBus.attack.value=.012;musicBus.release.value=.3;musicBus.connect(masterGain);horror=createHorror(raster,audio.context,masterGain,canvas,musicBus);
  monsterReverb=audio.context.createConvolver();const impulse=audio.context.createBuffer(1,Math.floor(audio.context.sampleRate*.28),audio.context.sampleRate),ir=impulse.getChannelData(0);for(let i=0;i<ir.length;i++)ir[i]=(Math.random()*2-1)*Math.pow(1-i/ir.length,3)*.2;monsterReverb.buffer=impulse;monsterReverb.connect(masterGain); const {default:createDoom}=await import(/* @vite-ignore */ new URL('./engine/doom.js',import.meta.url).href);
  engine=await (enginePromise??=createDoom({noInitialRun:true,audio,onHint:id=>horror?.hint(id),onDamageDirection:b=>horror?.damage(b),onIntro:()=>introGate.wait(),onFrame(ptr){
  // Reuse a view until WASM memory grows; no typed-array allocation per blit.
  if(frameBuffer!==engine.HEAPU8.buffer||framePointer!==ptr){frameBuffer=engine.HEAPU8.buffer;framePointer=ptr;framePixels=new Uint32Array(frameBuffer,ptr,320*200);}
- for(let i=0;i<framePixels.length;i++){const p=framePixels[i];pixels[i]=0xff000000|(p&0xff00)|((p&255)<<16)|((p>>>16)&255);}rasterCtx.putImageData(image,0,0);horror?.frame(engine,settings.state);
+ for(let i=0;i<framePixels.length;i++){const p=framePixels[i];pixels[i]=0xff000000|(p&0xff00)|((p&255)<<16)|((p>>>16)&255);}rasterCtx.putImageData(image,0,0);horror?.frame(engine,settings.state);updateMusic(settings.state,false);
 
  const rect=displayRect,scale=Math.min(3,Math.max(1,Math.ceil(Math.max(rect.width*devicePixelRatio/320,rect.height*devicePixelRatio/200))));
  if(upscale.width!==320*scale){upscale.width=320*scale;upscale.height=200*scale;}
@@ -45,9 +46,10 @@ async function start(file){if(starting)return;starting=true;document.querySelect
  engine.FS.chdir('/persist');
  let syncing=false,dirty=false;engine.flushSaves=()=>{document.querySelector('#save-status').textContent='Saving...';dirty=true;if(syncing)return;const flush=()=>{dirty=false;syncing=true;engine.FS.syncfs(false,e=>{syncing=false;document.querySelector('#save-status').textContent=e?'Save persistence failed: '+e:'Saved in this browser';if(dirty)flush();});};flush();};
  engine._tremor_music_rate(audio.context.sampleRate);
- musicGain=audio.context.createGain();musicGain.connect(masterGain);
+ musicGain=audio.context.createGain();musicFilter=audio.context.createBiquadFilter();musicFilter.type='lowpass';musicFilter.Q.value=.5;musicGain.connect(musicFilter).connect(musicBus);
  // ScriptProcessor is a compatibility fallback that pulls directly from WASM.
- musicNode=audio.context.createScriptProcessor(2048,0,2);musicNode.onaudioprocess=e=>{const l=e.outputBuffer.getChannelData(0),r=e.outputBuffer.getChannelData(1);if(settings.opened||settings.state.musicStyle==='horror'){l.fill(0);r.fill(0);return;}const ptr=engine._tremor_music_render(l.length)>>1;const heap=engine.HEAP16;for(let i=0;i<l.length;i++){l[i]=heap[ptr+i*2]/32768;r[i]=heap[ptr+i*2+1]/32768;}};if(settings.state.musicStyle!=='horror'){musicNode.connect(musicGain);musicConnected=true;}
+ const stream=createOPLStream(n=>{const ptr=engine._tremor_music_render(n)>>1;return engine.HEAP16.subarray(ptr,ptr+n*2);});
+ musicNode=audio.context.createScriptProcessor(2048,0,2);musicNode.onaudioprocess=e=>{const l=e.outputBuffer.getChannelData(0),r=e.outputBuffer.getChannelData(1);if(settings.opened||settings.state.musicStyle==='horror'){l.fill(0);r.fill(0);return;}stream(l,r,musicMix(settings.state.musicStyle,(engine._tremor_fear?.()||0)/100,0,settings.state.music).pitch);};if(settings.state.musicStyle!=='horror'){musicNode.connect(musicGain);musicConnected=true;}
  settings.apply();engine.onSettingsReady=()=>settings.apply();
  engine.FS.writeFile('/game.wad',bytes);engine.FS.writeFile('/tremor.wad',modBytes);document.querySelector('#title').style.display='none';document.querySelector('#game').style.display='block';canvas.focus();engine.callMain(['-iwad','/game.wad','-file','/tremor.wad','-config','/persist/default.cfg','-extraconfig','/persist/doom.cfg','-warp','1','1','-skill','3']);
  }catch(e){if(!enginePromise&&audio.context){await audio.context.close();audio.context=null;}document.querySelector('#error').textContent=String(e)+(enginePromise?' Reload the page to retry engine startup.':'');starting=!!enginePromise;document.querySelectorAll('button').forEach(b=>b.disabled=false);}}
@@ -65,7 +67,8 @@ window.addEventListener('keydown',e=>key(e,true));window.addEventListener('keyup
 function release(){if(engine){for(let i=0;i<512;i++)engine._tremor_input(i,0);for(const k of [13,127,173,175,172,174,61,45,48])engine._web_key(k,0);engine._web_mouse(0,0);}held.clear();horror?.map(false);horror?.purge(false);mouseX=0;}
 let mouseX=0,frameBuffer,framePointer,framePixels,frames=0,fpsTime=performance.now();
 const fps=document.createElement('span');fps.id='fps';document.body.append(fps);
-const settings=setupSettings({getEngine:()=>engine,release,onApply(s){if(musicNode){const wanted=s.musicStyle!=='horror';if(wanted!==musicConnected){musicNode.disconnect();if(wanted)musicNode.connect(musicGain);musicConnected=wanted;}}if(masterGain)masterGain.gain.value=s.master/100;fps.hidden=!s.fps;resize(s);},onClose(){if(engine)engine.settingsOpen=!!engine.previewing;canvas.focus();}});
+const settings=setupSettings({getEngine:()=>engine,release,onApply(s){if(musicNode){const wanted=s.musicStyle!=='horror';if(wanted!==musicConnected){musicNode.disconnect();if(wanted)musicNode.connect(musicGain);musicConnected=wanted;}}if(masterGain)masterGain.gain.value=s.master/100;updateMusic(s);fps.hidden=!s.fps;resize(s);},onClose(){if(engine)engine.settingsOpen=!!engine.previewing;canvas.focus();}});
+function updateMusic(s,updateScore=true){if(!musicGain)return;const mix=musicMix(s.musicStyle,(engine?._tremor_fear?.()||0)/100,0,s.music),t=audio.context.currentTime;musicGain.gain.setTargetAtTime(mix.oplGain,t,.15);musicFilter.frequency.setTargetAtTime(mix.oplCutoff,t,.3);if(updateScore)horror?.music(s);}
 function resize(s=settings.state){if(s.scale==='integer'){const n=Math.max(1,Math.floor(Math.min(innerWidth/320,(innerHeight-70)/240)));canvas.style.width=320*n+'px';canvas.style.height=240*n+'px';}else{canvas.style.width='';canvas.style.height='';}}
 window.addEventListener('resize',()=>resize());window.addEventListener('blur',release);
 document.addEventListener('pointerlockchange',()=>{if(document.pointerLockElement!==canvas)release();});

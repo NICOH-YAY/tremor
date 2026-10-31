@@ -57,3 +57,37 @@ not measured Gemini tokens. The review's actual prior live usage was roughly
 Actual post-change vendor tokens and the <8k target require the human's next
 live run. No paid tokenizer or model endpoint was called. Character preflight
 and tests constrain growth without removing information.
+## Music freeze regression
+
+2026-10-31 — Codex; no commit, live evaluation, rule changes, or C changes.
+
+- Root cause: `public/engine-page.js` called `_tremor_pressure()` from
+  `updateMusic()` during the initial `settings.apply()`, before `callMain()`.
+  `engine/tremor/tremor.c:535` traverses `thinkercap.next`; before level
+  initialization the sentinel is not linked, so this WASM call loops forever.
+  This happens for every music style, including saved Horror score settings.
+- Fix: settings apply the score using the last pressure sampled by
+  `public/horror.js`'s gameplay frame callback (initially zero). Settings no
+  longer query level data. Layered remains the default, with the existing
+  audible score and fear/pressure mix, cutoff and pitch behavior preserved.
+- Reproduction: `npx.cmd vitest run tests/start-flow.test.js` **before the
+  fix: 3 failures**, each child killed with `ETIMEDOUT` at 10 seconds
+  (Layered, Horror, Original; total 30.16 seconds). **After: 3 passed**
+  (1.54 seconds). The same regression tests are included in the full suite.
+- Harness: `tests/start-flow-smoke.mjs` executes the real `engine-page.js`
+  Play handler in happy-dom with the shipped production WASM and WADs.
+  Only IndexedDB mounting/syncing is replaced with an in-memory persistence
+  adapter. Fake Web Audio implements ScriptProcessor, compressor, filters,
+  oscillators, gains, convolver and buffers; AudioParam assignments and
+  automation reject non-finite numbers. It reaches the intro waiter, clicks
+  Continue, renders at least three frames, invokes three audio callbacks,
+  checks finite samples, and reapplies settings after level initialization.
+  A parent-process timeout catches synchronous hangs that an in-page timer
+  cannot. A direct Layered run reported one callMain, one intro, three frames,
+  three audio callbacks and five rAF callbacks.
+- Validation: `npm.cmd test` **57 tests passed (12 files)**;
+  `npm.cmd run typecheck` passed; `npm.cmd run build` passed (Vite retains
+  the existing unresolved-at-build-time `./art/title.jpg` warning);
+  `npm.cmd run engine:test` **508 checks, 0 failures**.
+  No new Chrome/device-audio listening result is claimed.
+

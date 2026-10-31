@@ -2,6 +2,7 @@
 
 | Choice | Alternative beaten | Reason |
 |---|---|---|
+| Layered OPL + audible horror default | Score-only default | Player feedback reported missing music; midrange score supports laptop playback, original melody remains present and fear darkens it. Score-only remains selectable. |
 | GPL engine + Freedoom | Separate agent TS game | Same human/evaluated mechanics; licensed data |
 |40 constant macros | Contextual legality/continuous floats | Finite reproducibility, no legality oracle; append-only ABI |
 |7 tics/0.2s | Per-tic model calls | Preserve 35Hz mechanics while bounding calls;5 actions/channel |
