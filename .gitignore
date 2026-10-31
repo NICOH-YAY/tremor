@@ -12,3 +12,6 @@ engine/build/test-engine.*
 engine/build/reference-engine.*
 
 engine/build/previous-engine.*
+
+# Reproducible local baseline traces, maps and development trials.
+eval/diagnostics/

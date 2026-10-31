@@ -76,3 +76,31 @@ Open door cue: tremor.c `TR_DoorOpen`, agent_api.c `automap`, and am_map.c glyph
 colour share the56-unit visible aperture test. `d` is open, `D` closed. The
 controller's64-unit USE probe and connected-marker retry bound are in
 baselines.ts `navigate`; this fixes retrying each map pixel and closing open doors.
+
+## Public route rule ? 2026-10-31 UTC
+
+`engine/tremor/tremor.c: TR_StoryTick / route_update / TR_ObjectiveBearing`
+replaces the straight-line objective arrow with a waypoint up to 256 units down
+a route on a 16-unit lattice over the level blockmap bounds. Walls have16-unit
+player clearance; sectors supply floor/ceiling heights. Weighted traversal avoids
+damaging floors and large drops, and resolves missing cards and tagged switch
+dependencies. Closed manual doors are planned as USE passages, never assumed
+already open. Unsupported height/ceiling transitions are excluded. Smoothing
+checks intermediate cells instead of cutting corners.
+
+The cue refreshes every seven tics (rather than the proposed35): tracing showed
+that holding a short corner waypoint for a full second caused overshoot and
+reversal. Search storage is bounded; dependency recursion is capped at four.
+Moving actors never affect route construction. This is an original planner,
+not copied engine navigation code. It is not a universal lift/teleporter solver.
+
+`agent_api.c` serializes only the resulting public objective text, relative
+bearing and existing distance bucket. `tremor_story` supplies the identical
+bearing to `public/horror.js`'s TAB arrow. Distance remains to the final current
+objective, not to the intermediate waypoint. No graph, path, coordinates,
+actor IDs, unread identity or hidden combat state reach controllers.
+
+`agent_api.c: tremor_agent_step` / `player_interface.ts: ACTION_IDS` append four
+constant macros: left/right 45-degree turns and forward+left/right 10-degree
+turns. All 40 IDs cost seven tics and are legal regardless of geometry/identity.
+These are combinations of controls humans already have.

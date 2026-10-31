@@ -117,3 +117,26 @@ TypeScript prototype and must not be read as current engine evidence.
 
 See the implementation/verification limits in DESIGN.md. Save format Tremor 2 and
 mod demo v113 intentionally replace the incompatible prior layouts.
+
+## Route and baseline follow-up ? 2026-10-31 UTC
+
+- A shared geometry-derived waypoint beats a straight-line objective arrow: the
+  seed1 trace showed controllers reconstructing a target through walls while
+  combat consumed their health. Both the human TAB arrow and Observation use
+  the new cue; an agent-only path or coordinate feed was rejected.
+- A bounded weighted lattice search beats sector adjacency alone: narrow
+  passages, wall clearance, stairs, closed doors and required activations need
+  physical geometry. The sector graph still plans quest dependencies, and
+  geometry refines missing-lock/switch ordering. Complex platforms and
+  teleporters remain a limitation, not an asserted solved case.
+- Refreshing the cue every seven tics beats holding it for 35 tics: the latter
+  reversed the arrow after crossing a short waypoint. Intermediate path cells
+  prevent corner cutting; static buffers avoid large WASM stack allocations.
+- Close, bounded engagement and READ channels beat repeatedly attacking every
+  visible figure. Careful reads first; aggressive attacks unread figures. Both
+  resume route following, probe nearby doors and recover from blocked motion.
+  Four extra constant macros provide45-degree turns and moving10-degree turns
+  without changing tic cost. The1800-step suite budget is unchanged.
+- Completion evidence must be normal-spawn engine play. A passing E1M1 seed17
+  regression replaces the former TODO; the exit fixture is not counted. The
+  declared E1M1-E1M3 / E1M4-E1M5 split and17/83 seeds remain fixed.

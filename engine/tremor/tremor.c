@@ -10,6 +10,7 @@
 #include "z_zone.h"
 #include <emscripten.h>
 #include <stdlib.h>
+#include <math.h>
 #include <string.h>
 
 int tr_kills_demons,tr_kills_humans,tr_crew_killed,tr_reads,tr_fired_unread;
@@ -267,6 +268,7 @@ char tr_radio_log[512];
 #define radio_log tr_radio_log
 static char objective[80],story_json[1024];
 static fixed_t objective_x,objective_y;
+static int route_clock=-1;
 static const char *radio_ids[]={"","crew-reveal","crew-death","crew-saved","breaking","static-1","static-2","static-3","static-4","static-5","static-6","static-7"};
 static const char *radio_text[]={"","That one's still human. Look before you shoot.","I heard that. I'll keep the channel open.","They're breathing. Thank you for waiting.","Listen to my voice. There is still a way out.","Control to anyone. Is that someone breathing on the line?","There is someone outside this room. They know my name.","Signal dropping. I can still hear you.","Please do not answer the other channel.","The banging stopped. That is worse.","I thought I heard the lift. It was above me.","Keep the receiver close. The walls carry sound here."};
 void TR_Radio(int beat) {
@@ -295,47 +297,150 @@ void TR_StoryTick(player_t *p) {
  if(!exitline)for(i=0;i<numlines;i++)if(exit_special(lines[i].special)){exitline=&lines[i];break;}
  if(!exitline)return;
  objective_x=exitline->v1->x+exitline->dx/2;objective_y=exitline->v1->y+exitline->dy/2;
- /* The quest planner chooses required locks, not navigation coordinates. Its
-    only output is the same objective and bearing shown by the human TAB HUD. */
+ /* Plan quest dependencies on height-aware sector geometry. The route cue
+    below supplies physical waypoints; no graph leaves this translation unit. */
  if(numsectors>4096)return;
- static int distance[4096],parent[4096],doorline[4096],done[4096];
- for(i=0;i<numsectors;i++){distance[i]=100000000;parent[i]=-1;doorline[i]=-1;done[i]=0;}
- for(i=0;i<numlines;i++){line_t *l=&lines[i];if(TR_KeyColor(l->special)<0)continue;
-  sector_t *door=l->backsector;if(door&&door->ceilingheight<=door->floorheight+56*FRACUNIT)doorline[door-sectors]=i;
- }
+ static int distance[4096],parent[4096],doorline[4096],done[4096],dependency[4096];
+ for(i=0;i<numsectors;i++){distance[i]=100000000;parent[i]=-1;doorline[i]=-1;done[i]=0;dependency[i]=-1;}
+ for(i=0;i<numlines;i++){line_t *l=&lines[i];if(TR_LineMarker(l->special)=='D'&&l->backsector)doorline[l->backsector-sectors]=i;}
  int start=p->mo->subsector->sector-sectors,finish=exitline->frontsector-sectors;
  distance[start]=0;
  for(int pass=0;pass<numsectors;pass++){
   int at=-1;for(i=0;i<numsectors;i++)if(!done[i]&&(at<0||distance[i]<distance[at]))at=i;
   if(at<0||distance[at]>=100000000)break;done[at]=1;if(at==finish)break;
-  for(i=0;i<numlines;i++){line_t *l=&lines[i];if(!l->frontsector||!l->backsector)continue;
-   int f=l->frontsector-sectors,b=l->backsector-sectors,to=f==at?b:b==at?f:-1;if(to<0||to==at)continue;
-   if((l->flags&ML_BLOCKING)&&!l->special)continue;
-   int cost=1,d=doorline[to];if(d>=0){int key=TR_KeyColor(lines[d].special);if(!p->cards[key]&&!p->cards[key+3])cost+=1000;}
-   if(distance[at]+cost<distance[to]){distance[to]=distance[at]+cost;parent[to]=at;}
+  sector_t *from=&sectors[at];
+  for(int j=0;j<from->linecount;j++){line_t *l=from->lines[j];if(!l->frontsector||!l->backsector||(l->flags&ML_BLOCKING))continue;
+   int f=l->frontsector-sectors,b=l->backsector-sectors,to=f==at?b:f;if(to==at)continue;
+   sector_t *dest=&sectors[to];int cost=1,dep=-1,d=doorline[to],key=d>=0?TR_KeyColor(lines[d].special):-1;
+   if(key>=0&&!p->cards[key]&&!p->cards[key+3]){cost+=10000;dep=d;}
+   fixed_t floor=from->floorheight>dest->floorheight?from->floorheight:dest->floorheight;
+   fixed_t ceiling=from->ceilingheight<dest->ceilingheight?from->ceilingheight:dest->ceilingheight;
+   if((dest->floorheight-from->floorheight>24*FRACUNIT||ceiling-floor<56*FRACUNIT)&&d<0&&doorline[at]<0){
+    int tag=dest->tag?dest->tag:from->tag,activation=-1;
+    if(tag)for(int k=0;k<numlines;k++)if(lines[k].tag==tag&&TR_LineMarker(lines[k].special)=='S'){activation=k;break;}
+    if(activation<0)continue;cost+=100;dep=activation;
+   }
+   if(distance[at]+cost<distance[to]){distance[to]=distance[at]+cost;parent[to]=at;dependency[to]=dep;}
   }
  }
- int required=-1;for(i=finish;i>=0&&i!=start;i=parent[i])if(doorline[i]>=0)required=doorline[i];
+ int required=-1;
+ for(i=finish;i>=0&&i!=start;i=parent[i])if(dependency[i]>=0)required=dependency[i];
  if(required<0)return;
  line_t *l=&lines[required];c=TR_KeyColor(l->special);
- if(p->cards[c]||p->cards[c+3]){snprintf(objective,sizeof(objective),"Open the %s door",colors[c]);objective_x=l->v1->x+l->dx/2;objective_y=l->v1->y+l->dy/2;return;}
+ if(c<0){strcpy(objective,"Activate the route switch");objective_x=l->v1->x+l->dx/2;objective_y=l->v1->y+l->dy/2;return;}
  for(th=thinkercap.next;th!=&thinkercap;th=th->next)if(th->function.acp1==(actionf_p1)P_MobjThinker){
   mobj_t *m=(mobj_t*)th;int color=m->sprite==SPR_BKEY||m->sprite==SPR_BSKU?0:m->sprite==SPR_YKEY||m->sprite==SPR_YSKU?1:m->sprite==SPR_RKEY||m->sprite==SPR_RSKU?2:-1;
   if(color==c&&(m->flags&MF_SPECIAL)){snprintf(objective,sizeof(objective),"Find the %s keycard",colors[c]);objective_x=m->x;objective_y=m->y;return;}
  }
-
 }
+
 static const char *briefings[]={"This is Halloran, UAC comms. I locked myself in control when the hangar crew stopped answering. Find the way out; I will stay on this frequency.","You are inside the containment perimeter. They sealed those doors with people still working behind them. Look for a card beside the locked routes.","The treatment plant is running without its operators. Something is moving against the current. Follow the access doors toward the exit.","That station used to report every fault to me. Now every light is green and nobody answers. Find the next passage out.","This is the laboratory sector. We kept the samples cold; that did not keep them quiet. The secured route should take you onward.","The central complex is ahead. I can hear its alarm through the wall of this room. Find the access card and keep moving.","You have reached the computing wing. The terminals are still accepting names from empty desks. Look for the route beyond the locks.","The last facility is beyond this threshold. I cannot promise what waits there. Get to the exit while this channel holds.","This annex was missing from the evacuation plan. There are voices on its local channel, all using the same name. Find a route back out."};
 void TR_StoryStart(void) {
  radio_last=story_clock; /* Leave space for the briefing before rare story beats. */
  snprintf(radio_log,sizeof(radio_log),"e1m%d|%s",gamemap,briefings[(gamemap-1)%9]);
  if(!(briefing_bits&(1u<<gamemap))){briefing_bits|=1u<<gamemap;TR_QueueRadio(radio_log);}
- objective[0]=0;TR_StoryTick(&players[consoleplayer]);
+ route_clock=-1;objective[0]=0;TR_StoryTick(&players[consoleplayer]);
 }
-int TR_ObjectiveBearing(player_t *p) {return (int)((double)(int32_t)(R_PointToAngle2(p->mo->x,p->mo->y,objective_x,objective_y)-p->mo->angle)*360.0/4294967296.0);}
+/* Public route cue: geometry only, never actors, identities or combat state.
+   A 16-unit lattice respects wall clearance and directional step heights.
+   Closed manual doors remain traversable hypotheses, to be opened with USE. */
+static fixed_t route_x,route_y;
+#define ROUTE_MAX 1048576
+static unsigned char route_solid[ROUTE_MAX],route_lock[ROUTE_MAX],route_pending[ROUTE_MAX];
+static int route_cost[ROUTE_MAX],route_sector[ROUTE_MAX];
+static int route_parent[ROUTE_MAX],route_queue[ROUTE_MAX];
+static fixed_t route_floor[ROUTE_MAX];
+static void route_update(player_t *p,int depth) {
+ if(depth>=4||!p->mo)return;
+ if(route_clock==leveltime/7)return;route_clock=leveltime/7;
+ route_x=objective_x;route_y=objective_y;
+ int w=bmapwidth*8,h=bmapheight*8,n=w*h;
+ if(w<1||h<1||n>ROUTE_MAX||numsectors>4096)return;
+ double ox=(double)bmaporgx/FRACUNIT,oy=(double)bmaporgy/FRACUNIT;
+ memset(route_solid,0,n);memset(route_lock,0,n);memset(route_pending,0,n);
+ for(int i=0;i<numlines;i++){
+  line_t *l=&lines[i];
+  int key=TR_KeyColor(l->special),locked=key>=0&&!p->cards[key]&&!p->cards[key+3];
+  if(l->backsector&&!(l->flags&ML_BLOCKING)&&!locked)continue;
+  double ax=(double)l->v1->x/FRACUNIT,ay=(double)l->v1->y/FRACUNIT;
+  double dx=(double)l->dx/FRACUNIT,dy=(double)l->dy/FRACUNIT,len=dx*dx+dy*dy;
+  int x0=(int)( (fmin(ax,ax+dx)-18-ox)/16),x1=(int)((fmax(ax,ax+dx)+18-ox)/16);
+  int y0=(int)((fmin(ay,ay+dy)-18-oy)/16),y1=(int)((fmax(ay,ay+dy)+18-oy)/16);
+  for(int y=y0;y<=y1;y++)for(int x=x0;x<=x1;x++)if(x>=0&&y>=0&&x<w&&y<h){
+   double px=ox+x*16+8-ax,py=oy+y*16+8-ay,t=len?(px*dx+py*dy)/len:0;
+   if(t<0)t=0;if(t>1)t=1;
+   if((px-t*dx)*(px-t*dx)+(py-t*dy)*(py-t*dy)<16*16){if(locked)route_lock[y*w+x]=key+1;else route_solid[y*w+x]=1;}
+  }
+ }
+ static unsigned char manual[4096];memset(manual,0,sizeof(manual));
+ for(int i=0;i<numlines;i++)if(TR_LineMarker(lines[i].special)=='D'&&lines[i].backsector&&lines[i].backsector-sectors<4096)manual[lines[i].backsector-sectors]=1;
+ for(int v=0;v<n;v++){route_parent[v]=-1;sector_t *sec=R_PointInSubsector((fixed_t)((ox+(v%w)*16+8)*FRACUNIT),(fixed_t)((oy+(v/w)*16+8)*FRACUNIT))->sector;route_floor[v]=sec->floorheight;route_sector[v]=sec-sectors;route_cost[v]=100000000;}
+ int sx=((p->mo->x-bmaporgx)/FRACUNIT)/16,sy=((p->mo->y-bmaporgy)/FRACUNIT)/16,start=sy*w+sx;
+ if(start<0||start>=n)return;
+ int head=0,tail=1,queued=1,best=start;double bestd=1e30;
+ route_queue[0]=start;route_parent[start]=start;route_cost[start]=0;route_pending[start]=1;
+ while(queued){int v=route_queue[head++];if(head==n)head=0;queued--;route_pending[v]=0;int x=v%w,y=v/w;
+  int neighbors[4]={v-1,v+1,v-w,v+w};
+  for(int j=0;j<4;j++){int u=neighbors[j];if(u<0||u>=n||abs(u%w-x)>1||route_solid[u])continue;
+   sector_t *sec=&sectors[route_sector[u]];int cost=1;
+   if(sec->special==4||sec->special==5||sec->special==7||sec->special==16)cost+=30;
+   if(route_floor[v]-route_floor[u]>24*FRACUNIT)cost+=20;
+   if(route_lock[u])cost+=10000;
+   if(sec->ceilingheight-sec->floorheight<56*FRACUNIT&&!manual[route_sector[u]]){if(!sec->tag)continue;cost+=1000;}
+   if(route_floor[u]-route_floor[v]>24*FRACUNIT){
+    fixed_t floor=route_floor[v];int ok=1;
+    for(int k=1;k<=4;k++){sector_t *s=R_PointInSubsector((fixed_t)((ox+(x+(u%w-x)*k/4.0)*16+8)*FRACUNIT),(fixed_t)((oy+(y+(u/w-y)*k/4.0)*16+8)*FRACUNIT))->sector;if(s->floorheight-floor>24*FRACUNIT){ok=0;break;}floor=s->floorheight;}
+    if(!ok){if(!sec->tag)continue;cost+=1000;}
+   }
+   if(route_cost[v]+cost>=route_cost[u])continue;
+   route_parent[u]=v;route_cost[u]=route_cost[v]+cost;
+   if(!route_pending[u]){route_pending[u]=1;route_queue[tail++]=u;if(tail==n)tail=0;queued++;}
+  }
+ }
+ for(int v=0;v<n;v++)if(route_parent[v]>=0){double dx=ox+(v%w)*16+8-(double)objective_x/FRACUNIT,dy=oy+(v/w)*16+8-(double)objective_y/FRACUNIT,d=dx*dx+dy*dy;if(d<bestd||(d==bestd&&route_cost[v]<route_cost[best])){bestd=d;best=v;}}
+ static int path[ROUTE_MAX];int count=0;
+ for(int v=best;v!=start&&count<ROUTE_MAX;v=route_parent[v])path[count++]=v;
+ /* The first height/clearance dependency on the minimum-cost route. */
+ if(strcmp(objective,"Activate the route switch"))for(int k=count-1;k>=0;k--){int v=path[k],prev=k==count-1?start:path[k+1];sector_t *sec=&sectors[route_sector[v]];
+  if((route_floor[v]-route_floor[prev]>24*FRACUNIT||sec->ceilingheight-sec->floorheight<56*FRACUNIT)&&sec->tag){
+   for(int j=0;j<numlines;j++){line_t *l=&lines[j];if(l->tag==sec->tag&&TR_LineMarker(l->special)=='S'){
+    strcpy(objective,"Activate the route switch");objective_x=l->v1->x+l->dx/2;objective_y=l->v1->y+l->dy/2;route_clock=-1;route_update(p,depth+1);return;}}
+  }
+ }
+ /* Resolve the first missing lock on the actual geometric route, rather than
+    trusting the coarser sector quest graph (which can cross tall ledges). */
+ {
+  int needed=-1;
+  for(int k=count-1;k>=0&&needed<0;k--){int v=path[k];double px=ox+(v%w)*16+8,py=oy+(v/w)*16+8;
+   for(int j=0;j<numlines;j++){line_t *l=&lines[j];int c=TR_KeyColor(l->special);if(c<0||p->cards[c]||p->cards[c+3])continue;
+    double ax=(double)l->v1->x/FRACUNIT,ay=(double)l->v1->y/FRACUNIT,dx=(double)l->dx/FRACUNIT,dy=(double)l->dy/FRACUNIT,len=dx*dx+dy*dy,t=len?((px-ax)*dx+(py-ay)*dy)/len:0;if(t<0)t=0;if(t>1)t=1;
+    double ex=px-ax-t*dx,ey=py-ay-t*dy;if(ex*ex+ey*ey<24*24){needed=c;break;}
+   }
+  }
+  if(needed>=0)for(thinker_t *th=thinkercap.next;th!=&thinkercap;th=th->next)if(th->function.acp1==(actionf_p1)P_MobjThinker){mobj_t *m=(mobj_t*)th;
+   int c=m->sprite==SPR_BKEY||m->sprite==SPR_BSKU?0:m->sprite==SPR_YKEY||m->sprite==SPR_YSKU?1:m->sprite==SPR_RKEY||m->sprite==SPR_RSKU?2:-1;
+   if(c==needed&&(m->flags&MF_SPECIAL)&&!(objective_x==m->x&&objective_y==m->y)){snprintf(objective,sizeof(objective),"Find the %s keycard",needed==0?"blue":needed==1?"yellow":"red");objective_x=m->x;objective_y=m->y;route_clock=-1;route_update(p,depth+1);return;}
+  }
+ }
+ if(bestd>64*64){route_x=(fixed_t)((ox+(best%w)*16+8)*FRACUNIT);route_y=(fixed_t)((oy+(best/w)*16+8)*FRACUNIT);}
+ if(count>2){
+  int v=path[count-1];
+  for(int k=count-2;k>=0&&k>=count-32;k--){
+   int u=path[k],dx=u%w-sx,dy=u/w-sy,steps=(abs(dx)+abs(dy))*2,ok=1,prev=start;
+   if(dx*dx+dy*dy>256)break;
+   for(int j=1;j<=steps;j++){int x=sx+dx*j/steps,y=sy+dy*j/steps,at=y*w+x;
+    if((route_solid[at]&&at!=start)||route_floor[at]-route_floor[prev]>24*FRACUNIT){ok=0;break;}prev=at;}
+   if(!ok)break;v=u;
+  }
+  route_x=(fixed_t)((ox+(v%w)*16+8)*FRACUNIT);route_y=(fixed_t)((oy+(v/w)*16+8)*FRACUNIT);
+ }
+
+
+}
+int TR_ObjectiveBearing(player_t *p) {route_update(p,0);return (int)((double)(int32_t)(R_PointToAngle2(p->mo->x,p->mo->y,route_x,route_y)-p->mo->angle)*360.0/4294967296.0);}
 const char *TR_ObjectiveDistance(player_t *p) {int d=P_AproxDistance(objective_x-p->mo->x,objective_y-p->mo->y)/FRACUNIT;return d<128?"near":d<512?"nearby":"far";}
 EMSCRIPTEN_KEEPALIVE const char *tremor_story(void) {
- player_t *p=&players[consoleplayer];snprintf(story_json,sizeof(story_json),"%s|%d|%s|%s",objective,TR_ObjectiveBearing(p),TR_ObjectiveDistance(p),radio_log);return story_json;
+ player_t *p=&players[consoleplayer];route_update(p,0);snprintf(story_json,sizeof(story_json),"%s|%d|%s|%s",objective,TR_ObjectiveBearing(p),TR_ObjectiveDistance(p),radio_log);return story_json;
 }
 
 EMSCRIPTEN_KEEPALIVE void tremor_look(int delta) {look_pending+=delta;if(look_pending>126)look_pending=126;if(look_pending< -126)look_pending=-126;}

@@ -9,7 +9,6 @@ async function fixture(crew=0){const m=await createTestEngine({noInitialRun:true
 const obs=(m:any)=>JSON.parse(m.UTF8ToString(m._tremor_agent_observe()));
 const result=(m:any)=>JSON.parse(m.UTF8ToString(m._tremor_agent_outcome()));
 describe('real Doom engine course interface',()=>{
- it.todo('baseline completes a Freedoom level from normal spawn within the step limit (completion target remains unmet)');
  it('controllers receive only public view, map, HUD and story fields',async()=>{
   const fields=['aim','armor','automap','entities','events','heading_deg','health','keys','map_cell_units','motion','objective','objective_bearing','objective_distance','purge','radio_log','rounds','summary','terror','tic','weapon','weapons'].sort();
   const controller:Controller={id:'public-schema-check',async decide(o){

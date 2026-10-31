@@ -3,6 +3,11 @@
 # Preserve generated artifacts exactly as emitted by the build.
 public/engine/** -text
 public/engine-headless/** -text
+# Manifest-listed text must have identical bytes on every platform.
+public/engine/*.js text eol=lf
+public/engine-headless/*.cjs text eol=lf
+public/engine-headless/artifacts.json text eol=lf
+public/radio/*.json text eol=lf
 public/wad/** binary
 *.wasm binary
 *.wad binary

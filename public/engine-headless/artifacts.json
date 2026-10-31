@@ -3,13 +3,13 @@
   "step_tics": 7,
   "sha256": {
     "public/engine/doom.js": "4ef824205ddbdf7ac9e88d3299a51f996d9232a7dbe5ed0f623705a521402dc7",
-    "public/engine/doom.wasm": "8d4a9e8f802fbe82d175b278cffc47f1ab51e630e7c7aa8f3e6819a093308e3d",
-    "public/engine/source.zip": "4298a99690fa5995ad5ff727dacdfa3f8b886f9f9bb164ab1426496f92ec4706",
-    "public/radio/lines.json": "ff1b922e55eb0fe871b39472edb601d280cfcd4dc676ccf6a7e525458f3fd9ae",
+    "public/engine/doom.wasm": "a4312991109e46afd41b7536d0c56e6f9116eb2d7a7695e4121ed811ac8d2270",
+    "public/engine/source.zip": "099a5e8f7f2aa5f611e0aae2bffb2770bfd796ed21b6a7ee313ba0d1e81dffb0",
+    "public/radio/lines.json": "27938f1a6a87467f30e8749014ca6be9b6fe8710b102d64dde3979dbee980d50",
     "public/engine-headless/doom.cjs": "48da089632b8b93d3870e94844d373c07f522e5b6f5e0b45c7afa2f966452595",
-    "public/engine-headless/doom.wasm": "8add4ab4ccee37026e7b2d1c0b33a03344aa2a4a42664a8d962c975da2e37714",
+    "public/engine-headless/doom.wasm": "d84d7bcc123d1c87d345bdaac38ceb82eeeacb5d618248f4b772fb9a0bb34f46",
     "public/engine-headless/doom-test.cjs": "0aeb9adb53d04b4db811fef4ff2fc3051384554ac9c77a6f3301deed5e1e1bd9",
-    "public/engine-headless/doom-test.wasm": "20fd88c595ea577e54c1f407bcc48c76d4265db7f19d554b633f3001080beb7c",
+    "public/engine-headless/doom-test.wasm": "2976f6f1f0f264592050d536592ddd6be3f5815f8b438e2941aa80d82723ee63",
     "public/wad/freedoom1.wad": "7323bcc168c5a45ff10749b339960e98314740a734c30d4b9f3337001f9e703d",
     "public/wad/tremor.wad": "ed554eef927c0f19c7554230f54747dad8ba6b8b3ac84a35b2dc99afd5652031"
   }

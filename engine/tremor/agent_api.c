@@ -63,6 +63,8 @@ EMSCRIPTEN_KEEPALIVE int tremor_agent_step(int action){
  case 33:c.forwardmove=25;c.buttons2=TR_READ;break;
  case 34:c.forwardmove=25;c.sidemove=-24;c.buttons=BT_ATTACK;break;
  case 35:c.forwardmove=25;c.sidemove=24;c.buttons=BT_ATTACK;break;
+ case 36:c.angleturn=1170;break;case 37:c.angleturn=-1170;break;
+ case 38:c.forwardmove=25;c.angleturn=260;break;case 39:c.forwardmove=25;c.angleturn=-260;break;
  case 24:c.forwardmove=50;break;
  case 19:c.forwardmove=12;break;
  case 17:c.angleturn=52;break;case 18:c.angleturn=-52;break;
@@ -123,7 +125,7 @@ EMSCRIPTEN_KEEPALIVE const char *tremor_agent_observe(void){
  const char *weapons[]={"fist","pistol","shotgun","chaingun","rocket launcher","plasma rifle","BFG9000","chainsaw","super shotgun"};
  add("{\"motion\":\"%s\",\"tic\":%d,\"health\":%d,\"armor\":%d,\"rounds\":%d,\"purge\":%d,\"weapon\":\"%s\",\"aim\":\"%s\",\"keys\":[",motion==1?"blocked":motion==2?"moving":"still",tics,p->health<0?0:p->health,p->armorpoints,tr_rounds,tr_charges,weapons[p->readyweapon],tr_trauma==0?"steady":tr_trauma<3?"shaky":"very shaky");
  const char *keys[]={"blue key","yellow key","red key","blue skull","yellow skull","red skull"};int comma=0;
- for(int i=0;i<NUMCARDS;i++)if(p->cards[i]){if(comma++)add(",");quoted(keys[i]);}add("],\"objective\":");quoted(TR_Objective());add(",\"objective_bearing\":%d,\"objective_distance\":",TR_ObjectiveBearing(p));quoted(TR_ObjectiveDistance(p));add(",\"radio_log\":");quoted(TR_RadioLog());add(",\"terror\":");quoted(TR_TerrorBucket());add(",\"weapons\":[");comma=0;for(int w=0;w<NUMWEAPONS;w++)if(p->weaponowned[w]){if(comma++)add(",");quoted(weapons[w]);}add("],\"entities\":[");comma=0;
+ for(int i=0;i<NUMCARDS;i++)if(p->cards[i]){if(comma++)add(",");quoted(keys[i]);}add("],\"objective\":");TR_ObjectiveBearing(p);quoted(TR_Objective());add(",\"objective_bearing\":%d,\"objective_distance\":",TR_ObjectiveBearing(p));quoted(TR_ObjectiveDistance(p));add(",\"radio_log\":");quoted(TR_RadioLog());add(",\"terror\":");quoted(TR_TerrorBucket());add(",\"weapons\":[");comma=0;for(int w=0;w<NUMWEAPONS;w++)if(p->weaponowned[w]){if(comma++)add(",");quoted(weapons[w]);}add("],\"entities\":[");comma=0;
  for(thinker_t *th=thinkercap.next;th!=&thinkercap;th=th->next){
   if(th->function.acp1!=(actionf_p1)P_MobjThinker)continue;
   mobj_t *m=(mobj_t*)th;if(m==p->mo||m->health<=0)continue;const char *name=label(m);if(!name)continue;

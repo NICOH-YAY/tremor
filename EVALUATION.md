@@ -1,52 +1,119 @@
-# Real-engine evaluation follow-up: completion target NOT met
+# Scripted baselines now exit E1M1; broader completion target NOT met
 
-The latest frozen scripted pass completed **0/20 levels**: **16 deaths and 4 step limits**. The target of substantial completion (aiming for 50% on E1M1-E1M3) was not achieved: tuning-map completion is 0/12. These bots are still not a credible successful-navigation benchmark. The required normal-spawn completion regression remains an explicit TODO; the exit-switch fixture is not substituted for it.
+The final scripted run completes **4/20 episodes**, with **15 deaths and one
+step limit**. Both baselines finish E1M1 at both declared seeds. Careful completes
+**2/6 tuning episodes (33.3%)**, below the requested 50% target on E1M1-E1M3.
+Neither baseline completes E1M2-E1M5. This is a real completion improvement over
+0/20, but not a successful general-navigation benchmark or a completed50% target.
 
-The [declared-before-tuning plan](docs/EVALUATION-PLAN.md) remains intact: tuning E1M1/E1M2/E1M3, held-out E1M4/E1M5, seeds 17/83, Hurt Me Plenty. No cases or seeds were moved. Dated amendments record changes in public observations, controls, objective rules, horror presentation and limits. Only tuning-map traces informed controller changes; held-out results were reported without tuning against them.
+The [declared plan](docs/EVALUATION-PLAN.md) is unchanged: tuning E1M1/E1M2/E1M3,
+held-out E1M4/E1M5, seeds 17/83, Hurt Me Plenty. No cases, seeds or budgets moved.
+Only tuning-map diagnostics informed changes. Repeated development runs of fixed
+seeds are not independent trials. Held-out outcomes were not used for tuning.
 
-## Latest results
+## Final results
 
-Run date 2026-10-31 UTC (October 30 local), config `tremor-engine-v4-public-map36-7tic-k8`, HEAD `27f662b`, uncommitted working tree. The [full per-seed table](eval/results/2026-10-31-table.md) and [JSON report](eval/results/2026-10-31-results.json) identify exact engine/WAD and controller/interface source hashes.
+Run date 2026-10-31 UTC (October30 local), config
+`tremor-engine-v5-public-route40-7tic-k8`, HEAD `d608349`, uncommitted working tree.
+The [full per-seed table](eval/results/2026-10-31-table.md) and
+[JSON report](eval/results/2026-10-31-results.json) record exact artifact hashes,
+controller/interface source hashes, config, costs and trace paths.
 
-Counts below are **exits / deaths / step limits**, with two seeds per player and level.
+Counts below are **exits / deaths / step limits**, two seeds per player/level.
 
 | Level | Aggressive | Careful |
 | --- | --- | --- |
-| E1M1 | 0 / 2 / 0 | 0 / 2 / 0 |
-| E1M2 | 0 / 1 / 1 | 0 / 2 / 0 |
-| E1M3 | 0 / 2 / 0 | 0 / 2 / 0 |
-| E1M4 | 0 / 0 / 2 | 0 / 1 / 1 |
+| E1M1 | 2 / 0 / 0 | 2 / 0 / 0 |
+| E1M2 | 0 / 2 / 0 | 0 / 2 / 0 |
+| E1M3 | 0 / 1 / 1 | 0 / 2 / 0 |
+| E1M4 | 0 / 2 / 0 | 0 / 2 / 0 |
 | E1M5 | 0 / 2 / 0 | 0 / 2 / 0 |
 
-| Player | Exits | Deaths | Limits | Illegal / errors | Crew killed / saved | Reads | Fired unread | Mean decision latency |
-| --- | ---: | ---: | ---: | --- | --- | ---: | ---: | ---: |
-| baseline_aggressive | 0 | 7 | 3 | 0 / 0 | 26 / 0 | 0 | 124 | 4.036ms |
-| baseline_careful | 0 | 9 | 1 | 0 / 0 | 3 / 3 | 33 | 0 | 3.741ms |
+| Player | Exits | Deaths | Limits | Crew killed / saved | Reads | Fired unread | Mean decision latency |
+| --- | ---: | ---: | ---: | --- | ---: | ---: | ---: |
+| baseline_aggressive | 2 | 7 | 1 | 20 / 0 | 0 | 18 | 0.110ms |
+| baseline_careful | 2 | 8 | 0 | 0 / 2 | 24 | 0 | 0.101ms |
 
-All 20 final terror buckets were **steady**, so this run does not distinguish the players on final terror. Numeric `finalTremor` in legacy output means trauma, not terror; the table now labels trauma and terror separately. Moral metrics distinguish the policies, but careful still killed 3 crew. Do not describe it as harmless or claim a causal/statistical result from two RNG starts.
+There were zero illegal actions, controller errors, API failures, call limits or
+timeouts. All final terror buckets were steady, so final terror does not
+distinguish the policies. Trauma and terror are separately labelled in the
+per-seed table. Moral metrics distinguish the policies: careful killed no crew
+in the declared suite, saved two and READ 24 times; aggressive killed 20 crew,
+saved none and READ zero times. This is descriptive evidence on two starts,
+not a statistical or causal result. The additional seed1 diagnostic includes
+a careful crew death, so the policy is not guaranteed harmless.
 
-There were no illegal actions, controller errors, API failures, call limits or timeouts. Scripted players made no model calls, used no model tokens and incurred no model API cost. Mean decision latency includes public-observation cloning/decision work, not simulation/render time. No live Vertex trials were run; the human owns those runs. Planned model/pricing metadata in the report is not evidence of a live invocation.
+No model trials were run. Plain `npm run eval` explicitly skipped both model
+players without `--live`; no mock or scripted substitute was counted as a model.
+Scripted players used zero model calls/tokens and incurred zero model API cost.
+Planned Vertex metadata and unverified model pricing in JSON are not evidence of
+an invocation. Decision latency includes public-observation cloning and policy
+work, and excludes engine simulation/rendering and route-cue construction.
 
-## What changed and what still fails
+## Diagnosis and rule changes
 
-The public interface adds a useful-scale mapped grid with inferred visible floor, heading, closed/open door and switch/crossing glyphs, key colours, visible props/barrels/elevation, weapon inventory, motion feedback and an episode radio transcript. Humans receive matching map glyphs, zoom controls and Radio log. The shared objective planner prefers normal exits and avoids making optional locks mandatory solely because of linedef order. Its sector graph is topological and does not prove physical lift/height reachability.
+The initial E1M1 seed1 diagnostic with the old controller died after 383 actions,
+with ammunition still available, after long combat/supply/navigation detours.
+Terror remained steady; a 30% hit-rate or corpse-driven terror spiral was not
+established. Subsequent traces exposed stale-waypoint reversals, overly
+conservative wall-cell clearance, repeated USE under attack, missing lock
+ordering, and stationary recognition/combat in groups. Details and the trace
+command are in [BASELINE-DIAGNOSIS](docs/BASELINE-DIAGNOSIS.md).
 
-Controllers use only Observation and the constant legal-action list. Their bounded map search, waypoint-bearing inference, frontier fallback, collision recovery, connected-door retry bound and 64-unit USE probe contain no world coordinates, hidden map IDs or crew identity. Open doors are traversed without being closed again. Aggressive fires at hostile figures, switches to fists when necessary, and strafes/retreats. Careful READs unknown humans, attempts STUN/PURGE while charges remain and prefers fists. Simultaneous movement/turning with fire or READ models controls available to a human.
+On 2026-10-31 UTC, the public objective rule changed from a straight-line arrow
+to a geometry-derived route waypoint. Humans get the same bearing on TAB as
+agents receive in Observation. The planner uses level geometry, height/headroom,
+manual doors, keys and tagged activations; it avoids damaging floor and large
+drops where alternatives exist. It does not inspect hidden combat identities or
+route around moving enemies. Four constant macros add medium turns and moving
+small turns, bringing the public vocabulary to 40. Rule sources and alternatives
+are recorded in [rule-source-map](docs/rule-source-map.md) and
+[DECISIONS](docs/DECISIONS.md). These public rule/control changes mean the v4/v5
+comparison does not isolate the effect of controller changes.
 
-These implementation changes did **not** solve sustained combat or general traversal. More episodes die than in the prior frozen engine report (6 deaths/14 limits); completion remains0. Correcting door handling exposes additional combat failure rather than providing successful paths. No success on an unplayed map, synthetic route, hidden-coordinate controller or privileged fixture is counted.
+Controllers use only public Observation and legal IDs. They no longer infer a
+hidden exit coordinate from intersecting bearing rays. They follow the shared
+cue, bound recognition/engagement attempts, choose visible supplies, probe doors
+and recover from blocked movement. Careful READs unknown figures and attempts
+aligned stun/purge; aggressive attacks unread figures. Corpses are not targets.
+No map IDs, seed dispatch, world coordinates, state handles or outcome metrics
+are controller inputs.
 
-The cap is1800 actions/calls, seven35Hz tics each: **six simulated minutes**, compared with the earlier600-action/120-second cap. This budgets separate aiming, movement, door waits and 35-tic recognition/purge channels; it is an engineering allowance, not a measured human completion time. It was not enlarged further after failures. The20-second call and five-minute wall-clock limits remain. The JSON config records the change, so comparisons with the older600-step run are not controlled comparisons.
+The change does not solve dense combat or all activation/platform arrangements.
+Stationary channels and close fights still cost too much health on E1M2/E1M3.
+An unreachable target now retains a reachable frontier cue rather than reverting
+to a bearing through a wall. The extra final E1M1 seed1 trace still dies; both
+declared seeds succeeding is not evidence of general E1M1 reliability.
 
-## Evidence and checks
+Limits remain 1800 actions/calls, seven 35Hz tics each (six simulated minutes),
+20 seconds per call and five minutes wall time. There was no new budget increase.
+The previous full0/20 report is retained as
+[pre-route results](eval/results/2026-10-31-pre-route-results.json) and
+[pre-route table](eval/results/2026-10-31-pre-route-table.md). Earlier engine reports
+remain available; prototype TypeScript successes remain
+[superseded](eval/SUPERSEDED.md) and are not Freedoom evidence.
 
-The original [2026-10-30 engine report](eval/results/2026-10-30-results.json) is retained. Earlier follow-up [first-pass](eval/results/2026-10-31-first-followup-results.json) and [compatibility-pass](eval/results/2026-10-31-compatibility-pass-results.json) records also show0/20. Repeated fixed-seed runs are not independent additional trials. Old TypeScript28/28 authored-map results remain [superseded](eval/SUPERSEDED.md), and imply no Freedoom completion.
+## Verification and reproduction
 
-Full final traces are local gitignored JSONL.gz files referenced by each result. Compression is lossless and retains every public observation/action. The latest report captures controller/interface source hashes before the run; packaged artifacts are checked against the regenerated manifest. Rerun scripted only:
+`npm test`: 122 passing, no completion TODO. The real production-engine regression
+runs careful from the normal E1M1 seed17 spawn to exit within 1800 steps, using the
+actual controller. It does not use an exit fixture, replay or privileged setter.
+A separate regression checks that the initial route cue follows the corridor.
+Existing public-field whitelist, unread-identity equivalence, constant-action,
+invalid-action, opaque-state, extra-observe/RNG and debug-export tests pass.
+
+Typecheck/build pass. Browser, production headless and test headless artifacts
+were rebuilt. `npm run engine:test`: 470 checks, zero failures. The artifact hash
+manifest was regenerated and verified against all listed files. Browser code was
+built; no new interactive pointer-lock/audio/play verification or remote CI is
+claimed. No commits were created; the branch remains main at d608349.
 
 ```sh
-npm run eval -- --players baseline_aggressive,baseline_careful
+npm run eval
+node --import ./scripts/typescript-loader.mjs scripts/trace-baseline.ts
 ```
 
-Local checks: npm test120 passing plus one completion TODO; typecheck/build pass; engine:test470 checks,0 failures. Regressions cover public-field whitelisting, unread identity equivalence, absence of browser debug setters from both agent targets,64-unit closed-door use/open-passage preservation, episode history/save/playback behavior and mouse prediction. The genuine normal-spawn completion regression is **not implemented as a passing test** because no such baseline completion was achieved.
-
-Node horror rendering measurements and inspected PNGs are in [HORROR-STATUS](docs/HORROR-STATUS.md). Native 640x400 failed inherited status-bar assumptions before a valid CPU sample. Browser inventory was empty, so no fresh interactive Chrome paint/audio/pointer-lock/save-reload verification is claimed. Remote CI and live models were not run. No commits were created.
+Full final evaluation traces are lossless gitignored JSONL.gz files referenced
+by each result. The small diagnostic script logs every public decision and
+renders public automap SVG/text snapshots at reset, progress, health loss,
+blocked movement, objective changes and termination in `eval/diagnostics/`.

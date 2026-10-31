@@ -122,3 +122,15 @@ not a selection of favourable seeds. Held-out results did not inform these fixes
 Controller/interface source hashes are captured before the final run. Traces are
 losslessly gzipped JSONL, retaining every action and public observation. Repeated
 runs of fixed seeds are not additional independent statistical trials.
+
+## Amendment ? 2026-10-31 UTC: shared route guidance
+
+The v5 public-route40 config replaces the straight-line human/agent objective
+bearing with a shared geometry-derived waypoint, and adds four constant human
+control combinations (40 total). Quest planning considers heights and activation
+dependencies. The route prefers safe floor over damaging floor and large drops.
+The step duration,1800 action/call cap, skill, seeds and tuning/held-out split are
+unchanged. This is a public rule/interface change, so comparisons with v4 do not
+isolate controller improvements. Only E1M1-E1M3 diagnostics/parameter trials
+informed tuning. Fixed-seed repeats are development trials, not new independent
+evaluation samples. The final report reruns the full declared suite once.

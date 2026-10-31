@@ -148,3 +148,12 @@ passages. USE probes cover64 units regardless of map pixel size, and denied-door
 retry memory groups connected visible markers. Recentered viewports clear inferred
 bearing/supply locations. The last two added controls combine forward+strafe+fire,
 matching diagonal human approaches. All 36 actions remain public and identity-neutral.
+
+## Route follow-up (2026-10-31; supersedes straight-line cue /36-action count)
+
+The40-action ABI appends medium left/right turns (45 degrees) and forward with
+small left/right turns (10 degrees). The seven-tic interval and all1800-step
+budgets remain unchanged. Objective bearing is now the shared human TAB route
+waypoint, up to 256 units ahead; objective distance remains to the current quest
+target. Geometry and dependencies are private planner inputs, not controller
+fields. The planner uses no monster/crew positions or identities.

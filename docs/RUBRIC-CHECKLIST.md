@@ -36,3 +36,8 @@ Five kinds, all green: rule invariants; legal and illegal actions; a terminal ou
 ## Submission
 - PR to columbia-university-ai-games/game-dev-f26 main; only midterms/nicoh-yay/ + the one workflow file. README (setup/play/test/eval commands from midterms/nicoh-yay/, scope, rule map, reuse terms), EVALUATION.md (suite, table, traces, CI evidence, limitations in his voice), AGENT-TEAM.md, peer notes (given + received, Nov 6), 3-5 min recording of the agent playing with limits stated, linked from README and PR.
 - Update Week 3 thread + README scope statement since the game changed.
+
+2026-10-31 follow-up: 4b now has genuine E1M1 normal-spawn exits and a passing
+completion regression. The50% tuning-map target remains unmet; see EVALUATION.md.
+For2c, route guidance is the same public TAB cue for humans and agents, and the
+constant vocabulary / unread-identity equivalence tests remain required.

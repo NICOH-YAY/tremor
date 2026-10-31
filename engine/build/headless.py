@@ -18,7 +18,5 @@ output=Path(cmd[-1]);output.write_bytes(output.read_bytes().replace(b"\r\n",b"\n
 
 Path('public/engine-headless/LICENSE.txt').write_bytes(Path('engine/doomgeneric/LICENSE').read_bytes().replace(b'\r\n',b'\n'))
 # Reproducibility evidence; regenerate after rebuilding both variants.
-import hashlib,json
-paths=['public/engine/doom.js','public/engine/doom.wasm','public/engine/source.zip','public/radio/lines.json','public/engine-headless/doom.cjs','public/engine-headless/doom.wasm','public/engine-headless/doom-test.cjs','public/engine-headless/doom-test.wasm','public/wad/freedoom1.wad','public/wad/tremor.wad']
-manifest={'target':'doomgeneric-tremor-node-v3','step_tics':7,'sha256':{name:hashlib.sha256(Path(name).read_bytes()).hexdigest() for name in paths if Path(name).exists()}}
-Path('public/engine-headless/artifacts.json').write_bytes((json.dumps(manifest,indent=2)+'\n').encode('utf-8'))
+import runpy
+runpy.run_path(str(root/'engine/build/artifacts.py'),run_name='__main__')

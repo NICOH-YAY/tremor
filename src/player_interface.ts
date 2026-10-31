@@ -3,7 +3,7 @@ import {readFileSync} from 'node:fs';
 import createDoom from '../public/engine-headless/doom.cjs';
 export const STEP_TICS=7;
 // This order is the C agent ABI; append only with a matching agent_api.c change.
-export const ACTION_IDS=['forward','back','strafe_left','strafe_right','turn_left_small','turn_left_large','turn_right_small','turn_right_large','fire','use','read','stun','purge','wait','weapon_fist','weapon_pistol','weapon_shotgun','turn_left_fine','turn_right_fine','forward_slow','advance_fire','strafe_left_fire','strafe_right_fire','back_fire','sprint','turn_left_small_fire','turn_right_small_fire','turn_left_fine_fire','turn_right_fine_fire','turn_left_small_read','turn_right_small_read','turn_left_fine_read','turn_right_fine_read','advance_read','approach_left_fire','approach_right_fire'] as const;
+export const ACTION_IDS=['forward','back','strafe_left','strafe_right','turn_left_small','turn_left_large','turn_right_small','turn_right_large','fire','use','read','stun','purge','wait','weapon_fist','weapon_pistol','weapon_shotgun','turn_left_fine','turn_right_fine','forward_slow','advance_fire','strafe_left_fire','strafe_right_fire','back_fire','sprint','turn_left_small_fire','turn_right_small_fire','turn_left_fine_fire','turn_right_fine_fire','turn_left_small_read','turn_right_small_read','turn_left_fine_read','turn_right_fine_read','advance_read','approach_left_fire','approach_right_fire','turn_left_medium','turn_right_medium','advance_left','advance_right'] as const;
 export type ActionId=typeof ACTION_IDS[number];
 export type TerminalReason='exit'|'dead'|'step_limit'|'call_limit'|'timeout';
 export interface EngineState {readonly seed:number;readonly levelId:string}

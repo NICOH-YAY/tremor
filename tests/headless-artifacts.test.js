@@ -1,7 +1,12 @@
 import {test,expect} from 'vitest';
 import {readFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
-// Hash raw bytes: generated artifacts are marked -text in .gitattributes.
+// Hash raw bytes after the generator canonicalizes manifest-listed text to LF.
+test('every manifest-listed text file contains only LF line endings',()=>{
+ const manifest=JSON.parse(readFileSync('public/engine-headless/artifacts.json','utf8'));
+ for(const path of Object.keys(manifest.sha256).filter(path=>/\.(?:js|cjs|json)$/.test(path)))
+  expect(readFileSync(path,'utf8'),path).not.toContain('\r');
+});
 test('generated JavaScript preserves build LF bytes',()=>{for(const path of ['public/engine/doom.js','public/engine-headless/doom.cjs','public/engine-headless/doom-test.cjs'])expect(readFileSync(path,'utf8'),path).not.toContain('\r\n');});
 test('browser diagnostic setters are absent from both agent artifacts',()=>{
  for(const target of ['doom','doom-test']){
