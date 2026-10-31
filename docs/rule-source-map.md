@@ -104,3 +104,13 @@ actor IDs, unread identity or hidden combat state reach controllers.
 constant macros: left/right 45-degree turns and forward+left/right 10-degree
 turns. All 40 IDs cost seven tics and are legal regardless of geometry/identity.
 These are combinations of controls humans already have.
+
+## 2026-10-31 controller-only survival follow-up
+
+No public observation fields, action macros or hidden inputs were added. The
+controller stores public automap arrow cells and prior health, discards local
+memory on viewport recentering, and uses visible supply labels, HUD inventory,
+entity bearing/range and the existing shared route cue. This memory is controller
+logic, not a new engine rule. The evaluation runner now imposes the requested600
+steps/calls; the C artifact's1800 ceiling remains unchanged. See EVALUATION.md for
+failed tuning attempts and the honest unmet completion target.

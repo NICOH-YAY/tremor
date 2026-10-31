@@ -58,3 +58,22 @@ the final line records the terminal reason/outcome. Snapshots cover reset,
 periodic progress, health loss, blocked motion, objective changes and termination.
 The SVGs are drawn solely from public map pixels. A step50 PNG was also visually
 inspected during development; no new interactive browser-play claim is made.
+
+## 2026-10-31 controller survival follow-up
+
+Only E1M2/E1M3 trace diagnostics and tuning-map trials informed the survival
+changes; held-out E1M4/E1M5 informed no change. See EVALUATION.md for the final
+600-action results and failed development variants. Final careful seed17 dies
+at124 on E1M2 with77 rounds and at115 on E1M3 with79 rounds; terror stays steady.
+Fine-turn READ improves tracking but still costs stationary time under fire.
+Final E1M3 seed83 survives600 with nine reads but loops toward the route-switch
+objective. Repeated-cell lateral recovery does not solve that activation.
+
+Controllers now include bounded safe-cell retreat when damaged and blocked in a
+crowd, map-recenter invalidation, low-ammo visible supply selection, empty-gun
+fists, careful close back-fire and scarcity-based closing. These are attempted
+survival improvements, not evidence that cover or activation traversal is solved.
+Aggressive retains its original close-combat branch after broader combat regressed
+E1M1 tuning completion. Completion remains4/20 overall and2/6 for careful tuning;
+the requested4/6 target is not met. Neither map has been proved unwinnable by a
+heuristic. Production completion tests cover both E1M1 seeds under600 actions.

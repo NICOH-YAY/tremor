@@ -24,15 +24,31 @@ test('navigation uses a closed marker within64 units and leaves an open passage 
 });
 
 // Normal spawn, production module, real controller: no exit fixture or replay.
-test('careful baseline completes E1M1 seed17 within the declared step limit',async()=>{
+test.each([17,83])('careful baseline completes E1M1 seed%i within the declared step limit',async(seed)=>{
  const {runEpisode}=await import('../src/eval/runner');
- const result=await runEpisode(baseline(true),{seed:17,levelId:'E1M1',maxSteps:1800,tracePath:false});
+ const result=await runEpisode(baseline(true),{seed,levelId:'E1M1',maxSteps:600,maxCalls:600,tracePath:false});
  expect(result.reason).toBe('exit');expect(result.reachedExit).toBe(true);
- expect(result.steps).toBeLessThanOrEqual(1800);expect(result.illegalActions).toBe(0);
+ expect(result.steps).toBeLessThanOrEqual(600);expect(result.illegalActions).toBe(0);
 },30000);
 
 test('public route points down the starting corridor rather than through the exit wall',()=>{
  const state=reset(1,'E1M1'),o=observe(state);
  expect(Math.abs(o.objective_bearing)).toBeLessThan(10);
  expect(observe(state)).toEqual(o);
+});
+
+test('a damaged, blocked controller turns back toward remembered safe route cells',async()=>{
+ const o=observe(reset(17)),bot=baseline(true);o.weapon='fist';o.entities=[];o.motion='moving';o.heading_deg=0;
+ const map=(x:number)=>Array.from({length:40},(_,y)=>Array.from({length:40},(_,i)=>y===20&&i===x?'>':'.').join('')).join('\n');
+ for(let x=5;x<21;x++){o.automap=map(x);await bot.decide(o,[...ACTION_IDS]);}
+ o.motion='blocked';await bot.decide(o,[...ACTION_IDS]);
+ o.health=50;o.entities=Array.from({length:3},()=>({type:'unknown figure',distance:200,bearing_deg:0,elevation_deg:0}));
+ expect((await bot.decide(o,[...ACTION_IDS])).action).toMatch(/^turn_(left|right)_large$/);
+});
+
+test('scarce rounds close the gap and empty guns switch to fists',async()=>{
+ const o=observe(reset(17));o.weapon='fist';o.rounds=5;o.entities=[{type:'Imp',distance:250,bearing_deg:0,elevation_deg:0}];
+ expect((await baseline().decide(o,[...ACTION_IDS])).action).toBe('forward');
+ o.weapon='shotgun';o.rounds=0;
+ expect((await baseline().decide(o,[...ACTION_IDS])).action).toBe('weapon_fist');
 });

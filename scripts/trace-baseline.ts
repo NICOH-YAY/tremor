@@ -1,6 +1,6 @@
 import {mkdirSync,writeFileSync} from 'node:fs';
 import {baseline} from '../src/agent/baselines';
-import {reset,observe,step,outcome,ACTION_IDS} from '../src/player_interface';
+import {reset,observe,step,outcome,terminate,ACTION_IDS} from '../src/player_interface';
 // Diagnostic harness only. Controllers receive exactly Observation and legal IDs.
 const careful=!process.argv.includes('--aggressive'),level=process.argv.find(a=>/^E1M\d$/.test(a))??'E1M1';
 const seed=Number(process.env.TRACE_SEED??1),label=`${level}-${seed}-${careful?'careful':'aggressive'}`;
@@ -19,12 +19,13 @@ function render(index:number){
  lastMap=index;
 }
 let index=0;
-for(;index<1800&&!outcome(state).done;index++){
+for(;index<600&&!outcome(state).done;index++){
  const o=observe(state),{action}=await bot.decide(o,[...ACTION_IDS]);
  lines.push(JSON.stringify({step:index,action,health:o.health,rounds:o.rounds,objective:o.objective,bearing:o.objective_bearing,distance:o.objective_distance,heading:o.heading_deg,motion:o.motion,terror:o.terror,entities:o.entities}));
  if(index%50===0||objective!==o.objective||(health>o.health||o.motion==='blocked')&&index-lastMap>=10)render(index);
  health=o.health;objective=o.objective;step(state,action);
 }
+if(!outcome(state).done)terminate(state,'step_limit');
 render(index);
 const end=outcome(state);lines.push(JSON.stringify({end}));
 writeFileSync(`eval/diagnostics/${label}-trace.jsonl`,lines.join('\n')+'\n');

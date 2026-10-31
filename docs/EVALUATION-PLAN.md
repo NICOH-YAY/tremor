@@ -134,3 +134,20 @@ unchanged. This is a public rule/interface change, so comparisons with v4 do not
 isolate controller improvements. Only E1M1-E1M3 diagnostics/parameter trials
 informed tuning. Fixed-seed repeats are development trials, not new independent
 evaluation samples. The final report reruns the full declared suite once.
+
+## Survival follow-up — 2026-10-31 UTC
+
+The current session explicitly restores 600 actions and 600 controller calls,
+with unchanged E1M1–E1M3 tuning / E1M4–E1M5 held-out maps, seeds17/83, skill2,
+seven-tic actions, 20-second call and five-minute episode limits. This supersedes
+all earlier 1800-budget statements for the current report; it does not move the
+suite or increase a budget to obtain success. The runner and diagnostic harness
+impose600; the unchanged C artifact retains its higher internal safety ceiling.
+
+Current config: `tremor-engine-v6-survival-route40-600-k8`. No new observation or
+human-control rule was added. Controller tuning used only tuning maps, including
+failed repeated development trials. An initial full run's aggressive E1M1 failure
+was corrected from tuning-map evidence by restoring its original close-combat
+branch, then all20 episodes were rerun. Held-out results selected no changes.
+Final careful tuning completion is2/6, below4/6. See dated EVALUATION.md for the
+full failures and split-labelled report; no live model trials were run.
