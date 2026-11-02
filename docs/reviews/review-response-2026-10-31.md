@@ -45,7 +45,7 @@ clean committed result, target-Brave measurement or human testimony is invented.
 | m4 seed note | DONE:8-bit RNG-start statement in README/plan/report. |
 | Upstream screenshots | Preserved. Only marked engine patches; no upstream screenshots deleted. |
 | Submission copy | Scratch game-dev-f26/midterms/nicoh-yay copy command verification recorded below; actual course checkout not edited. |
-| Skill | Two real tremor-level-check invocations logged with requested session label; this is one session, not invented separate sessions. |
+| Skill | codex-doom12 and codex-doom13 are separate Codex sessions; see docs/agent-sessions/README.md. Each records tremor-level-check invocations. |
 
 ## Audit-sources mapping
 
@@ -88,8 +88,7 @@ clean committed result, target-Brave measurement or human testimony is invented.
 Final results, exact commands/counts and trace links: EVALUATION.md and
 SKILL-INVOCATIONS.md. Live model rows pending; cannot make A-proof live-comparison,
 clean-commit or human playthrough claims. Other-map baseline failures remain.
-Two invocations in this one session satisfy the user's requested logged count;
-they do not establish two distinct sessions if the course requires that literally.
+codex-doom12 and codex-doom13 were separate Codex sessions, as recorded in docs/agent-sessions/README.md.
 
 Performance evidence: engine/build/session-before-browser.json,
 session-after-browser.json,session-after-headless.json. Stationary E1M1 software
@@ -104,3 +103,7 @@ the same checks passed. Full 28-case rerun: aggressive2 exits/10deaths/2step-lim
 careful2/10/2, zero illegal actions. EVALUATION.md links the final run and sample
 trace manifest. Live model rows pending. No commits. Final secondary objectives
 are distinct key types actually collected plus completed exit; switches excluded.
+
+## Changes since the reviewed commit 9927bfe
+
+Since 9927bfe, the project added lossless model prompt encoding, cost accounting, live-suite evidence, layered music, a startup fix, the watch page and submission documentation. Session codex-doom18 adds bounded trace reasons, a human-run demo command, canvas-relative hints and a vendored patch check. The independent reviews remain unchanged. Claude will run a fresh read-only review on the final commit; no final review is claimed here.

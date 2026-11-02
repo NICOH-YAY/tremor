@@ -1,6 +1,6 @@
 You are the implementation agent for Nicoh's course game "Trial by Combat: The Broken Oath". Claude is the independent reviewer; do not review your own work as approval.
 
-Working dir: D:\Coding VS\game-dev-f26 (branch nicoh-yay/trial-by-combat). ALL files you create go under midterms/nicoh-yay/ EXCEPT one CI workflow file: .github/workflows/midterm-nicoh-yay.yml (that filename is mandated by the course). Do not modify anything else in the repo. Do not commit, push, or spend any cloud/model credits. Read AGENTS.md and midterms/nicoh-yay/docs/DESIGN.md (the spec — follow it exactly; if something is ambiguous, choose the simplest option and list it under "Open questions" in your final message). Also skim course_game/player_interface.py and docs/rule-source-map.md for the course's interface/evidence-label conventions.
+Working dir: <local workspace>"Open questions" in your final message). Also skim course_game/player_interface.py and docs/rule-source-map.md for the course's interface/evidence-label conventions.
 
 BUILD (headless, no renderer yet), TypeScript, Node 24, npm, Vitest. Self-contained package at midterms/nicoh-yay/ (its own package.json + lockfile; uncommitted). Name things after the game ("trial-by-combat"), not "midterm".
 1. src/sim/: pure deterministic rules. Seeded PRNG (mulberry32) with SEPARATE named streams (testimony, tells, persona). Integer math. JSON-serializable state; stableHash(state). No DOM/three imports.

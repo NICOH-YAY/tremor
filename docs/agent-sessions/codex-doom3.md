@@ -1,4 +1,4 @@
-You are Codex, the sole code editor for "Tremor" in D:\Coding VS\tremor-wt\doom (branch feat/doom). The Doom engine runs in the browser (engine/platform, public/engine) with the Tremor mod (engine/tremor). Read engine/BUILD.md, engine/PATCHES.md. Emscripten: D:\Coding VS\tremor-tools\emsdk.
+You are Codex, the sole code editor for "Tremor" in a former engine worktree (branch feat/doom). The Doom engine runs in the browser (engine/platform, public/engine) with the Tremor mod (engine/tremor). Read engine/BUILD.md, engine/PATCHES.md. Emscripten: the Tremor repository root-tools\emsdk.
 
 Implement:
 A. SETTINGS MENU (HTML overlay, opened from the title screen and in-game with a dedicated key, default F10, and from a gear button; pauses the game while open; saved to localStorage; applied on load):

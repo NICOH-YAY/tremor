@@ -6,6 +6,7 @@ Python. No machine-specific defaults. Run from project root (also works after
 copy to game-dev-f26/midterms/nicoh-yay/):
 
 ```sh
+# cwd: midterms/nicoh-yay
 npm ci
 npm run engine:headless
 npm run engine:headless:test

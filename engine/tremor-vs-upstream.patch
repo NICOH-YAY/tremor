@@ -1,0 +1,1216 @@
+diff --git a/engine/doomgeneric/doomgeneric/am_map.c b/engine/doomgeneric/doomgeneric/am_map.c
+index d3d504e..c77d8a0 100644
+--- a/engine/doomgeneric/doomgeneric/am_map.c
++++ b/engine/doomgeneric/doomgeneric/am_map.c
+@@ -1,3 +1,4 @@
++#include "tremor.h"
+ //
+ // Copyright(C) 1993-1996 Id Software, Inc.
+ // Copyright(C) 2005-2014 Simon Howard
+@@ -647,12 +648,7 @@ AM_Responder
+             mtof_zoommul = M_ZOOMIN;
+             ftom_zoommul = M_ZOOMOUT;
+         }
+-        else if (key == key_map_toggle)
+-        {
+-            bigstate = 0;
+-            viewactive = true;
+-            AM_Stop ();
+-        }
++        else if (key == key_map_toggle) { rc=true; }
+         else if (key == key_map_maxzoom)
+         {
+             bigstate = !bigstate;
+@@ -708,6 +704,7 @@ AM_Responder
+         rc = false;
+         key = ev->data1;
+ 
++        if (key == key_map_toggle) { bigstate=0;viewactive=true;AM_Stop();return true; }
+         if (key == key_map_east)
+         {
+             if (!followplayer) m_paninc.x = 0;
+@@ -1135,7 +1132,19 @@ void AM_drawWalls(void)
+ 	{
+ 	    if ((lines[i].flags & LINE_NEVERSEE) && !cheating)
+ 		continue;
+-	    if (!lines[i].backsector)
++	    /* TREMOR: public mapped activation markers, matching the agent legend.
++           Secret/never-see lines retain their ordinary treatment. */
++        if (lines[i].special && !(lines[i].flags & ML_SECRET)) {
++            mline_t marker;fixed_t mx=l.a.x+(l.b.x-l.a.x)/2,my=l.a.y+(l.b.y-l.a.y)/2;
++            static const short door[]={-6,-8,-6,8,-6,8,3,8,3,8,6,4,6,4,6,-4,6,-4,3,-8,3,-8,-6,-8};
++            static const short button[]={6,8,-6,8,-6,8,-6,0,-6,0,6,0,6,0,6,-8,6,-8,-6,-8};
++            static const short trigger[]={-6,8,6,8,0,8,0,-8};
++            int kind=TR_LineMarker(lines[i].special),key=TR_KeyColor(lines[i].special),color=key==0?BLUES:key==1?YELLOWS:key==2?REDS:WHITE;
++            if(kind=='D'&&TR_DoorOpen(&lines[i]))color=GRAYS;
++            const short *glyph=kind=='D'?door:kind=='S'?button:trigger;int count=kind=='D'?6:kind=='S'?5:2;
++            for(int stroke=0;stroke<count;stroke++){marker.a.x=mx+glyph[stroke*4]*FRACUNIT;marker.a.y=my+glyph[stroke*4+1]*FRACUNIT;marker.b.x=mx+glyph[stroke*4+2]*FRACUNIT;marker.b.y=my+glyph[stroke*4+3]*FRACUNIT;AM_drawMline(&marker,color);}
++        }
++        if (!lines[i].backsector)
+ 	    {
+ 		AM_drawMline(&l, WALLCOLORS+lightlev);
+ 	    }
+diff --git a/engine/doomgeneric/doomgeneric/d_loop.c b/engine/doomgeneric/doomgeneric/d_loop.c
+index 1939dbd..49e06e6 100644
+--- a/engine/doomgeneric/doomgeneric/d_loop.c
++++ b/engine/doomgeneric/doomgeneric/d_loop.c
+@@ -759,6 +759,12 @@ void TryRunTics (void)
+         }
+     }
+ 
++#ifdef __EMSCRIPTEN__
++    /* TREMOR: rAF presents independently; do not sleep waiting for a 35 Hz tic.
++       NetUpdate above remains the authoritative clock/input scheduler. */
++    if (availabletics < 1 && !singletics && !net_client_connected)
++        return;
++#endif
+     if (counts < 1)
+ 	counts = 1;
+ 
+diff --git a/engine/doomgeneric/doomgeneric/d_main.c b/engine/doomgeneric/doomgeneric/d_main.c
+index 9012e5f..171989c 100644
+--- a/engine/doomgeneric/doomgeneric/d_main.c
++++ b/engine/doomgeneric/doomgeneric/d_main.c
+@@ -1,3 +1,4 @@
++#include "tremor.h" /* TREMOR settings startup hook. */
+ //
+ // Copyright(C) 1993-1996 Id Software, Inc.
+ // Copyright(C) 2005-2014 Simon Howard
+@@ -305,6 +306,8 @@ void D_Display (void)
+ 	return;
+     }
+     
++    // Browser transitions present the completed frame without a blocking wipe.
++    I_FinishUpdate();return;
+     // wipe update
+     wipe_EndScreen(0, 0, SCREENWIDTH, SCREENHEIGHT);
+ 
+@@ -423,6 +426,9 @@ void doomgeneric_Tick()
+ //
+ void D_DoomLoop (void)
+ {
++#ifdef TR_HEADLESS
++    return; /* Agent owns the fixed-tic clock; no real-time loop. */
++#endif
+     if (bfgedition &&
+         (demorecording || (gameaction == ga_playdemo) || netgame))
+     {
+@@ -1840,6 +1846,7 @@ void D_DoomMain (void)
+ 			D_StartTitle ();                // start up intro loop
+     }
+ 
++    TR_SettingsReady(); /* TREMOR: override loaded config with browser settings. */
+     D_DoomLoop ();
+ }
+ 
+diff --git a/engine/doomgeneric/doomgeneric/d_ticcmd.h b/engine/doomgeneric/doomgeneric/d_ticcmd.h
+index daf0da3..f035dd1 100644
+--- a/engine/doomgeneric/doomgeneric/d_ticcmd.h
++++ b/engine/doomgeneric/doomgeneric/d_ticcmd.h
+@@ -33,6 +33,7 @@ typedef struct
+ {
+     signed char	forwardmove;	// *2048 for move
+     signed char	sidemove;	// *2048 for move
++    short tr_mouse;             // local presentation prediction, never demo data
+     short angleturn;            // <<16 for angle delta
+     byte chatchar;
+     byte buttons;
+diff --git a/engine/doomgeneric/doomgeneric/deh_str.h b/engine/doomgeneric/doomgeneric/deh_str.h
+index cdecaf0..bbadb94 100644
+--- a/engine/doomgeneric/doomgeneric/deh_str.h
++++ b/engine/doomgeneric/doomgeneric/deh_str.h
+@@ -35,7 +35,8 @@ void DEH_AddStringReplacement(char *from_text, char *to_text);
+ 
+ #else
+ 
+-#define DEH_String(x) (x)
++char *TR_String(const char *text);
++#define DEH_String(x) TR_String(x)
+ #define DEH_printf printf
+ #define DEH_fprintf fprintf
+ #define DEH_snprintf snprintf
+diff --git a/engine/doomgeneric/doomgeneric/f_finale.c b/engine/doomgeneric/doomgeneric/f_finale.c
+index ca6775e..ab31f2c 100644
+--- a/engine/doomgeneric/doomgeneric/f_finale.c
++++ b/engine/doomgeneric/doomgeneric/f_finale.c
+@@ -148,6 +148,7 @@ void F_StartFinale (void)
+     // Do dehacked substitutions of strings
+   
+     finaletext = DEH_String(finaletext);
++    if(W_CheckNumForName("FREEDOOM")>=0)finaletext="THE SIGNAL CLEARS.\n\nYOU FOUND THE WAY OUT.\nSOMEONE IS STILL BREATHING.\n\nTREMOR - END OF EPISODE";
+     finaleflat = DEH_String(finaleflat);
+     
+     finalestage = F_STAGE_TEXT;
+diff --git a/engine/doomgeneric/doomgeneric/g_game.c b/engine/doomgeneric/doomgeneric/g_game.c
+index 9954d78..df9d04e 100644
+--- a/engine/doomgeneric/doomgeneric/g_game.c
++++ b/engine/doomgeneric/doomgeneric/g_game.c
+@@ -1,3 +1,5 @@
++/* TREMOR: engine hooks; see engine/PATCHES.md. */
++#include "tremor.h"
+ //
+ // Copyright(C) 1993-1996 Id Software, Inc.
+ // Copyright(C) 2005-2014 Simon Howard
+@@ -133,6 +135,8 @@ boolean         longtics;               // cph's doom 1.91 longtics hack
+ boolean         lowres_turn;            // low resolution turning for longtics
+ boolean         demoplayback; 
+ boolean		netdemo; 
++/* TREMOR: v112 demos add an action byte after buttons and use longtics. */
++static boolean tremor_demo;
+ byte*		demobuffer;
+ byte*		demo_p;
+ byte*		demoend; 
+@@ -426,7 +430,10 @@ void G_BuildTiccmd (ticcmd_t* cmd, int maketic)
+     }
+ 
+     // buttons
+-    cmd->chatchar = HU_dequeueChatChar(); 
++    cmd->lookfly=TR_LookCommand(); /* TREMOR: signed pitch delta, recorded. */
++    cmd->chatchar = HU_dequeueChatChar();
++    /* TREMOR: sampled into the tic command, never read live by simulation. */
++    cmd->buttons2 = (gamekeydown[tr_keys[0]]?TR_READ:0) | (gamekeydown[tr_keys[1]]?TR_STUN:0) | (gamekeydown[tr_keys[2]]?TR_PURGE:0) | (tr_gore<<4) | 64;
+  
+     if (gamekeydown[key_fire] || mousebuttons[mousebfire] 
+ 	|| joybuttons[joybfire]) 
+@@ -539,7 +546,8 @@ void G_BuildTiccmd (ticcmd_t* cmd, int maketic)
+     if (strafe) 
+ 	side += mousex*2; 
+     else 
+-	cmd->angleturn -= mousex*0x8; 
++	cmd->angleturn -= mousex*0x8;
++    cmd->tr_mouse=TR_BrowserMouseCommand();cmd->angleturn+=cmd->tr_mouse;
+ 
+     if (mousex == 0)
+     {
+@@ -1577,7 +1585,8 @@ void G_DoLoadGame (void)
+     P_UnArchivePlayers (); 
+     P_UnArchiveWorld (); 
+     P_UnArchiveThinkers (); 
+-    P_UnArchiveSpecials (); 
++    P_UnArchiveSpecials ();
++    TR_InvalidateStory(); /* TREMOR: next tic replans loaded objective, no stale35-tic wait. */
+  
+     if (!P_ReadSaveGameEOF())
+ 	I_Error ("Bad savegame");
+@@ -1674,6 +1683,7 @@ void G_DoSaveGame (void)
+ 
+     remove(savegame_file);
+     rename(temp_savegame_file, savegame_file);
++    TR_FlushSaves(); /* TREMOR: persist completed save atomically after rename. */
+     
+     gameaction = ga_nothing;
+     M_StringCopy(savedescription, "", sizeof(savedescription));
+@@ -1730,6 +1740,7 @@ G_InitNew
+   int		map )
+ {
+     char *skytexturename;
++    TR_NewGame(); /* TREMOR: trauma lasts until a new episode/game. */
+     int             i;
+ 
+     if (paused)
+@@ -1896,7 +1907,8 @@ G_InitNew
+ 
+ 
+ void G_ReadDemoTiccmd (ticcmd_t* cmd) 
+-{ 
++{
++    cmd->tr_mouse=0;
+     if (*demo_p == DEMOMARKER) 
+     {
+ 	// end of demo data stream 
+@@ -1918,7 +1930,9 @@ void G_ReadDemoTiccmd (ticcmd_t* cmd)
+         cmd->angleturn = ((unsigned char) *demo_p++)<<8; 
+     }
+ 
+-    cmd->buttons = (unsigned char)*demo_p++; 
++    cmd->buttons = (unsigned char)*demo_p++;
++    cmd->buttons2 = tremor_demo ? *demo_p++ : 0;
++    cmd->lookfly = tremor_demo ? *demo_p++ : 0; /* TREMOR */
+ } 
+ 
+ // Increase the size of the demo buffer to allow unlimited demos
+@@ -1957,7 +1971,7 @@ void G_WriteDemoTiccmd (ticcmd_t* cmd)
+ { 
+     byte *demo_start;
+ 
+-    if (gamekeydown[key_demo_quit])           // press q to end demo recording 
++    if (gamekeydown[key_demo_quit] && key_demo_quit != tr_keys[2]) /* TREMOR */           // press q to end demo recording
+ 	G_CheckDemoStatus (); 
+ 
+     demo_start = demo_p;
+@@ -1977,7 +1991,9 @@ void G_WriteDemoTiccmd (ticcmd_t* cmd)
+         *demo_p++ = cmd->angleturn >> 8; 
+     }
+ 
+-    *demo_p++ = cmd->buttons; 
++    *demo_p++ = cmd->buttons;
++    *demo_p++ = cmd->buttons2;
++    *demo_p++ = cmd->lookfly; /* TREMOR: recorded mercy/recognition. */
+ 
+     // reset demo pointer back
+     demo_p = demo_start;
+@@ -1999,7 +2015,10 @@ void G_WriteDemoTiccmd (ticcmd_t* cmd)
+         }
+     } 
+ 	
+-    G_ReadDemoTiccmd (cmd);         // make SURE it is exactly the same 
++    /* Canonicalize recorded bytes without discarding local mouse prediction. */
++    short local_mouse = cmd->tr_mouse;
++    G_ReadDemoTiccmd (cmd);         // make SURE it is exactly the same
++    cmd->tr_mouse = local_mouse;
+ } 
+  
+  
+@@ -2065,7 +2084,7 @@ void G_BeginRecording (void)
+     // Record a high resolution "Doom 1.91" demo.
+     //
+ 
+-    longtics = M_CheckParm("-longtics") != 0;
++    longtics = true; tremor_demo = true; /* TREMOR: v112. */
+ 
+     // If not recording a longtics demo, record in low res
+ 
+@@ -2077,7 +2096,7 @@ void G_BeginRecording (void)
+  
+     if (longtics)
+     {
+-        *demo_p++ = DOOM_191_VERSION;
++        *demo_p++ = 113; /* TREMOR: distinct from vanilla demos. */
+     }
+     else
+     {
+@@ -2092,6 +2111,7 @@ void G_BeginRecording (void)
+     *demo_p++ = fastparm;
+     *demo_p++ = nomonsters;
+     *demo_p++ = consoleplayer;
++    *demo_p++ = tr_gore; /* TREMOR: capture setting affecting RNG/gibs. */
+ 	 
+     for (i=0 ; i<MAXPLAYERS ; i++) 
+ 	*demo_p++ = playeringame[i]; 		 
+@@ -2160,7 +2180,9 @@ void G_DoPlayDemo (void)
+ 
+     demoversion = *demo_p++;
+ 
+-    if (demoversion == G_VanillaVersionCode())
++    tremor_demo = demoversion == 113; /* TREMOR */
++    if (tremor_demo) { longtics = true; }
++    else if (demoversion == G_VanillaVersionCode())
+     {
+         longtics = false;
+     }
+@@ -2193,6 +2215,7 @@ void G_DoPlayDemo (void)
+     fastparm = *demo_p++;
+     nomonsters = *demo_p++;
+     consoleplayer = *demo_p++;
++    if(tremor_demo) tr_gore=*demo_p++; /* TREMOR */
+ 	
+     for (i=0 ; i<MAXPLAYERS ; i++) 
+ 	playeringame[i] = *demo_p++; 
+diff --git a/engine/doomgeneric/doomgeneric/hu_stuff.c b/engine/doomgeneric/doomgeneric/hu_stuff.c
+index b63cac7..9e40492 100644
+--- a/engine/doomgeneric/doomgeneric/hu_stuff.c
++++ b/engine/doomgeneric/doomgeneric/hu_stuff.c
+@@ -363,6 +363,7 @@ void HU_Start(void)
+ 
+     s = DEH_String(s);
+     
++    s=DEH_String(s);
+     while (*s)
+ 	HUlib_addCharToTextLine(&w_title, *(s++));
+ 
+@@ -419,7 +420,11 @@ void HU_Ticker(void)
+ 	if ((plr->message && !message_nottobefuckedwith)
+ 	    || (plr->message && message_dontfuckwithme))
+ 	{
+-	    HUlib_addMessageToSText(&w_message, 0, plr->message);
++	    #ifdef TR_HEADLESS
++            extern void TR_AgentMessage(const char *);
++            TR_AgentMessage(plr->message);
++#endif
++            HUlib_addMessageToSText(&w_message, 0, plr->message);
+ 	    plr->message = 0;
+ 	    message_on = true;
+ 	    message_counter = HU_MSGTIMEOUT;
+diff --git a/engine/doomgeneric/doomgeneric/info.c b/engine/doomgeneric/doomgeneric/info.c
+index 9389e84..51eefec 100644
+--- a/engine/doomgeneric/doomgeneric/info.c
++++ b/engine/doomgeneric/doomgeneric/info.c
+@@ -43,7 +43,7 @@ char *sprnames[] = {
+     "POL3","POL1","POL6","GOR2","GOR3","GOR4","GOR5","SMIT","COL1","COL2",
+     "COL3","COL4","CAND","CBRA","COL6","TRE1","TRE2","ELEC","CEYE","FSKU",
+     "COL5","TBLU","TGRN","TRED","SMBT","SMGT","SMRT","HDB1","HDB2","HDB3",
+-    "HDB4","HDB5","HDB6","POB1","POB2","BRS1","TLMP","TLP2", NULL
++    "HDB4","HDB5","HDB6","POB1","POB2","BRS1","TLMP","TLP2", /* TREMOR: original custom survivor sprite. */ "CREW", NULL
+ };
+ 
+ 
+diff --git a/engine/doomgeneric/doomgeneric/info.h b/engine/doomgeneric/doomgeneric/info.h
+index 648b518..0c97bfd 100644
+--- a/engine/doomgeneric/doomgeneric/info.h
++++ b/engine/doomgeneric/doomgeneric/info.h
+@@ -164,6 +164,7 @@ typedef enum
+     SPR_BRS1,
+     SPR_TLMP,
+     SPR_TLP2,
++    SPR_CREW, /* TREMOR: revealed survivor A/B frames. */
+     NUMSPRITES
+ 
+ } spritenum_t;
+diff --git a/engine/doomgeneric/doomgeneric/m_menu.c b/engine/doomgeneric/doomgeneric/m_menu.c
+index 6df9655..731a04f 100644
+--- a/engine/doomgeneric/doomgeneric/m_menu.c
++++ b/engine/doomgeneric/doomgeneric/m_menu.c
+@@ -1161,6 +1161,7 @@ static char *M_SelectEndMessage(void)
+         endmsg = doom2_endmsg;
+     }
+ 
++    if(W_CheckNumForName("FREEDOOM")>=0)return "Leave the base?";
+     return endmsg[gametic % NUM_QUITMESSAGES];
+ }
+ 
+diff --git a/engine/doomgeneric/doomgeneric/m_random.c b/engine/doomgeneric/doomgeneric/m_random.c
+index 8e3b4e1..6d42500 100644
+--- a/engine/doomgeneric/doomgeneric/m_random.c
++++ b/engine/doomgeneric/doomgeneric/m_random.c
+@@ -61,5 +61,10 @@ int M_Random (void)
+ 
+ void M_ClearRandom (void)
+ {
++    #ifdef TR_HEADLESS
++    extern int tr_agent_seed;
++    rndindex = prndindex = tr_agent_seed & 255;
++#else
+     rndindex = prndindex = 0;
++#endif
+ }
+diff --git a/engine/doomgeneric/doomgeneric/p_inter.c b/engine/doomgeneric/doomgeneric/p_inter.c
+index 1eb58cf..ef410d2 100644
+--- a/engine/doomgeneric/doomgeneric/p_inter.c
++++ b/engine/doomgeneric/doomgeneric/p_inter.c
+@@ -1,3 +1,5 @@
++/* TREMOR: engine hooks; see engine/PATCHES.md. */
++#include "tremor.h"
+ //
+ // Copyright(C) 1993-1996 Id Software, Inc.
+ // Copyright(C) 2005-2014 Simon Howard
+@@ -69,6 +71,8 @@ P_GiveAmmo
+   int		num )
+ {
+     int		oldammo;
++    /* TREMOR: scarce shared rounds. */
++    return TR_Ammo(player, num==0?1:num>=5?4:2);
+ 	
+     if (ammo == am_noammo)
+ 	return false;
+@@ -190,9 +194,9 @@ P_GiveWeapon
+ 		// give one clip with a dropped weapon,
+ 		// two clips with a found weapon
+ 		if (dropped)
+-			gaveammo = P_GiveAmmo (player, weaponinfo[weapon].ammo, 1);
++			gaveammo = false; /* TREMOR: weapons give no rounds. */
+ 		else
+-			gaveammo = P_GiveAmmo (player, weaponinfo[weapon].ammo, 2);
++			gaveammo = false; /* TREMOR */
+     }
+     else
+     {
+@@ -653,6 +657,8 @@ P_TouchSpecialThing
+     if (special->flags & MF_COUNTITEM)
+ 	player->itemcount++;
+     P_RemoveMobj (special);
++    if(special->sprite==SPR_CLIP || special->sprite==SPR_SHEL) player->message=(special->flags&MF_DROPPED)?"+1 round":"+2 rounds";
++    if(special->sprite==SPR_AMMO || special->sprite==SPR_SBOX) player->message="+4 rounds";
+     player->bonuscount += BONUSADD;
+     if (player == &players[consoleplayer])
+ 	S_StartSound (NULL, sound);
+@@ -670,6 +676,10 @@ P_KillMobj
+     mobjtype_t	item;
+     mobj_t*	mo;
+ 	
++    /* TREMOR: reward, trauma and gore before original death processing. */
++    TR_Kill(source,target);
++    if (TR_Gib(source,target) && target->info->xdeathstate)
++        target->health = -target->info->spawnhealth-1;
+     target->flags &= ~(MF_SHOOTABLE|MF_FLOAT|MF_SKULLFLY);
+ 
+     if (target->type != MT_SKULL)
+@@ -757,6 +767,7 @@ P_KillMobj
+ 	return;
+     }
+ 
++    return; /* TREMOR: rare drops are handled by TR_Kill. */
+     mo = P_SpawnMobj (target->x,target->y,ONFLOORZ, item);
+     mo->flags |= MF_DROPPED;	// special versions of items
+ }
+@@ -788,6 +799,15 @@ P_DamageMobj
+     fixed_t	thrust;
+     int		temp;
+ 	
++    /* TREMOR: crew can never deal damage, including retaliation. */
++    if (TR_BlockDamage(source)) return;
++    if(target->player) damage=TR_Damage(damage); /* TREMOR */
++    /* TREMOR: classify the actual inflictor, not a later weapon switch. */
++    target->tr_melee_hit = source && source==inflictor && source->player &&
++        (source->player->readyweapon==wp_fist || source->player->readyweapon==wp_chainsaw);
++    target->tr_shotgun_hit = source && source==inflictor && source->player &&
++        (source->player->readyweapon==wp_shotgun || source->player->readyweapon==wp_supershotgun);
++    if (target->health > 0 && (target->flags & MF_SHOOTABLE)) { if(target->player)target->player->attacker=source;TR_Damaged(target); }
+     if ( !(target->flags & MF_SHOOTABLE) )
+ 	return;	// shouldn't happen...
+ 		
+diff --git a/engine/doomgeneric/doomgeneric/p_map.c b/engine/doomgeneric/doomgeneric/p_map.c
+index e371869..5da0adb 100644
+--- a/engine/doomgeneric/doomgeneric/p_map.c
++++ b/engine/doomgeneric/doomgeneric/p_map.c
+@@ -1,3 +1,4 @@
++#include "tremor.h" /* TREMOR: pitch-aware attack. */
+ //
+ // Copyright(C) 1993-1996 Id Software, Inc.
+ // Copyright(C) 2005-2014 Simon Howard, Andrey Budko
+@@ -1085,6 +1086,7 @@ P_AimLineAttack
+     // can't shoot outside view angles
+     topslope = 100*FRACUNIT/160;	
+     bottomslope = -100*FRACUNIT/160;
++    if(t1->player && (tr_pitch || !tr_autoaim))topslope=bottomslope=TR_PitchSlope();
+     
+     attackrange = distance;
+     linetarget = NULL;
+@@ -1124,7 +1126,7 @@ P_LineAttack
+     y2 = t1->y + (distance>>FRACBITS)*finesine[angle];
+     shootz = t1->z + (t1->height>>1) + 8*FRACUNIT;
+     attackrange = distance;
+-    aimslope = slope;
++    aimslope = t1->player && (tr_pitch || !tr_autoaim)?TR_PitchSlope():slope; /* TREMOR: pitch-aware hitscan. */
+ 		
+     P_PathTraverse ( t1->x, t1->y,
+ 		     x2, y2,
+diff --git a/engine/doomgeneric/doomgeneric/p_mobj.c b/engine/doomgeneric/doomgeneric/p_mobj.c
+index a3b9c43..60746c9 100644
+--- a/engine/doomgeneric/doomgeneric/p_mobj.c
++++ b/engine/doomgeneric/doomgeneric/p_mobj.c
+@@ -1,3 +1,5 @@
++/* TREMOR: engine hooks; see engine/PATCHES.md. */
++#include "tremor.h"
+ //
+ // Copyright(C) 1993-1996 Id Software, Inc.
+ // Copyright(C) 2005-2014 Simon Howard
+@@ -68,7 +70,7 @@ P_SetMobjState
+ 
+ 	// Modified handling.
+ 	// Call action functions when the state is set
+-	if (st->action.acp1)		
++	if (st->action.acp1 && !(mobj->tr_crew && mobj->health>0)) /* TREMOR: no living crew attack actions. */
+ 	    st->action.acp1(mobj);	
+ 	
+ 	state = st->nextstate;
+@@ -440,6 +442,9 @@ P_NightmareRespawn (mobj_t* mobj)
+ //
+ void P_MobjThinker (mobj_t* mobj)
+ {
++    if(!mobj->player){mobj->tr_oldx=mobj->x;mobj->tr_oldy=mobj->y;mobj->tr_oldz=mobj->z;mobj->tr_oldtic=leveltime;} /* TREMOR */
++    /* TREMOR: survivors and stunned humans bypass hostile state actions. */
++    if (TR_Think(mobj)) return;
+     // momentum movement
+     if (mobj->momx
+ 	|| mobj->momy
+@@ -571,6 +576,7 @@ int		iquetail;
+ 
+ void P_RemoveMobj (mobj_t* mobj)
+ {
++    TR_CorpseRemoved(mobj);
+     if ((mobj->flags & MF_SPECIAL)
+ 	&& !(mobj->flags & MF_DROPPED)
+ 	&& (mobj->type != MT_INV)
+@@ -822,6 +828,8 @@ void P_SpawnMapThing (mapthing_t* mthing)
+     
+     mobj = P_SpawnMobj (x,y,z, i);
+     mobj->spawnpoint = *mthing;
++    /* TREMOR: classify before counting monsters. */
++    TR_MapSpawn(mobj);
+ 
+     if (mobj->tics > 0)
+ 	mobj->tics = 1 + (P_Random () % mobj->tics);
+@@ -883,6 +891,8 @@ P_SpawnBlood
+ {
+     mobj_t*	th;
+ 	
++    /* TREMOR: off suppresses blood particles; normal retains vanilla blood. */
++    if (!tr_gore) return;
+     z += ((P_Random()-P_Random())<<10);
+     th = P_SpawnMobj (x,y,z, MT_BLOOD);
+     th->momz = FRACUNIT*2;
+@@ -1006,7 +1016,7 @@ P_SpawnPlayerMissile
+     fixed_t	slope;
+     
+     // see which target is to be aimed at
+-    an = source->angle;
++    an = source->angle + TR_Aim(); /* TREMOR: projectile aim error. */
+     slope = P_AimLineAttack (source, an, 16*64*FRACUNIT);
+     
+     if (!linetarget)
+@@ -1022,11 +1032,12 @@ P_SpawnPlayerMissile
+ 
+ 	if (!linetarget)
+ 	{
+-	    an = source->angle;
++	    an = source->angle + TR_Aim(); /* TREMOR: projectile aim error. */
+ 	    slope = 0;
+ 	}
+     }
+ 		
++    if(tr_pitch || !tr_autoaim) {an=source->angle+TR_Aim();slope=TR_PitchSlope();} /* TREMOR: manual pitch disables horizontal autoaim. */
+     x = source->x;
+     y = source->y;
+     z = source->z + 4*8*FRACUNIT;
+@@ -1042,6 +1053,7 @@ P_SpawnPlayerMissile
+ 			 finecosine[an>>ANGLETOFINESHIFT]);
+     th->momy = FixedMul( th->info->speed,
+ 			 finesine[an>>ANGLETOFINESHIFT]);
++    if(tr_pitch || !tr_autoaim) slope=TR_PitchSlope(); /* TREMOR */
+     th->momz = FixedMul( th->info->speed, slope);
+ 
+     P_CheckMissileSpawn (th);
+diff --git a/engine/doomgeneric/doomgeneric/p_mobj.h b/engine/doomgeneric/doomgeneric/p_mobj.h
+index 90ed764..1b58f85 100644
+--- a/engine/doomgeneric/doomgeneric/p_mobj.h
++++ b/engine/doomgeneric/doomgeneric/p_mobj.h
+@@ -271,6 +271,12 @@ typedef struct mobj_s
+     // Player number last looked for.
+     int			lastlook;	
+ 
++    /* TREMOR: identity and mercy state, stored with each actor. */
++    angle_t tr_oldangle; fixed_t tr_oldviewz; int tr_oldpitch; fixed_t tr_oldx,tr_oldy,tr_oldz; int tr_oldtic; /* TREMOR: cosmetic interpolation. */
++    int tr_seen, tr_death_tic; /* TREMOR: saved corpse exposure. */
++    int tr_crew, tr_revealed, tr_stun, tr_cower;
++    int tr_melee_hit, tr_shotgun_hit; /* TREMOR: immediate damage classification. */
++
+     // For nightmare respawn.
+     mapthing_t		spawnpoint;	
+ 
+diff --git a/engine/doomgeneric/doomgeneric/p_pspr.c b/engine/doomgeneric/doomgeneric/p_pspr.c
+index e4774c7..001cc69 100644
+--- a/engine/doomgeneric/doomgeneric/p_pspr.c
++++ b/engine/doomgeneric/doomgeneric/p_pspr.c
+@@ -1,3 +1,5 @@
++/* TREMOR: engine hooks; see engine/PATCHES.md. */
++#include "tremor.h"
+ //
+ // Copyright(C) 1993-1996 Id Software, Inc.
+ // Copyright(C) 2005-2014 Simon Howard
+@@ -151,83 +153,8 @@ void P_BringUpWeapon (player_t* player)
+ //
+ boolean P_CheckAmmo (player_t* player)
+ {
+-    ammotype_t		ammo;
+-    int			count;
+-
+-    ammo = weaponinfo[player->readyweapon].ammo;
+-
+-    // Minimal amount for one shot varies.
+-    if (player->readyweapon == wp_bfg)
+-	count = deh_bfg_cells_per_shot;
+-    else if (player->readyweapon == wp_supershotgun)
+-	count = 2;	// Double barrel.
+-    else
+-	count = 1;	// Regular.
+-
+-    // Some do not need ammunition anyway.
+-    // Return if current ammunition sufficient.
+-    if (ammo == am_noammo || player->ammo[ammo] >= count)
+-	return true;
+-		
+-    // Out of ammo, pick a weapon to change to.
+-    // Preferences are set here.
+-    do
+-    {
+-	if (player->weaponowned[wp_plasma]
+-	    && player->ammo[am_cell]
+-	    && (gamemode != shareware) )
+-	{
+-	    player->pendingweapon = wp_plasma;
+-	}
+-	else if (player->weaponowned[wp_supershotgun] 
+-		 && player->ammo[am_shell]>2
+-		 && (gamemode == commercial) )
+-	{
+-	    player->pendingweapon = wp_supershotgun;
+-	}
+-	else if (player->weaponowned[wp_chaingun]
+-		 && player->ammo[am_clip])
+-	{
+-	    player->pendingweapon = wp_chaingun;
+-	}
+-	else if (player->weaponowned[wp_shotgun]
+-		 && player->ammo[am_shell])
+-	{
+-	    player->pendingweapon = wp_shotgun;
+-	}
+-	else if (player->ammo[am_clip])
+-	{
+-	    player->pendingweapon = wp_pistol;
+-	}
+-	else if (player->weaponowned[wp_chainsaw])
+-	{
+-	    player->pendingweapon = wp_chainsaw;
+-	}
+-	else if (player->weaponowned[wp_missile]
+-		 && player->ammo[am_misl])
+-	{
+-	    player->pendingweapon = wp_missile;
+-	}
+-	else if (player->weaponowned[wp_bfg]
+-		 && player->ammo[am_cell]>40
+-		 && (gamemode != shareware) )
+-	{
+-	    player->pendingweapon = wp_bfg;
+-	}
+-	else
+-	{
+-	    // If everything fails.
+-	    player->pendingweapon = wp_fist;
+-	}
+-	
+-    } while (player->pendingweapon == wp_nochange);
+-
+-    // Now set appropriate weapon overlay.
+-    P_SetPsprite (player,
+-		  ps_weapon,
+-		  weaponinfo[player->readyweapon].downstate);
+-
+-    return false;	
++    /* TREMOR: one shared round for any firearm discharge. */
++    return TR_CheckAmmo(player);
+ }
+ 
+ 
+@@ -244,6 +171,7 @@ void P_FireWeapon (player_t* player)
+     P_SetMobjState (player->mo, S_PLAY_ATK1);
+     newstate = weaponinfo[player->readyweapon].atkstate;
+     P_SetPsprite (player, ps_weapon, newstate);
++    TR_Noise(player->mo); /* TREMOR: survivors flinch at nearby fire. */
+     P_NoiseAlert (player->mo, player->mo);
+ }
+ 
+@@ -466,9 +394,10 @@ A_Punch
+ 	
+     damage = (P_Random ()%10+1)<<1;
+ 
+-    if (player->powers[pw_strength])	
+-	damage *= 10;
++    /* TREMOR: brutal fists always use berserk strength. */
++    damage *= TR_MELEE_MULTIPLIER; /* TREMOR */
+ 
++    if(!TR_Hit()) { S_StartSound(player->mo,sfx_punch); return; } /* TREMOR */
+     angle = player->mo->angle;
+     angle += (P_Random()-P_Random())<<18;
+     slope = P_AimLineAttack (player->mo, angle, MELEERANGE);
+@@ -477,6 +406,8 @@ A_Punch
+     // turn to face target
+     if (linetarget)
+     {
++	/* TREMOR: impact shake; web layer adds a low body thud. */
++        TR_Impact();
+ 	S_StartSound (player->mo, sfx_punch);
+ 	player->mo->angle = R_PointToAngle2 (player->mo->x,
+ 					     player->mo->y,
+@@ -541,14 +472,8 @@ A_Saw
+ 
+ static void DecreaseAmmo(player_t *player, int ammonum, int amount)
+ {
+-    if (ammonum < NUMAMMO)
+-    {
+-        player->ammo[ammonum] -= amount;
+-    }
+-    else
+-    {
+-        player->maxammo[ammonum - NUMAMMO] -= amount;
+-    }
++    /* TREMOR: weapon-specific costs become one shared round. */
++    TR_SpendRound(player);
+ }
+ 
+ 
+@@ -640,7 +565,7 @@ P_GunShot
+     int		damage;
+ 	
+     damage = 5*(P_Random ()%3+1);
+-    angle = mo->angle;
++    angle = mo->angle + TR_Aim(); /* TREMOR: trauma on each bullet. */
+ 
+     if (!accurate)
+ 	angle += (P_Random()-P_Random())<<18;
+@@ -725,7 +650,7 @@ A_FireShotgun2
+     for (i=0 ; i<20 ; i++)
+     {
+ 	damage = 5*(P_Random ()%3+1);
+-	angle = player->mo->angle;
++	angle = player->mo->angle + TR_Aim(); /* TREMOR: trauma. */
+ 	angle += (P_Random()-P_Random())<<19;
+ 	P_LineAttack (player->mo,
+ 		      angle,
+diff --git a/engine/doomgeneric/doomgeneric/p_saveg.c b/engine/doomgeneric/doomgeneric/p_saveg.c
+index 5cb8196..1e78aa3 100644
+--- a/engine/doomgeneric/doomgeneric/p_saveg.c
++++ b/engine/doomgeneric/doomgeneric/p_saveg.c
+@@ -1,3 +1,4 @@
++#include "tremor.h" /* TREMOR: versioned mod save data. */
+ //
+ // Copyright(C) 1993-1996 Id Software, Inc.
+ // Copyright(C) 2005-2014 Simon Howard
+@@ -416,6 +417,9 @@ static void saveg_read_mobj_t(mobj_t *str)
+ 
+     // struct mobj_s* tracer;
+     str->tracer = saveg_readp();
++    /* TREMOR: actor identity and stun/fear timers. */
++    str->tr_oldtic=-1; str->tr_seen=saveg_read32(); str->tr_death_tic=saveg_read32(); str->tr_crew=saveg_read32(); str->tr_revealed=saveg_read32();
++    str->tr_stun=saveg_read32(); str->tr_cower=saveg_read32();
+ }
+ 
+ static void saveg_write_mobj_t(mobj_t *str)
+@@ -531,6 +535,9 @@ static void saveg_write_mobj_t(mobj_t *str)
+ 
+     // struct mobj_s* tracer;
+     saveg_writep(str->tracer);
++    /* TREMOR: actor identity and stun/fear timers. */
++    saveg_write32(str->tr_seen); saveg_write32(str->tr_death_tic); saveg_write32(str->tr_crew); saveg_write32(str->tr_revealed);
++    saveg_write32(str->tr_stun); saveg_write32(str->tr_cower);
+ }
+ 
+ 
+@@ -1355,7 +1362,7 @@ void P_WriteSaveGameHeader(char *description)
+         saveg_write8(0);
+ 
+     memset(name, 0, sizeof(name));
+-    M_snprintf(name, sizeof(name), "version %i", G_VanillaVersionCode());
++    M_snprintf(name, sizeof(name), "Tremor %i", 3);
+ 
+     for (i=0; i<VERSIONSIZE; ++i)
+         saveg_write8(name[i]);
+@@ -1392,7 +1399,7 @@ boolean P_ReadSaveGameHeader(void)
+         read_vcheck[i] = saveg_read8();
+ 
+     memset(vcheck, 0, sizeof(vcheck));
+-    M_snprintf(vcheck, sizeof(vcheck), "version %i", G_VanillaVersionCode());
++    M_snprintf(vcheck, sizeof(vcheck), "Tremor %i", 3);
+     if (strcmp(read_vcheck, vcheck) != 0)
+ 	return false;				// bad version 
+ 
+@@ -1439,7 +1446,10 @@ void P_WriteSaveGameEOF(void)
+ //
+ void P_ArchivePlayers (void)
+ {
+-    int		i;
++    int i;
++    /* TREMOR: episode trauma and level resources. */
++    for(i=0;i<16384;i++)saveg_write8(tr_radio_history[i]);saveg_write32(tr_briefing_bits);saveg_write32(tr_last_corpse);saveg_write32(tr_radio_pending);for(i=0;i<512;i++)saveg_write8(tr_radio_log[i]);saveg_write32(tr_story_clock); saveg_write32(tr_radio_last); saveg_write32(tr_radio_bits); saveg_write32(tr_pitch); saveg_write32(tr_terror); saveg_write32(tr_trauma); saveg_write32(tr_rounds);
++    saveg_write32(tr_charges); saveg_write32(tr_saved);
+ 		
+     for (i=0 ; i<MAXPLAYERS ; i++)
+     {
+@@ -1459,7 +1469,10 @@ void P_ArchivePlayers (void)
+ //
+ void P_UnArchivePlayers (void)
+ {
+-    int		i;
++    int i;
++    /* TREMOR: episode trauma and level resources. */
++    for(i=0;i<16384;i++)tr_radio_history[i]=saveg_read8();tr_radio_history[16383]=0;tr_briefing_bits=saveg_read32();tr_last_corpse=saveg_read32();tr_radio_pending=saveg_read32();for(i=0;i<512;i++)tr_radio_log[i]=saveg_read8();TR_ClearRadioQueue();tr_story_clock=saveg_read32();tr_radio_last=saveg_read32();tr_radio_bits=saveg_read32();tr_pitch=saveg_read32(); tr_terror=saveg_read32(); tr_trauma=saveg_read32(); tr_rounds=saveg_read32();
++    tr_charges=saveg_read32(); tr_saved=saveg_read32();
+ 	
+     for (i=0 ; i<MAXPLAYERS ; i++)
+     {
+diff --git a/engine/doomgeneric/doomgeneric/p_setup.c b/engine/doomgeneric/doomgeneric/p_setup.c
+index 00306e8..ccecde1 100644
+--- a/engine/doomgeneric/doomgeneric/p_setup.c
++++ b/engine/doomgeneric/doomgeneric/p_setup.c
+@@ -1,3 +1,5 @@
++/* TREMOR: engine hooks; see engine/PATCHES.md. */
++#include "tremor.h"
+ //
+ // Copyright(C) 1993-1996 Id Software, Inc.
+ // Copyright(C) 2005-2014 Simon Howard
+@@ -809,6 +811,8 @@ P_SetupLevel
+     bodyqueslot = 0;
+     deathmatch_p = deathmatchstarts;
+     P_LoadThings (lumpnum+ML_THINGS);
++    /* TREMOR: exact level budget after every map thing has spawned. */
++    TR_LevelStart();
+     
+     // if deathmatch, randomly spawn the active players
+     if (deathmatch)
+diff --git a/engine/doomgeneric/doomgeneric/p_user.c b/engine/doomgeneric/doomgeneric/p_user.c
+index 73c0dc9..ad9d5b8 100644
+--- a/engine/doomgeneric/doomgeneric/p_user.c
++++ b/engine/doomgeneric/doomgeneric/p_user.c
+@@ -1,3 +1,5 @@
++/* TREMOR: engine hooks; see engine/PATCHES.md. */
++#include "tremor.h"
+ //
+ // Copyright(C) 1993-1996 Id Software, Inc.
+ // Copyright(C) 2005-2014 Simon Howard
+@@ -144,6 +146,7 @@ void P_MovePlayer (player_t* player)
+ 	
+     cmd = &player->cmd;
+ 	
++    TR_BrowserMouseApplied(cmd->tr_mouse);
+     player->mo->angle += (cmd->angleturn<<16);
+ 
+     // Do not let the player control movement
+@@ -228,9 +231,13 @@ void P_DeathThink (player_t* player)
+ //
+ void P_PlayerThink (player_t* player)
+ {
++    player->mo->tr_oldangle=player->mo->angle;player->mo->tr_oldviewz=player->viewz;player->mo->tr_oldpitch=tr_pitch;
++    player->mo->tr_oldx=player->mo->x;player->mo->tr_oldy=player->mo->y;player->mo->tr_oldz=player->mo->z;player->mo->tr_oldtic=leveltime; /* TREMOR */
+     ticcmd_t*		cmd;
+     weapontype_t	newweapon;
+ 	
++    /* TREMOR: process mercy/recognition at simulation tic rate. */
++    TR_PlayerThink(player);
+     // fixme: do this in the cheat code
+     if (player->cheats & CF_NOCLIP)
+ 	player->mo->flags |= MF_NOCLIP;
+diff --git a/engine/doomgeneric/doomgeneric/r_main.c b/engine/doomgeneric/doomgeneric/r_main.c
+index 22278fe..5ebe4f5 100644
+--- a/engine/doomgeneric/doomgeneric/r_main.c
++++ b/engine/doomgeneric/doomgeneric/r_main.c
+@@ -1,3 +1,6 @@
++#include "doomstat.h" /* TREMOR: presentation tic. */
++/* TREMOR: engine hooks; see engine/PATCHES.md. */
++#include "tremor.h"
+ //
+ // Copyright(C) 1993-1996 Id Software, Inc.
+ // Copyright(C) 2005-2014 Simon Howard
+@@ -624,7 +627,11 @@ void R_InitLightTables (void)
+ 	{
+ 	    scale = FixedDiv ((SCREENWIDTH/2*FRACUNIT), (j+1)<<LIGHTZSHIFT);
+ 	    scale >>= LIGHTSCALESHIFT;
+-	    level = startmap - scale/DISTMAP;
++	    #if defined(TR_VANILLA_LIGHT) || defined(TR_PREVIOUS_LIGHT)
++            level = startmap - scale/DISTMAP;
++#else
++            level = startmap + 2 + j/3 - scale/DISTMAP;
++#endif
+ 	    
+ 	    if (level < 0)
+ 		level = 0;
+@@ -743,7 +750,11 @@ void R_ExecuteSetViewSize (void)
+ 	startmap = ((LIGHTLEVELS-1-i)*2)*NUMCOLORMAPS/LIGHTLEVELS;
+ 	for (j=0 ; j<MAXLIGHTSCALE ; j++)
+ 	{
+-	    level = startmap - j*SCREENWIDTH/(viewwidth<<detailshift)/DISTMAP;
++	    #if defined(TR_VANILLA_LIGHT) || defined(TR_PREVIOUS_LIGHT)
++            level = startmap - j*SCREENWIDTH/(viewwidth<<detailshift)/DISTMAP;
++#else
++            level = startmap + 5 - j*SCREENWIDTH/(viewwidth<<detailshift)/DISTMAP;
++#endif
+ 	    
+ 	    if (level < 0)
+ 		level = 0;
+@@ -825,13 +836,26 @@ void R_SetupFrame (player_t* player)
+     int		i;
+     
+     viewplayer = player;
++    TR_RenderClock(); /* TREMOR */
+     viewx = player->mo->x;
+     viewy = player->mo->y;
+-    viewangle = player->mo->angle + viewangleoffset;
++    viewangle = player->mo->angle + viewangleoffset + (angle_t)(TR_Sway()*128);
++#ifdef TR_VANILLA_LIGHT
+     extralight = player->extralight;
++#else
++    extralight = player->extralight-1;
++#endif /* TREMOR: lower ambient effective light. */
++    /* TREMOR: Heretic-style shear, rebuilding dependent plane slopes. */
++    centery=viewheight/2 + (player->mo->tr_oldtic==leveltime-1?TR_Interpolate(player->mo->tr_oldpitch*FRACUNIT,tr_pitch*FRACUNIT)/FRACUNIT:tr_pitch)*viewheight/200 + (TR_Sway()>>FRACBITS)/2;
++    centeryfrac=centery*FRACUNIT;
++    {int y;for(y=0;y<viewheight;y++) {fixed_t dy=abs((y-centery)*FRACUNIT+FRACUNIT/2);yslope[y]=FixedDiv((viewwidth<<detailshift)/2*FRACUNIT,dy);}}
++
+ 
+-    viewz = player->viewz;
++    viewz = player->viewz + TR_Sway()/2; /* TREMOR: render-only sway/kick. */
+     
++    if(player->mo->tr_oldtic==leveltime-1){viewx=TR_Interpolate(player->mo->tr_oldx,viewx);viewy=TR_Interpolate(player->mo->tr_oldy,viewy);viewz=TR_Interpolate(player->mo->tr_oldviewz,player->viewz)+TR_Sway()/2;viewangle=player->mo->tr_oldangle+(angle_t)((int64_t)(int32_t)(player->mo->angle-player->mo->tr_oldangle)*tr_fraction/FRACUNIT)+viewangleoffset+(angle_t)(TR_Sway()*128);}
++    viewangle+=TR_BrowserMouseView();
++    TR_PreviewView(); /* TREMOR: render-only, no world movement. */
+     viewsin = finesine[viewangle>>ANGLETOFINESHIFT];
+     viewcos = finecosine[viewangle>>ANGLETOFINESHIFT];
+ 	
+@@ -862,6 +886,7 @@ void R_SetupFrame (player_t* player)
+ //
+ void R_RenderPlayerView (player_t* player)
+ {	
++    TR_ProfileStart(); /* TREMOR: renderer CPU timing, excludes Canvas. */
+     R_SetupFrame (player);
+ 
+     // Clear buffers.
+@@ -871,21 +896,22 @@ void R_RenderPlayerView (player_t* player)
+     R_ClearSprites ();
+     
+     // check for new console commands.
+-    NetUpdate ();
++    if(!TR_PreviewActive()) NetUpdate (); /* TREMOR: previews cannot queue catch-up tics. */
+ 
+     // The head node is the last node output.
+     R_RenderBSPNode (numnodes-1);
+     
+     // Check for new console commands.
+-    NetUpdate ();
++    if(!TR_PreviewActive()) NetUpdate (); /* TREMOR: previews cannot queue catch-up tics. */
+     
+     R_DrawPlanes ();
+     
+     // Check for new console commands.
+-    NetUpdate ();
++    if(!TR_PreviewActive()) NetUpdate (); /* TREMOR: previews cannot queue catch-up tics. */
+     
+     R_DrawMasked ();
+ 
+     // Check for new console commands.
+-    NetUpdate ();				
++    if(!TR_PreviewActive()) NetUpdate (); /* TREMOR: previews cannot queue catch-up tics. */
++    TR_ProfileEnd();
+ }
+diff --git a/engine/doomgeneric/doomgeneric/r_plane.c b/engine/doomgeneric/doomgeneric/r_plane.c
+index ea1611c..59cc205 100644
+--- a/engine/doomgeneric/doomgeneric/r_plane.c
++++ b/engine/doomgeneric/doomgeneric/r_plane.c
+@@ -1,3 +1,4 @@
++#include "tremor.h" /* TREMOR: dim near-floor suit light. */
+ //
+ // Copyright(C) 1993-1996 Id Software, Inc.
+ // Copyright(C) 2005-2014 Simon Howard
+@@ -159,7 +160,11 @@ R_MapPlane
+ 	if (index >= MAXLIGHTZ )
+ 	    index = MAXLIGHTZ-1;
+ 
+-	ds_colormap = planezlight[index];
++	#ifdef TR_VANILLA_LIGHT
++        ds_colormap = planezlight[index];
++#else
++        ds_colormap = distance<96*FRACUNIT ? colormaps+12*256 : planezlight[index];
++#endif /* TREMOR */
+     }
+ 	
+     ds_y = y;
+@@ -395,7 +400,11 @@ void R_DrawPlanes (void)
+ 	    //  i.e. colormaps[0] is used.
+ 	    // Because of this hack, sky is not affected
+ 	    //  by INVUL inverse mapping.
+-	    dc_colormap = colormaps;
++	    #if defined(TR_VANILLA_LIGHT) || defined(TR_PREVIOUS_LIGHT)
++        dc_colormap = colormaps;
++#else
++        dc_colormap = colormaps+4*256;
++#endif /* TREMOR: night sky. */
+ 	    dc_texturemid = skytexturemid;
+ 	    for (x=pl->minx ; x <= pl->maxx ; x++)
+ 	    {
+diff --git a/engine/doomgeneric/doomgeneric/r_segs.c b/engine/doomgeneric/doomgeneric/r_segs.c
+index 9b4e413..3120676 100644
+--- a/engine/doomgeneric/doomgeneric/r_segs.c
++++ b/engine/doomgeneric/doomgeneric/r_segs.c
+@@ -1,3 +1,4 @@
++#include "tremor.h" /* TREMOR: cosmetic sector flicker. */
+ //
+ // Copyright(C) 1993-1996 Id Software, Inc.
+ // Copyright(C) 2005-2014 Simon Howard
+@@ -112,7 +113,7 @@ R_RenderMaskedSegRange
+     backsector = curline->backsector;
+     texnum = texturetranslation[curline->sidedef->midtexture];
+ 	
+-    lightnum = (frontsector->lightlevel >> LIGHTSEGSHIFT)+extralight;
++    lightnum = (TR_Light(frontsector) >> LIGHTSEGSHIFT)+extralight;
+ 
+     if (curline->v1->y == curline->v2->y)
+ 	lightnum--;
+@@ -638,7 +639,7 @@ R_StoreWallRange
+ 	// OPTIMIZE: get rid of LIGHTSEGSHIFT globally
+ 	if (!fixedcolormap)
+ 	{
+-	    lightnum = (frontsector->lightlevel >> LIGHTSEGSHIFT)+extralight;
++	    lightnum = (TR_Light(frontsector) >> LIGHTSEGSHIFT)+extralight;
+ 
+ 	    if (curline->v1->y == curline->v2->y)
+ 		lightnum--;
+diff --git a/engine/doomgeneric/doomgeneric/r_things.c b/engine/doomgeneric/doomgeneric/r_things.c
+index 74e7369..ac00c7c 100644
+--- a/engine/doomgeneric/doomgeneric/r_things.c
++++ b/engine/doomgeneric/doomgeneric/r_things.c
+@@ -1,3 +1,6 @@
++#include "doomstat.h" /* TREMOR: presentation tic. */
++/* TREMOR: engine hooks; see engine/PATCHES.md. */
++#include "tremor.h"
+ //
+ // Copyright(C) 1993-1996 Id Software, Inc.
+ // Copyright(C) 2005-2014 Simon Howard
+@@ -443,6 +446,7 @@ R_DrawVisSprite
+ //
+ void R_ProjectSprite (mobj_t* thing)
+ {
++    fixed_t rx=thing->x,ry=thing->y,rz=thing->z;
+     fixed_t		tr_x;
+     fixed_t		tr_y;
+     
+@@ -471,9 +475,12 @@ void R_ProjectSprite (mobj_t* thing)
+     angle_t		ang;
+     fixed_t		iscale;
+     
++    /* TREMOR: never change actor coordinates or consume gameplay RNG. */
++    if(thing->tr_oldtic==leveltime-1) {rx=TR_Interpolate(thing->tr_oldx,rx);ry=TR_Interpolate(thing->tr_oldy,ry);rz=TR_Interpolate(thing->tr_oldz,rz);}
++    if(tr_terror>=80 && thing->health>0 && (thing->flags&MF_COUNTKILL) && !(leveltime&15)) rx+=FRACUNIT;
+     // transform the origin point
+-    tr_x = thing->x - viewx;
+-    tr_y = thing->y - viewy;
++    tr_x = rx - viewx;
++    tr_y = ry - viewy;
+ 	
+     gxt = FixedMul(tr_x,viewcos); 
+     gyt = -FixedMul(tr_y,viewsin);
+@@ -500,18 +507,19 @@ void R_ProjectSprite (mobj_t* thing)
+ 	I_Error ("R_ProjectSprite: invalid sprite number %i ",
+ 		 thing->sprite);
+ #endif
+-    sprdef = &sprites[thing->sprite];
++    /* TREMOR: recognition affects rendering, never the hostile sprite states. */
++    sprdef = &sprites[(thing->tr_crew && thing->tr_revealed && thing->health>0) ? SPR_CREW : thing->sprite];
+ #ifdef RANGECHECK
+-    if ( (thing->frame&FF_FRAMEMASK) >= sprdef->numframes )
++    if ( ((thing->tr_crew && thing->tr_revealed && thing->health>0) ? ((thing->tr_cower || thing->tr_stun)?1:0) : (thing->frame&FF_FRAMEMASK)) >= sprdef->numframes )
+ 	I_Error ("R_ProjectSprite: invalid sprite frame %i : %i ",
+ 		 thing->sprite, thing->frame);
+ #endif
+-    sprframe = &sprdef->spriteframes[ thing->frame & FF_FRAMEMASK];
++    sprframe = &sprdef->spriteframes[(thing->tr_crew && thing->tr_revealed && thing->health>0) ? ((thing->tr_cower || thing->tr_stun)?1:0) : (thing->frame & FF_FRAMEMASK)];
+ 
+     if (sprframe->rotate)
+     {
+ 	// choose a different rotation based on player view
+-	ang = R_PointToAngle (thing->x, thing->y);
++	ang = R_PointToAngle (rx, ry);
+ 	rot = (ang-thing->angle+(unsigned)(ANG45/2)*9)>>29;
+ 	lump = sprframe->lump[rot];
+ 	flip = (boolean)sprframe->flip[rot];
+@@ -542,10 +550,10 @@ void R_ProjectSprite (mobj_t* thing)
+     vis = R_NewVisSprite ();
+     vis->mobjflags = thing->flags;
+     vis->scale = xscale<<detailshift;
+-    vis->gx = thing->x;
+-    vis->gy = thing->y;
+-    vis->gz = thing->z;
+-    vis->gzt = thing->z + spritetopoffset[lump];
++    vis->gx = rx;
++    vis->gy = ry;
++    vis->gz = rz;
++    vis->gzt = rz + spritetopoffset[lump];
+     vis->texturemid = vis->gzt - viewz;
+     vis->x1 = x1 < 0 ? 0 : x1;
+     vis->x2 = x2 >= viewwidth ? viewwidth-1 : x2;	
+@@ -592,6 +600,9 @@ void R_ProjectSprite (mobj_t* thing)
+ 	    index = MAXLIGHTSCALE-1;
+ 
+ 	vis->colormap = spritelights[index];
++        /* TREMOR: faint intermittent red on identified possessed humans. */
++        if (thing->tr_revealed && !thing->tr_crew && TR_Human(thing) && thing->health>0 && (leveltime&8))
++            vis->colormap = TR_RedMap(vis->colormap);
+     }	
+ }
+ 
+@@ -617,7 +628,7 @@ void R_AddSprites (sector_t* sec)
+     // Well, now it will be done.
+     sec->validcount = validcount;
+ 	
+-    lightnum = (sec->lightlevel >> LIGHTSEGSHIFT)+extralight;
++    lightnum = (TR_Light(sec) >> LIGHTSEGSHIFT)+extralight;
+ 
+     if (lightnum < 0)		
+ 	spritelights = scalelight[0];
+@@ -665,7 +676,7 @@ void R_DrawPSprite (pspdef_t* psp)
+     flip = (boolean)sprframe->flip[0];
+     
+     // calculate edges of the shape
+-    tx = psp->sx-160*FRACUNIT;
++    tx = psp->sx-160*FRACUNIT + TR_ArmX(); /* TREMOR: render-only weapon sway. */
+ 	
+     tx -= spriteoffset[lump];	
+     x1 = (centerxfrac + FixedMul (tx,pspritescale) ) >>FRACBITS;
+@@ -684,7 +695,7 @@ void R_DrawPSprite (pspdef_t* psp)
+     // store information in a vissprite
+     vis = &avis;
+     vis->mobjflags = 0;
+-    vis->texturemid = (BASEYCENTER<<FRACBITS)+FRACUNIT/2-(psp->sy-spritetopoffset[lump]);
++    vis->texturemid = (BASEYCENTER<<FRACBITS)+FRACUNIT/2-(psp->sy+TR_ArmY()-spritetopoffset[lump]);
+     vis->x1 = x1 < 0 ? 0 : x1;
+     vis->x2 = x2 >= viewwidth ? viewwidth-1 : x2;	
+     vis->scale = pspritescale<<detailshift;
+diff --git a/engine/doomgeneric/doomgeneric/st_stuff.c b/engine/doomgeneric/doomgeneric/st_stuff.c
+index e25accc..a3ef6f0 100644
+--- a/engine/doomgeneric/doomgeneric/st_stuff.c
++++ b/engine/doomgeneric/doomgeneric/st_stuff.c
+@@ -1,3 +1,4 @@
++#include "tremor.h" /* TREMOR: HUD shows shared rounds even with fists. */
+ //
+ // Copyright(C) 1993-1996 Id Software, Inc.
+ // Copyright(C) 2005-2014 Simon Howard
+@@ -859,16 +860,12 @@ void ST_updateFaceWidget(void)
+ 
+ void ST_updateWidgets(void)
+ {
+-    static int	largeammo = 1994; // means "n/a"
+     int		i;
+ 
+     // must redirect the pointer if the ready weapon has changed.
+     //  if (w_ready.data != plyr->readyweapon)
+     //  {
+-    if (weaponinfo[plyr->readyweapon].ammo == am_noammo)
+-	w_ready.num = &largeammo;
+-    else
+-	w_ready.num = &plyr->ammo[weaponinfo[plyr->readyweapon].ammo];
++    w_ready.num = &tr_rounds; /* TREMOR: shared firearm budget. */
+     //{
+     // static int tic=0;
+     // static int dir=-1;
+@@ -1234,7 +1231,7 @@ void ST_createWidgets(void)
+ 		  ST_AMMOX,
+ 		  ST_AMMOY,
+ 		  tallnum,
+-		  &plyr->ammo[weaponinfo[plyr->readyweapon].ammo],
++		  &tr_rounds, /* TREMOR: also valid when fists are selected. */
+ 		  &st_statusbaron,
+ 		  ST_AMMOWIDTH );
+ 
+diff --git a/engine/doomgeneric/doomgeneric/w_main.c b/engine/doomgeneric/doomgeneric/w_main.c
+index 115f081..133f74d 100644
+--- a/engine/doomgeneric/doomgeneric/w_main.c
++++ b/engine/doomgeneric/doomgeneric/w_main.c
+@@ -1,3 +1,5 @@
++#include "tremor.h" /* TREMOR: original sprite namespace insertion. */
++#include <string.h>
+ //
+ // Copyright(C) 1993-1996 Id Software, Inc.
+ // Copyright(C) 2005-2014 Simon Howard
+@@ -179,7 +181,7 @@ boolean W_ParseCommandLine(void)
+     {
+ 	// the parms after p are wadfile/lump names,
+ 	// until end of parms or another - preceded parm
+-	modifiedgame = true;            // homebrew levels
++	/* TREMOR: the bundled sprite-only PWAD does not replace levels. */
+ 	while (++p != myargc && myargv[p][0] != '-')
+         {
+             char *filename;
+@@ -187,7 +189,14 @@ boolean W_ParseCommandLine(void)
+             filename = D_TryFindWADByName(myargv[p]);
+ 
+             printf(" adding %s\n", filename);
+-	    W_AddFile(filename);
++            /* TREMOR: recognize only the bundled mod filename. */
++            { unsigned int first=numlumps;
++              const char *base=strrchr(filename,'/');
++              base=base?base+1:filename;
++              W_AddFile(filename);
++              if(!strcmp(base,"tremor.wad")) TR_MergeCrewSprites(first);
++              else modifiedgame=true;
++            }
+         }
+     }
+ 

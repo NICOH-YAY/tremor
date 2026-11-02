@@ -1,7 +1,7 @@
 # Watch page and session evidence result
 
 Current session: `01a19d64-be6f-79c3-9bae-4cb4d55288b7`, started
-2026-11-02T17:53:09.196Z, working directory `D:\Coding VS\tremor`.
+2026-11-02T17:53:09.196Z, working directory `the Tremor repository root`.
 This is the completion record written during the current session, rather than a
 copied historical scratchpad result. No commit was made.
 

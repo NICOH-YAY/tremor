@@ -12,7 +12,7 @@ test('watch page runs real replay, pauses, verifies, and starts a live baseline 
  const canvas=window.document.querySelector('canvas');
  canvas.getContext=()=>({createImageData:()=>({data:new Uint8ClampedArray(320*200*4)}),putImageData(){frames++;}});
  const source=readFileSync('public/watch.js','utf8').replace(/^import .+;\r?\n/gm,'');
- const run=new Function('document','Option','createDoom','ACTION_IDS','baseline_careful','fetch','crypto','requestAnimationFrame','DecompressionStream',source+'\nreturn {start,tick};');
+ const run=new Function('document','Option','createDoom','ACTION_IDS','baseline_careful','fetch','crypto','requestAnimationFrame','DecompressionStream',source+'\nreturn {start,tick,show};');
  const fetchLocal=async path=>{const p=String(path).replace(/^\.\//,'');return new Response(readFileSync(`public/${p}`));};
  const ui=run(window.document,window.Option,createDoom,ACTION_IDS,baseline_careful,fetchLocal,webcrypto,fn=>{next=fn;},DecompressionStream);
  const $=id=>window.document.getElementById(id);
@@ -31,6 +31,7 @@ test('watch page runs real replay, pauses, verifies, and starts a live baseline 
  expect($('hud').textContent).toContain('tic 1603');
  expect($('hud').textContent).toContain('health 100');
  expect($('reason').textContent).toContain('Not retained');
+ ui.show({action:'wait',source:'model',valid:true,reason:'I will wait.'});expect($('reason').textContent).toBe('I will wait.');
  expect($('ending').textContent).toContain('timeout');
  expect($('counts').textContent).toContain('Step 229 / 600');
  expect($('counts').textContent).toContain('calls 233 / 600');

@@ -17,7 +17,10 @@
     "engine:wad": "python scripts/build-tremor-wad.py",
     "engine:build": "python engine/build/build.py",
     "engine:headless": "python engine/build/headless.py",
-    "engine:headless:test": "python engine/build/headless.py --test"
+    "engine:headless:test": "python engine/build/headless.py --test",
+    "demo:live": "node --import ./scripts/typescript-loader.mjs scripts/demo-live.ts --live",
+    "demo:copy": "node scripts/copy-demo.mjs",
+    "upstream:patch": "node scripts/upstream-patch.mjs"
   },
   "devDependencies": {
     "happy-dom": "^21.0.4",

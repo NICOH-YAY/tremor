@@ -46,3 +46,10 @@ it('estimated cost includes each known model call, including parse failures',asy
  const r=await runEpisode(c,{seed:17,levelId:'E1M1',maxCalls:2,tracePath:false});
  expect(r.estimatedCost).toBeCloseTo(5.6);expect(r.trace[0].estimatedCost).toBeCloseTo(2.8);expect(r.unknownUsageCalls).toBe(0);
 });
+
+it('records bounded reasons without returning them in validation feedback',async()=>{
+ const reason='private explanation '.repeat(30);let calls=0;
+ const c:Controller={id:'reason',model:true,async decide(o,legal,feedback){expect(feedback??'').not.toContain('private explanation');calls++;return {action:'wait',reason};}};
+ const r=await runEpisode(c,{seed:17,levelId:'E1M1',maxSteps:2,tracePath:false});
+ expect(calls).toBe(2);expect(r.trace.map(row=>row.reason)).toEqual([reason.slice(0,300),reason.slice(0,300)]);
+});

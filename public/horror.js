@@ -1,3 +1,4 @@
+import {hintBounds} from './hint-layout.js';
 import {musicMix} from './music.js';
 // Original CPU-cheap presentation: cached overlays, bounded Web Audio graph.
 export function createHorror(canvas,ac,master,displayCanvas=canvas,musicBus=master){
@@ -17,7 +18,7 @@ export function createHorror(canvas,ac,master,displayCanvas=canvas,musicBus=mast
  const decoder=new TextDecoder(),domCache=new WeakMap();function set(el,key,value){let values=domCache.get(el);if(!values){values={};domCache.set(el,values);}if(values[key]!==value){values[key]=value;if(key==='textContent')el.textContent=value;else el.style[key]=value;}}
  let rect=displayCanvas.getBoundingClientRect();new ResizeObserver(()=>{rect=displayCanvas.getBoundingClientRect();}).observe(displayCanvas);
  let nextStory=0,purging=false,hintUntil=0,hintText='',damageUntil=0,damageSide=0;const seenHints=new Set();try{for(const id of JSON.parse(localStorage.getItem('tremor.hints.v1')||'[]'))seenHints.add(id);}catch{}
- const hint=document.createElement('div');hint.style.cssText='position:absolute;left:18px;bottom:100px';overlay.append(hint);
+ const hint=document.createElement('div');hint.style.cssText='position:fixed;overflow:hidden;font-size:clamp(10px,1.6vw,18px)';overlay.append(hint);
  let lastStory='',lastObjective='',changed=0,subUntil=0,map=false,nextHeart=0,nextNote=0,nextWhisper=0,fear=0;
  const score=ac.createGain();score.gain.value=0;score.connect(musicBus);
  const low=ac.createBiquadFilter();low.type='lowpass';low.frequency.value=1600;low.Q.value=.5;low.connect(score);
@@ -39,7 +40,7 @@ export function createHorror(canvas,ac,master,displayCanvas=canvas,musicBus=mast
  crackle(true);
  return {music:updateMusic,hint(id){if(seenHints.has(id))return;seenHints.add(id);try{localStorage.setItem('tremor.hints.v1',JSON.stringify([...seenHints]));}catch{}hintText=['Hold R to read.',"Your hands won't stop shaking.","Don't look at them. Keep moving.",'Out of rounds. Fists. Mercy gives rounds.'][id];hintUntil=performance.now()+6000;},damage(b){damageSide=b;damageUntil=performance.now()+350;},intro(){crackle();},map(v){map=v;nextStory=0;},purge(v){purging=v;},frame(engine,s){
   const now=performance.now();fear=(engine._tremor_fear?.()||0)/100;
-  if(now<damageUntil){ctx.fillStyle='rgba(255,20,10,'+((damageUntil-now)/700)+')';if(Math.abs(damageSide)>135)ctx.fillRect(0,182,320,18);else if(Math.abs(damageSide)<45)ctx.fillRect(0,0,320,18);else ctx.fillRect(damageSide>0?0:304,0,16,200);}set(hint,'textContent',now<hintUntil?hintText:'');
+  if(now<damageUntil){ctx.fillStyle='rgba(255,20,10,'+((damageUntil-now)/700)+')';if(Math.abs(damageSide)>135)ctx.fillRect(0,182,320,18);else if(Math.abs(damageSide)<45)ctx.fillRect(0,0,320,18);else ctx.fillRect(damageSide>0?0:304,0,16,200);}set(hint,'textContent',now<hintUntil?hintText:'');const hb=hintBounds(rect);set(hint,'left',hb.left+'px');set(hint,'top',hb.top+'px');set(hint,'width',hb.width+'px');set(hint,'height',(hb.bottom-hb.top)+'px');hint.style.display='flex';hint.style.alignItems='end';
   ctx.save();if(fear){ctx.globalCompositeOperation='saturation';ctx.globalAlpha=fear*.7;ctx.fillStyle='#808080';ctx.fillRect(0,0,320,200);}ctx.restore();
   if(s.brightness!==100){ctx.save();ctx.globalCompositeOperation=s.brightness>100?'screen':'source-over';ctx.globalAlpha=Math.abs(s.brightness-100)/160;ctx.fillStyle=s.brightness>100?'#fff':'#000';ctx.fillRect(0,0,320,200);ctx.restore();}
   ctx.save();ctx.globalAlpha=fear*.9;ctx.drawImage(shade,0,0);if(s.grain||previewing){ctx.globalAlpha=.3;ctx.fillStyle=grainPattern;ctx.fillRect(0,0,320,200);}ctx.restore();

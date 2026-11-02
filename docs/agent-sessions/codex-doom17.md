@@ -1,4 +1,4 @@
-You are Codex, sole code editor for "Tremor" in D:\Coding VS\tremor (branch main, clean at c042ec0). Course brief (read it): <scratchpad>\midterm-brief.md . Two tasks.
+You are Codex, sole code editor for "Tremor" in the Tremor repository root (branch main, clean at c042ec0). Course brief (read it): <scratchpad>\midterm-brief.md . Two tasks.
 
 TASK A — "Watch the agent" page for the required 3-5 minute recording ("the game and an agent playing without manual move selection").
 - Add public/watch.html (+ public/watch.js), linked from the title page ("Watch the agent") and README. It runs the REAL browser engine and plays an agent with NO human input (keyboard/mouse ignored except a Pause button), in two modes:

@@ -1,4 +1,4 @@
-You are Codex, the INTEGRATOR and merger for "Tremor" in D:\Coding VS\tremor (branch main). Read AGENTS.md, docs/CONTRACTS.md, docs/DESIGN.md, docs/RUBRIC-CHECKLIST.md. Three parallel worker branches (renderer, mechanics, content) and the agent-harness branch have been merged into main. Your job: make the whole thing one coherent, FUN, SMOOTH, complete game that a human can play start to finish in a browser, without breaking tests. You may edit any file now (you are integrator).
+You are Codex, the INTEGRATOR and merger for "Tremor" in the Tremor repository root (branch main). Read AGENTS.md, docs/CONTRACTS.md, docs/DESIGN.md, docs/RUBRIC-CHECKLIST.md. Three parallel worker branches (renderer, mechanics, content) and the agent-harness branch have been merged into main. Your job: make the whole thing one coherent, FUN, SMOOTH, complete game that a human can play start to finish in a browser, without breaking tests. You may edit any file now (you are integrator).
 
 Integration notes from the workers (do all of these):
 ## From content worker (feat/content @2df3d79)

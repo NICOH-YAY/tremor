@@ -28,7 +28,7 @@ export async function runEpisode(controller:Controller,options:EpisodeOptions){
  if(result&&!valid){invalid++;consecutive++;}else if(result)consecutive=0;
  // Failed calls consume call budget but do not advance the world.
  if(result)steps++;
- await record({step:steps,observation:observation.summary,action,source:!result?'error':controller.mocked?'replay-mocked':controller.model?'model':controller.id.startsWith('baseline_')?'baseline':'controller',valid,feedback,latencyMs:latency,tokensIn:decision?.tokensIn??0,tokensOut:decision?.tokensOut??0,estimatedCost:controller.model?(decision?estimatedCost(decision.tokensIn??0,decision.tokensOut??0):null):0});
+ await record({step:steps,observation:observation.summary,action,source:!result?'error':controller.mocked?'replay-mocked':controller.model?'model':controller.id.startsWith('baseline_')?'baseline':'controller',valid,feedback,...(typeof decision?.reason==='string'?{reason:decision.reason.slice(0,300)}:{}),latencyMs:latency,tokensIn:decision?.tokensIn??0,tokensOut:decision?.tokensOut??0,estimatedCost:controller.model?(decision?estimatedCost(decision.tokensIn??0,decision.tokensOut??0):null):0});
  if(consecutive>=3&&!outcome(world).done&&steps<maxSteps){const beforeFallback=observe(world).summary;step(world,'player','wait');steps++;fallbacks++;consecutive=0;await record({step:steps,observation:beforeFallback,action:'wait',source:'fallback',valid:true,latencyMs:0,tokensIn:0,tokensOut:0,estimatedCost:0});}
  }
  for(const key of observe(world).keys)if(!reachedKeys.has(key)){reachedKeys.add(key);objectivesReached++;}

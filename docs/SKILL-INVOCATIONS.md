@@ -43,7 +43,7 @@ remain synchronous (cached/gated, not incrementally spread). Initial hostile-cou
 budget is explicitly disclosed. Secondary objective count uses collected key types
 plus completed exit, not text-change spam. Final report preserves baseline failures.
 
-These are two actual invocations in this session, not two invented sessions.
+These before/after invocations belong to codex-doom12. codex-doom13 below is a separate Codex session; see docs/agent-sessions/README.md.
 
 Final result path: `eval/results/2026-10-31-2026-10-31T05-54-45-516Z-results.json`. Trace paths/hashes: `eval/traces-sample/manifest.json`.
 Final root and copied-folder checks: 43 active tests/9 files, 508 C checks, typecheck
@@ -110,3 +110,17 @@ added; upstream licenses, notices and provenance retained.
 ## 2026-10-31 - live evidence documentation update
 
 No rule changes; tremor-level-check was not invoked for this docs/evidence-only task. Summarized the human-run full live suite from clean revision 8f0e4a9, run 2026-10-31T06-19-01-385Z, without new evaluations or paid calls. Added an offline aggregation script and two exact-copy live gzip samples with verified SHA-256s. npm test (50 tests, 10 files), typecheck, build and engine:test (508 checks, 0 failures) passed. Existing art/title.jpg build warning remains. No commits. Historical invocation records above describe their original sessions; the current live evidence supersedes their pending-live status.
+
+## 2026-11-02 - Codex session codex-doom18 - before changes
+
+Invoked **tremor-level-check** by name. Read the skill, AGENTS.md, contracts, rubric, full course brief, audit and current sources. Initial working tree was clean at 2b18e48. Scope: audit items 1-17, trace reasons and a human-run demo command. No live calls or commits. Regression checks and baseline comparison pending.
+
+## 2026-11-02 - Codex session codex-doom18 - after changes
+
+Invoked **tremor-level-check** again by name and reread the skill. Reviewed ownership, contracts, rubric and final changes; added design rows for hint layout and trace reasons to docs/rule-source-map.md.
+
+Failing tests first: `npx.cmd vitest run tests/hint.test.js tests/agent.test.ts` failed because hint-layout.js was missing and recorded reasons were undefined (19 existing tests passed). After implementation, `npm.cmd test` passed 64 tests in 16 files; `npm.cmd run typecheck`, `npm.cmd run build` and `npm.cmd run engine:test` passed (508 C checks, zero failures). The existing art/title.jpg build-resolution warning remains. The final patch/layout/watch checks passed, then all 64 tests passed again. The watch DOM test displays a supplied reason; historical traces remain unchanged. No C changes or rebuilds; evaluated headless engine and WAD SHA-256s match the primary report. Manifest raw-byte/LF checks pass.
+
+Ran `npm.cmd run eval -- --players baseline_aggressive,baseline_careful --cases all`. Result: eval/results/2026-11-02-2026-11-02T18-08-28-280Z-results.json; table has the same basename. Gzip trace paths are recorded per episode in that JSON under ignored eval/traces/. Compared all 28 episodes with the 2026-10-31T06-19-01-385Z report: reason, score, metrics, steps, illegalActions, fallbacks and objectivesReached are identical. Each baseline exits 2/14, dies 10/14 and reaches the step limit 2/14. No call/time limits or illegal actions. This offline run does not replace the declared live-suite tables.
+
+Changes: submission links and scope/citation/specification, upstream patch and freshness check, separate-session correction, review-version response, CI/version evidence, working directories and large-file provenance, prose privacy, playtest and peer templates, limitations facts, canvas-relative first-time hints, trace reason retention and optional live-demo/copy commands. The patch freshness test also works in the course folder without Tremor Git history; regeneration requires the Tremor history. The demo was not run. No paid calls, commits, invented testimony or changes to either protected review. Student AGENT-TEAM.md and the personal limitations TODO remain untouched. Final commit SHA, course PR Actions URL/SHA, recording and student peer notes remain human submission steps.

@@ -134,3 +134,7 @@ Runner maxSteps is an integer 1..600: larger requests are rejected before reset,
 matching the engine's fixed 600 ceiling. Natural terminals retain precedence.
 
 Preflight rejects prompts above 24,000 characters before any network request (no truncation); output cap 256 tokens. This is a character budget, not an exact Gemini tokenizer limit. Offline E1M1 character measurements and chars/4 planning estimates are in docs/reviews/prompt-size-e1m1.json. Real Gemini input token counts are recorded in the 2026-10-31 live results linked from [EVALUATION](../EVALUATION.md).
+
+## Trace reasons and optional demo
+
+New per-step traces retain a model's stated reason when it is a string, capped at 300 characters. The runner does not pass it back as validation feedback. Model history still contains only the existing observations and actions. Old suite traces have no reconstructed reasons. The watch overlay displays a reason when present. The one-episode human-run demo uses E1M1 seed 17 and the same limits; it is labelled demo, not part of the declared suite, and is excluded from evaluation tables.

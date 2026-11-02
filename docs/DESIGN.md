@@ -75,3 +75,5 @@ cells), the early return can retain the previous cue. This is not reached in the
 suite; extending supported data requires fixing both cases.
 
 Music: Layered (default), Horror score, Original. One compressed music bus feeds master; the music slider scales both layers once (engine music volume stays full). Pads cover 120?900 Hz plus sub, with a 1.2?2 kHz slowly modulated lowpass. The calm score targets roughly -24 dBFS RMS at music 70 before master; this is a design target, not a listening measurement. Reused pulse/bell/metal oscillators avoid per-note buffers. Fear above .3 builds tension; fear above .9 permits 0.7?1.2 second dips at least 45 seconds apart. Layered OPL sweeps 18 kHz to 2.5 kHz, falls up to 45 cents and ducks up to 22%. Fixed-buffer interpolation in the existing OPL callback preserves streaming phase. Settings version 2 migrates unversioned horror to layered once; legacy data cannot distinguish a deliberate horror choice from the former default. Original and all versioned choices survive.
+
+Reference game: Doom (id Software, 1993), Episode 1 'Knee-Deep in the Dead', played here on Freedoom Phase 1 v0.13.0 data; no proprietary IWAD shipped.

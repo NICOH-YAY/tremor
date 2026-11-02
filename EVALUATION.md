@@ -5,7 +5,7 @@ Primary evidence: the human ran `npm run eval:live` from clean committed revisio
 [Full results JSON](eval/results/2026-10-31-2026-10-31T06-19-01-385Z-results.json) and [runner per-episode table](eval/results/2026-10-31-2026-10-31T06-19-01-385Z-table.md) record all 56 episodes, including failures; no players were skipped and model rows are live, not mocked.
 Earlier baseline-only reports are superseded as current evidence; their dated files remain in `eval/results/` and their work records in [SKILL-INVOCATIONS](docs/SKILL-INVOCATIONS.md).
 
-Configuration ID: `faebcbfb97da87f4e3953745bc163d276f15e2e22c506ee9a343582eb8d6a363`. Vertex `gemini-3.5-flash-lite`, project `game-dev-f26-nak2173`, location `global`, standard tier, temperature 0.2; history K=8 versus observation-only, shared lossless prompt encoding. Skill index 2, 40 constant seven-tic actions. Limits: 600 actions, 600 controller calls, 20 seconds/call, 300 seconds/episode. Failed calls consume budget. Natural exit/death takes precedence over later limits.
+Configuration ID: `faebcbfb97da87f4e3953745bc163d276f15e2e22c506ee9a343582eb8d6a363`. Vertex `gemini-3.5-flash-lite`, project `<your-gcp-project>`, location `global`, standard tier, temperature 0.2; history K=8 versus observation-only, shared lossless prompt encoding. Skill index 2, 40 constant seven-tic actions. Limits: 600 actions, 600 controller calls, 20 seconds/call, 300 seconds/episode. Failed calls consume budget. Natural exit/death takes precedence over later limits.
 
 Tuning: E1M1-E1M3; seen: E1M4-E1M5; held-out: E1M6-E1M7, frozen before model trials. Each map/player has two trials, RNG starts 17/83. Starts are 8-bit: modulo-256 equivalent seeds are identical, not new independent trials. See the [declared hypotheses and amendment history](docs/EVALUATION-PLAN.md).
 
@@ -14,6 +14,7 @@ Tuning: E1M1-E1M3; seen: E1M4-E1M5; held-out: E1M6-E1M7, frozen before model tri
 All counts below are computed from the primary JSON. Reproduce both tables offline:
 
 ```sh
+# cwd: midterms/nicoh-yay
 node --import ./scripts/typescript-loader.mjs scripts/summarize-results.ts
 ```
 
@@ -106,4 +107,30 @@ typecheck, build, and 508 engine checks pass. See the
 
 TODO: Nicoh to write his own limitations and reflection here.
 
+### Facts for the limitations paragraph
+
+The known-limitations section above records measured constraints. No human full-episode playthrough, recording, or personal reflection is supplied by Codex. Peer notes status: to be filled by the student. If partner notes have not arrived by Nov 6, say so in the student-written limitations. The optional demo is outside the declared suite and does not change its counts.
+
 Historical validation for the evaluation documentation/evidence update at 13856cb: `npm test` (50 tests, 10 files), `npm run typecheck`, `npm run build`, and `npm run engine:test` (508 checks, 0 failures) passed. Build retains the existing `art/title.jpg` resolution warning. Sample gzip integrity, source-copy equality, manifest/artifact SHA-256s, cost calculations and reproduced Markdown tables were checked offline. No new evaluation runs, gameplay/controller changes or commits.
+
+## Evaluated and submitted versions
+
+| Version | Revision |
+|---|---|
+| Game version evaluated | 8f0e4a9dc937904ec47b1fe00045315330a112ae |
+| Submitted version | Final commit pending Claude; codex-doom18 edits follow 2b18e48 |
+
+Changes since evaluation are music/presentation, the startup fix, the watch page, documentation, trace reason retention and hint placement. The model prompt, action interface and simulation have not changed in this session. Raw SHA-256 checks against the primary JSON on 2026-11-02 give:
+
+| Artifact | Compared with evaluated bytes |
+|---|---|
+| `public/engine-headless/doom.cjs` | unchanged |
+| `public/engine-headless/doom.wasm` | unchanged |
+| `public/wad/freedoom1.wad` | unchanged |
+| `public/wad/tremor.wad` | unchanged |
+
+The engine-headless WASM and both WAD hashes are unchanged. Browser music artifacts changed after evaluation. The offline summarize command above also works from the Tremor root.
+
+## Course CI evidence
+
+The course workflow runs npm ci, npm test, npm run typecheck and npm run build. tests/agent.test.ts invokes the C checks using shipped test WASM. The green pre-PR fork run is [41244931991](https://github.com/NICOH-YAY/game-dev-f26/actions/runs/41244931991) at c042ec0. Final PR Actions run URL + SHA: to be added after the final push. This earlier run is not final-version CI evidence.

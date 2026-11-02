@@ -1,4 +1,4 @@
-You are building the SCAFFOLD of "Tremor" in D:\Coding VS\tremor (already contains docs/DESIGN.md — read it first). After you finish, three other agents will work IN PARALLEL on separate git branches (renderer, enemies+rules, levels+audio), and you will later merge them. So your most important job is clean, stable module boundaries and shared types that parallel workers can code against without touching each other's files.
+You are building the SCAFFOLD of "Tremor" in the Tremor repository root (already contains docs/DESIGN.md — read it first). After you finish, three other agents will work IN PARALLEL on separate git branches (renderer, enemies+rules, levels+audio), and you will later merge them. So your most important job is clean, stable module boundaries and shared types that parallel workers can code against without touching each other's files.
 
 Stack: TypeScript (strict), Vite, Vitest (happy-dom for DOM tests), Node 24, npm. No WebGL, no game engine, no runtime deps unless essential. Canvas 2D only. Original code only: do NOT copy any id Software / linuxdoom code.
 

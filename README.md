@@ -1,8 +1,30 @@
 # TREMOR
 
-The gun works perfectly. The person holding it does not.
+## Submission artifacts
 
-Real GPL Doom engine via doomgeneric WASM, original horror rules, licensed Freedoom
+- [Evaluation](EVALUATION.md).
+- [Agent team account](AGENT-TEAM.md): pending student authorship.
+- Recording: RECORDING LINK — to be added.
+- [Peer notes](docs/peer-notes/README.md).
+- [Agent sessions](docs/agent-sessions/README.md).
+- [Independent review](docs/reviews/review.md), [second review](docs/reviews/independent-review-2026-10-31.md), and [response](docs/reviews/review-response-2026-10-31.md).
+- Course PR Actions run URL + SHA: to be added after the final push.
+
+## Scope change
+
+The Week 3 scope record was Robotron: 2084 (Williams, 1982), waves 1-4. No license was found for its source. On 2026-10-30 the project moved to Doom Episode 1 because the GPL engine permits reuse. The retired TypeScript prototype is in legacy/.
+
+Reference game: Doom (id Software, 1993), Episode 1 'Knee-Deep in the Dead', played here on Freedoom Phase 1 v0.13.0 data; no proprietary IWAD shipped.
+
+## Specification at a glance
+
+The human episode runs through Episode 1 to the E1M8 finale. The course API resets one Freedoom E1Mx map with reset(seed), skill index 2, a pistol start, hostile count +1 rounds, zero trauma and initially steady terror. The seed selects an 8-bit RNG start. There are 40 constant action IDs with validation feedback. Each action advances seven tics; compound macros hold their named controls. READ and PURGE require 35 continuous tics. Exit scores 100; all other endings score 0. Moral metrics are descriptive. Termination reasons are exit, dead, step_limit (600), call_limit (600), or timeout (20 seconds per call, five minutes per episode). See [contracts](docs/CONTRACTS.md) for the five operations and invalid-action policy.
+
+The current rule map is [docs/rule-source-map.md](docs/rule-source-map.md). Superseded specifications and maps are history only.
+
+
+
+The project uses the GPL Doom engine via doomgeneric WASM, Tremor rules and licensed Freedoom
 Phase 1 v0.13.0 data. Browser and agent use the same simulation. Human Episode 1
 plays through its ending; evaluation ends on each level exit, skill index 2.
 Tuning E1M1-E1M3, seen E1M4/E1M5, fresh held-out E1M6/E1M7, seeds 17/83.
@@ -25,10 +47,11 @@ Halloran gives one briefing per map and rare once-per-episode beats, at least 31
 
 ## Setup and commands
 
-Requires Node 24+ and npm. Run from this project root, or `cd midterms/nicoh-yay`
+The same commands work from the Tremor repository root. Every command below uses `midterms/nicoh-yay` in the course checkout. Requires Node 24+ and npm. Run from this project root, or `cd midterms/nicoh-yay`
 in game-dev-f26. PowerShell may require npm.cmd instead of npm.
 
 ```sh
+# cwd: midterms/nicoh-yay
 npm ci
 npm run dev
 npm test
@@ -48,7 +71,7 @@ project root, open http://localhost:5191/watch.html (also linked from the title)
 Replay recorded LIVE model episodes or run the careful scripted baseline with
 no manual moves. Production builds serve `dist/watch.html`. Replays verify their
 terminal outcome, tic, health and all metrics against the committed reports.
-Original traces did not retain model reasons; the page labels that gap explicitly.
+The original suite traces did not retain model reasons; new traces retain up to 300 characters per step. the page labels that gap explicitly.
 The model recordings end by timeout, not success. This is replay evidence, not a
 new live model trial. Run `npm test` from the project root for the deterministic
 headless and browser-spectator replay checks.
@@ -78,9 +101,12 @@ CI uses committed WASM; no compiler needed. Optional source rebuild needs Python
 and emsdk 6.0.13: set EMSDK root / optional EMSDK_PYTHON or put emcc on PATH.
 
 ```sh
+# cwd: midterms/nicoh-yay
+npm run engine:wad
 npm run engine:headless
 npm run engine:headless:test
 npm run engine:build
+python engine/build/headless.py --watch
 python engine/build/artifacts.py
 ```
 
@@ -93,7 +119,7 @@ engine:wad requires Pillow. Keep corresponding GPL source with binaries.
 Inherited: 35Hz physics, geometry, AI, keys, doors, weapons, pickups, infighting
 and intermissions. Added: crew uncertainty, READ/STUN/PURGE, trauma, healing,
 scarce shared rounds, corpse fear, public route guidance, sparse radio, horror
-audio and clamped Y-shear freelook. This is GPL reuse, not clean-room reconstruction.
+audio and clamped Y-shear freelook. This project reuses the GPL engine.
 Native 320x200 at 4:3. Route guidance is not a universal lift/teleporter solver.
 Excluded from evaluation: multiplayer, Doom II, other episodes, arbitrary PWADs,
 jumping and true 3D freelook. Agents use 40 macros and public descriptions, no
@@ -120,3 +146,28 @@ Nicoh's personal agent-team account, peer notes, recording and course
 PR remain human submission work. Codex does not invent personal testimony.
 
 Model prompts preserve all public map information with lossless row RLE and reverse history deltas; see [contracts](docs/CONTRACTS.md). Seen/held-out baseline comparisons concern route progress and survival; completion has only been demonstrated on E1M1.
+
+## CI evidence
+
+The course workflow `.github/workflows/midterm-nicoh-yay.yml` runs npm ci, npm test, npm run typecheck and npm run build. tests/agent.test.ts runs the C checks through the shipped doom-test WASM; CI needs no emsdk. The green pre-PR fork run is [41244931991](https://github.com/NICOH-YAY/game-dev-f26/actions/runs/41244931991), commit c042ec0. Final course PR Actions run URL + SHA: to be added.
+
+## Upstream comparison and large files
+
+The Tremor repository is https://github.com/NICOH-YAY/tremor. Pristine vendor commit: 821957f. Final submission commit: to be filled by Claude after committing; Codex cannot commit. [UPSTREAM](engine/UPSTREAM.md) gives the offline comparison recipe. [The patch](engine/tremor-vs-upstream.patch) contains changes to vendored files. Regenerate it with:
+
+```sh
+# cwd: midterms/nicoh-yay
+npm run upstream:patch
+```
+
+`public/wad/freedoom1.wad` is committed so a fresh checkout can play and test offline. It is Freedoom 0.13.0, BSD-3-Clause, from https://github.com/freedoom/freedoom/releases/download/v0.13.0/freedoom-0.13.0.zip; SHA-256: 7323bcc168c5a45ff10749b339960e98314740a734c30d4b9f3337001f9e703d. Retrieve the release and extract freedoom1.wad to restore it; it is upstream data, not built here. `npm run engine:wad` rebuilds the derived tremor.wad (Python and Pillow required). `public/engine/source.zip` supplies GPL corresponding source; `npm run engine:build` recreates it and the browser engine. Committed WASM lets TAs and CI run without emsdk. The rebuild commands above recreate browser, headless and test artifacts; see [BUILD](engine/BUILD.md) for the watch target. `python engine/build/artifacts.py` refreshes the LF artifact manifest after rebuilding. `engine/doomgeneric/screenshots/sdl.png` is retained to preserve the vendor tree.
+
+## Optional live demo
+
+The human may run one [demo](eval/demo/README.md), labelled "demo, not part of the declared suite". It is excluded from EVALUATION tables. Codex has not run it.
+
+```sh
+# cwd: midterms/nicoh-yay
+npm run demo:live
+npm run demo:copy
+```

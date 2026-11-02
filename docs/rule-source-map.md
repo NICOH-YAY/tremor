@@ -121,3 +121,10 @@ the same `engine/tremor/agent_api.c` macros through the browser spectator build;
 baseline. No human input handlers feed this runner. Determinism evidence:
 `tests/watch-replay.test.ts` checks the three committed samples in headless and
 spectator modules, including report terminal records, tic, health and all metrics.
+
+## codex-doom18 presentation and trace records
+
+| Rule | Classification | Exact locator |
+|---|---|---|
+| First-time hints remain in the 3D view above the status bar | design | public/hint-layout.js hintBounds; public/horror.js frame; tests/hint.test.js |
+| Model reasons are trace-only strings capped at 300 characters; validation feedback and K=8 observation/action history are unchanged | design | src/eval/runner.ts record; src/agent/model_player.ts history; tests/agent.test.ts bounded reasons regression |
