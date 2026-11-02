@@ -14,7 +14,10 @@ int DG_GetKey(int *pressed,unsigned char *key){return 0;}
 #include "i_video.h"
 #include "st_stuff.h"
 #include "hu_stuff.h"
+#include "s_sound.h"
+#include "doomstat.h"
 EMSCRIPTEN_KEEPALIVE pixel_t *tremor_watch_frame(void) {
+    S_UpdateSounds(players[consoleplayer].mo);
     ST_Drawer(0,1);
     HU_Drawer();
     I_FinishUpdate();

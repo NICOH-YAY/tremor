@@ -42,6 +42,10 @@ EMSCRIPTEN_KEEPALIVE void tremor_agent_reset(int seed,int episode,int map,int sk
  tr_agent_seed=seed;terminal=tics=steps=nmessages=motion=0;
  if(!initialized){
   static char *argv[]={"tremor-agent","-iwad","/freedoom1.wad","-file","/tremor.wad","-nosound","-warp","1","1"};
+  /* Tremor spectator-only audio; headless evaluation keeps -nosound. */
+#ifdef TR_WATCH
+  if(EM_ASM_INT({return Module.audio ? 1 : 0;}))argv[5]="-nojoy";
+#endif
   doomgeneric_Create(9,argv);I_InitGraphics();V_RestoreBuffer();R_ExecuteSetViewSize();initialized=1;
  }
  gametic=0;memset(commands,0,sizeof(commands));netcmds=commands;

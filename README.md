@@ -3,12 +3,12 @@
 ## Submission artifacts
 
 - [Evaluation](EVALUATION.md).
-- [Agent team account](AGENT-TEAM.md): pending student authorship.
+- [Agent team account](AGENT-TEAM.md): student reflection pending.
 - Recording: RECORDING LINK — to be added.
 - [Peer notes](docs/peer-notes/README.md).
 - [Agent sessions](docs/agent-sessions/README.md).
-- [Independent review](docs/reviews/review.md), [second review](docs/reviews/independent-review-2026-10-31.md), and [response](docs/reviews/review-response-2026-10-31.md).
-- Course PR Actions run URL + SHA: to be added after the final push.
+- [First independent review](docs/reviews/independent-review-2026-10-31.md) and [response](docs/reviews/review-response-2026-10-31.md); [second review](docs/reviews/review.md) and [response](docs/reviews/review-response.md); [final review](docs/reviews/review-final-2026-11-02.md) and [response](docs/reviews/review-final-response.md).
+- Course PR Actions run URL + SHA: to be added after the PR opens.
 
 ## Scope change
 
@@ -23,11 +23,6 @@ The human episode runs through Episode 1 to the E1M8 finale. The course API rese
 The current rule map is [docs/rule-source-map.md](docs/rule-source-map.md). Superseded specifications and maps are history only.
 
 
-
-The project uses the GPL Doom engine via doomgeneric WASM, Tremor rules and licensed Freedoom
-Phase 1 v0.13.0 data. Browser and agent use the same simulation. Human Episode 1
-plays through its ending; evaluation ends on each level exit, skill index 2.
-Tuning E1M1-E1M3, seen E1M4/E1M5, fresh held-out E1M6/E1M7, seeds 17/83.
 
 ## Rules
 
@@ -47,8 +42,7 @@ Halloran gives one briefing per map and rare once-per-episode beats, at least 31
 
 ## Setup and commands
 
-The same commands work from the Tremor repository root. Every command below uses `midterms/nicoh-yay` in the course checkout. Requires Node 24+ and npm. Run from this project root, or `cd midterms/nicoh-yay`
-in game-dev-f26. PowerShell may require npm.cmd instead of npm.
+Requires Node 24+ and npm. All commands run in the project root: D:\Coding VS\tremor locally, or midterms/nicoh-yay in the course checkout. PowerShell may require npm.cmd instead of npm.
 
 ```sh
 # cwd: midterms/nicoh-yay
@@ -71,17 +65,17 @@ project root, open http://localhost:5191/watch.html (also linked from the title)
 Replay recorded LIVE model episodes or run the careful scripted baseline with
 no manual moves. Production builds serve `dist/watch.html`. Replays verify their
 terminal outcome, tic, health and all metrics against the committed reports.
-The original suite traces did not retain model reasons; new traces retain up to 300 characters per step. the page labels that gap explicitly.
+The original suite traces did not retain model reasons; new traces retain up to 300 characters per step. The page labels that gap explicitly.
 The model recordings end by timeout, not success. This is replay evidence, not a
-new live model trial. Run `npm test` from the project root for the deterministic
+new live model trial. Run `npm test` (cwd: project root) for the deterministic
 headless and browser-spectator replay checks.
 
-Recording link: **pending student recording/upload**. Follow the
+Recording: [automated production and file details](recordings/README.md); upload link pending. Follow the
 [3-5 minute recording guide](docs/RECORDING-GUIDE.md), then paste a CourseWorks-viewable
 URL here and in the submission PR. Link [AGENTS.md](AGENTS.md) and the
 [Codex session evidence](docs/agent-sessions/README.md) from that PR as well.
 
-Evaluation: `npm run eval -- --players baseline_aggressive,baseline_careful --cases all`.
+Evaluation: `npm run eval -- --players baseline_aggressive,baseline_careful --cases all` (cwd: project root).
 600 actions/calls, 7 tics/action, 20s/call, five minutes/episode. Failed calls count.
 Invalid actions idle for 7 tics; three invalid decisions trigger labelled wait.
 Errors preserve that streak. Natural exit/death takes precedence over later limits.
@@ -91,7 +85,7 @@ Representative traces: eval/traces-sample/. Seeds choose only an 8-bit RNG start
 
 Live trials require ADC credentials and GOOGLE_CLOUD_PROJECT; optional
 GOOGLE_CLOUD_LOCATION defaults global. Run `npm run eval:live -- --players
-model-history,model-obs-only --cases all`. Both use gemini-3.5-flash-lite, K=8
+model-history,model-obs-only --cases all` (cwd: project root). Both use gemini-3.5-flash-lite, K=8
 versus observation-only. The full live suite ran from clean revision `8f0e4a9` on 2026-10-31.
 Aggressive/careful each exited 2/14; history/observation-only each exited 0/14.
 Model episode-cap timeouts: 8/7; call timeouts: 0/0; errors: 20/11.
@@ -142,32 +136,33 @@ Nuked OPL3 is LGPL-2.1-or-later with source/relink inputs shipped.
 [Third-party table](THIRD-PARTY.md). Phobos/UAC are descriptive; no affiliation
 with id Software or ZeniMax. Proprietary Doom WADs do not ship.
 
-Nicoh's personal agent-team account, peer notes, recording and course
-PR remain human submission work. Codex does not invent personal testimony.
+Personal reflections, peer notes and the course submission PR are supplied by the student.
 
 Model prompts preserve all public map information with lossless row RLE and reverse history deltas; see [contracts](docs/CONTRACTS.md). Seen/held-out baseline comparisons concern route progress and survival; completion has only been demonstrated on E1M1.
 
 ## CI evidence
 
-The course workflow `.github/workflows/midterm-nicoh-yay.yml` runs npm ci, npm test, npm run typecheck and npm run build. tests/agent.test.ts runs the C checks through the shipped doom-test WASM; CI needs no emsdk. The green pre-PR fork run is [41244931991](https://github.com/NICOH-YAY/game-dev-f26/actions/runs/41244931991), commit c042ec0. Final course PR Actions run URL + SHA: to be added.
+The course workflow `.github/workflows/midterm-nicoh-yay.yml` runs npm ci, npm test, npm run typecheck and npm run build. tests/agent.test.ts runs the C checks through the shipped doom-test WASM; CI needs no emsdk. Historical fork evidence only: [41244931991](https://github.com/NICOH-YAY/game-dev-f26/actions/runs/41244931991), commit c042ec0. Final course PR Actions run URL + SHA: to be added after the PR opens.
 
 ## Upstream comparison and large files
 
-The Tremor repository is https://github.com/NICOH-YAY/tremor. Pristine vendor commit: 821957f. Final submission commit: to be filled by Claude after committing; Codex cannot commit. [UPSTREAM](engine/UPSTREAM.md) gives the offline comparison recipe. [The patch](engine/tremor-vs-upstream.patch) contains changes to vendored files. Regenerate it with:
+The Tremor repository is https://github.com/NICOH-YAY/tremor. Pristine vendor commit: 821957f. Final submission commit: to be filled at submission. [UPSTREAM](engine/UPSTREAM.md) gives the offline comparison recipe. [The patch](engine/tremor-vs-upstream.patch) contains changes to vendored files. Regenerate it with:
 
 ```sh
 # cwd: midterms/nicoh-yay
 npm run upstream:patch
 ```
 
-`public/wad/freedoom1.wad` is committed so a fresh checkout can play and test offline. It is Freedoom 0.13.0, BSD-3-Clause, from https://github.com/freedoom/freedoom/releases/download/v0.13.0/freedoom-0.13.0.zip; SHA-256: 7323bcc168c5a45ff10749b339960e98314740a734c30d4b9f3337001f9e703d. Retrieve the release and extract freedoom1.wad to restore it; it is upstream data, not built here. `npm run engine:wad` rebuilds the derived tremor.wad (Python and Pillow required). `public/engine/source.zip` supplies GPL corresponding source; `npm run engine:build` recreates it and the browser engine. Committed WASM lets TAs and CI run without emsdk. The rebuild commands above recreate browser, headless and test artifacts; see [BUILD](engine/BUILD.md) for the watch target. `python engine/build/artifacts.py` refreshes the LF artifact manifest after rebuilding. `engine/doomgeneric/screenshots/sdl.png` is retained to preserve the vendor tree.
+`public/wad/freedoom1.wad` is committed so a fresh checkout can play and test offline. It is Freedoom 0.13.0, BSD-3-Clause, from https://github.com/freedoom/freedoom/releases/download/v0.13.0/freedoom-0.13.0.zip; SHA-256: 7323bcc168c5a45ff10749b339960e98314740a734c30d4b9f3337001f9e703d. Retrieve the release and extract freedoom1.wad to restore it; it is upstream data, not built here. `npm run engine:wad` (cwd: project root) rebuilds the derived tremor.wad (Python and Pillow required). `public/engine/source.zip` supplies GPL corresponding source; `npm run engine:build` (cwd: project root) recreates it and the browser engine. Committed WASM lets TAs and CI run without emsdk. The rebuild commands above recreate browser, headless and test artifacts; see [BUILD](engine/BUILD.md) for the watch target. `python engine/build/artifacts.py` (cwd: project root) refreshes the LF artifact manifest after rebuilding. `engine/doomgeneric/screenshots/sdl.png` is retained to preserve the vendor tree.
 
 ## Optional live demo
 
-The human may run one [demo](eval/demo/README.md), labelled "demo, not part of the declared suite". It is excluded from EVALUATION tables. Codex has not run it.
+The human may run one [demo](eval/demo/README.md), labelled "demo, not part of the declared suite". It is excluded from EVALUATION tables. The 2026-11-02 live demo records 293 calls (289 engine actions), ending at the five-minute episode cap.
 
 ```sh
 # cwd: midterms/nicoh-yay
 npm run demo:live
 npm run demo:copy
 ```
+
+For step/call/timeout endings, the recorded limit reason is applied to the replay; final tic, health and all other metrics are independently reproduced from the actions.

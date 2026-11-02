@@ -13,7 +13,7 @@ test.each([false,true])('watch page verifies replay (HTTP decompressed: %s), pau
  const canvas=window.document.querySelector('canvas');
  canvas.getContext=()=>({createImageData:()=>({data:new Uint8ClampedArray(320*200*4)}),putImageData(){frames++;}});
  const source=readFileSync('public/watch.js','utf8').replace(/^import .+;\r?\n/gm,'');
- const run=new Function('document','Option','createDoom','ACTION_IDS','baseline_careful','fetch','crypto','requestAnimationFrame','DecompressionStream',source+'\nreturn {start,tick,show};');
+ const run=new Function('document','Option','createDoom','ACTION_IDS','baseline_careful','fetch','crypto','requestAnimationFrame','DecompressionStream',source+'\nreturn {start,tick,show,recording};');
  const fetchLocal=async path=>{const p=String(path).replace(/^\.\//,'');const bytes=readFileSync(`public/${p}`);return new Response(decompressed&&p.endsWith('.gz')?gunzipSync(bytes):bytes);};
  const ui=run(window.document,window.Option,createDoom,ACTION_IDS,baseline_careful,fetchLocal,webcrypto,fn=>{next=fn;},DecompressionStream);
  const $=id=>window.document.getElementById(id);
@@ -32,11 +32,20 @@ test.each([false,true])('watch page verifies replay (HTTP decompressed: %s), pau
  expect($('hud').textContent).toContain('tic 1603');
  expect($('hud').textContent).toContain('health 100');
  expect($('reason').textContent).toContain('Not retained');
- ui.show({action:'wait',source:'model',valid:true,reason:'I will wait.'});expect($('reason').textContent).toBe('I will wait.');
+
+ ui.show({action:'wait',source:'model',valid:true,reason:'I will wait.'});expect($('reason').textContent).toBe('I will wait.');ui.show({reason:''});expect($('reason').textContent).toBe('(no reason given)');
  expect($('ending').textContent).toContain('timeout');
  expect($('counts').textContent).toContain('Step 229 / 600');
  expect($('counts').textContent).toContain('calls 233 / 600');
  expect(frames).toBeGreaterThan(200);
+ // Selecting a success after a limit replay must use a fresh engine state.
+ const manifest=JSON.parse(readFileSync('public/replays/manifest.json','utf8'));
+ $('mode').value=String(manifest.findIndex(x=>x.player==='baseline_careful'&&x.terminal.reason==='exit'));
+ await ui.start({preventDefault(){}});now=performance.now();
+ for(let i=0;i<1000&&!$('pause').disabled;i++){now+=1000;await next(now);}
+ expect($('badge').textContent).toBe('Replay verified');
+ expect($('ending').textContent).toContain('exit');
+ await ui.recording.verify(0);await ui.recording.start(0);expect($('badge').textContent).toBe('Replay verified');
  // Each representation must reject a bad hash before resetting or playing.
  const badCrypto={subtle:{digest:async()=>new Uint8Array(32).buffer}};
  const rejected=run(window.document,window.Option,createDoom,ACTION_IDS,baseline_careful,fetchLocal,badCrypto,()=>{},DecompressionStream);
@@ -51,4 +60,10 @@ test.each([false,true])('watch page verifies replay (HTTP decompressed: %s), pau
  window.document.dispatchEvent(new window.KeyboardEvent('keydown',{key:'w'}));
  canvas.dispatchEvent(new window.MouseEvent('mousemove',{movementX:100}));
  expect($('counts').textContent).toBe(before);
+ // A stationary scripted controller survives the starting room to the action cap.
+ const capped=run(window.document,window.Option,createDoom,ACTION_IDS,()=>({id:'baseline_careful',decide:async()=>({action:'wait'})}),fetchLocal,webcrypto,fn=>{next=fn;},DecompressionStream);
+ await capped.start({preventDefault(){}});now=performance.now();
+ for(let i=0;i<605&&!$('pause').disabled;i++){now+=200;await next(now);}
+ expect($('counts').textContent).toContain('Step 600 / 600');
+ expect($('ending').textContent).toContain('step_limit');
 },60000);

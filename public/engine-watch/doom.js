@@ -173,10 +173,11 @@ function updateMemoryViews() {
   if (HEAP8?.buffer?.resizable) return;
   var b = getMemoryBuffer();
   HEAP8 = new Int8Array(b);
-  HEAP16 = new Int16Array(b);
+  Module["HEAP16"] = HEAP16 = new Int16Array(b);
   Module["HEAPU8"] = HEAPU8 = new Uint8Array(b);
   HEAP32 = new Int32Array(b);
   HEAPU32 = new Uint32Array(b);
+  HEAPF64 = new Float64Array(b);
   HEAP64 = new BigInt64Array(b);
 }
 
@@ -3305,6 +3306,35 @@ var __emscripten_system = command => {
   return -52;
 };
 
+var readEmAsmArgsArray = [];
+
+/** @type {!Float64Array} */ var HEAPF64;
+
+var readEmAsmArgs = (sigPtr, buf) => {
+  readEmAsmArgsArray.length = 0;
+  var ch;
+  // Most arguments are i32s, so shift the buffer pointer so it is a plain
+  // index into HEAP32.
+  while (ch = HEAPU8[sigPtr++]) {
+    // Floats are always passed as doubles, so all types except for 'i'
+    // are 8 bytes and require alignment.
+    var wide = (ch != 105);
+    wide &= (ch != 112);
+    buf += wide && (buf % 8) ? 4 : 0;
+    readEmAsmArgsArray.push(// Special case for pointers under wasm64 or CAN_ADDRESS_2GB mode.
+    ch == 112 ? HEAPU32[((buf) >> 2)] : ch == 106 ? HEAP64[((buf) >> 3)] : ch == 105 ? HEAP32[((buf) >> 2)] : HEAPF64[((buf) >> 3)]);
+    buf += wide ? 8 : 4;
+  }
+  return readEmAsmArgsArray;
+};
+
+var runEmAsmFunction = (code, sigPtr, argbuf) => {
+  var args = readEmAsmArgs(sigPtr, argbuf);
+  return ASM_CONSTS[code](...args);
+};
+
+var _emscripten_asm_const_int = (code, sigPtr, argbuf) => runEmAsmFunction(code, sigPtr, argbuf);
+
 var _emscripten_get_now = () => performance.now();
 
 var getHeapMax = () => // Stay one Wasm page short of 4GB: while e.g. Chrome is able to allocate
@@ -3563,6 +3593,10 @@ Module["FS_createLazyFile"] = FS_createLazyFile;
 // Begin JS library exports
 // End JS library exports
 // end include: postlibrary.js
+var ASM_CONSTS = {
+  181133: () => Module.audio ? 1 : 0
+};
+
 function params(c, v, s) {
   Module.audio?.params(c, v, s);
 }
@@ -3637,6 +3671,7 @@ var wasmImports = {
   /** @export */ __syscall_rmdir: ___syscall_rmdir,
   /** @export */ __syscall_unlinkat: ___syscall_unlinkat,
   /** @export */ _emscripten_system: __emscripten_system,
+  /** @export */ emscripten_asm_const_int: _emscripten_asm_const_int,
   /** @export */ emscripten_get_now: _emscripten_get_now,
   /** @export */ emscripten_resize_heap: _emscripten_resize_heap,
   /** @export */ exit: _exit,

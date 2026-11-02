@@ -65,7 +65,7 @@ Both samples use E1M1/17 for a matched map/seed comparison, chosen to show the c
 - [model-history, E1M1/17, timeout](eval/traces-sample/model-history-E1M1-17.jsonl.gz); SHA-256 `d8ef5acf3bc513604d2722639b9a5deda2bdd31ca0c4e3d38e9456873f8d1c0d`.
 - [model-obs-only, E1M1/17, timeout](eval/traces-sample/model-obs-only-E1M1-17.jsonl.gz); SHA-256 `04dd986103a68dfc2b0a1e30c38dc02cdd0178592be77c7237471145b8979847`.
 
-[SHA-256 manifest](eval/traces-sample/manifest.json) records each source run/report; retained baseline samples are explicitly from the older baseline run. Raw full-run traces remain ignored in `eval/traces/`.
+[SHA-256 manifest](eval/traces-sample/manifest.json) records each source run/report; retained baseline samples and the served baseline-success replay are from revision 203810d, run 06-16-26-402Z, stamped workingTree: dirty. All 28 baseline outcomes and metrics match the clean 8f0e4a9 run (see codex-doom18 evidence). Raw full-run traces remain ignored in `eval/traces/`.
 
 ## Artifact provenance
 
@@ -99,7 +99,7 @@ their original report terminal status/reason/score and every metric in both
 headless and browser-spectator modules: history timeout at tic 1603, health 100;
 observation-only timeout at tic 1876, health 104; baseline exit at tic 805, health 71.
 Original trace reasons were not retained and are labeled unavailable. These are
-deterministic replay checks, not additional trials. Current validation: 61 tests,
+deterministic replay checks, not additional trials. Current validation is recorded in [the final review response](docs/reviews/review-final-response.md): tests,
 typecheck, build, and 508 engine checks pass. See the
 [recording guide](docs/RECORDING-GUIDE.md) and [session result](docs/agent-sessions/codex-doom17-result.md).
 
@@ -109,7 +109,7 @@ TODO: Nicoh to write his own limitations and reflection here.
 
 ### Facts for the limitations paragraph
 
-The known-limitations section above records measured constraints. No human full-episode playthrough, recording, or personal reflection is supplied by Codex. Peer notes status: to be filled by the student. If partner notes have not arrived by Nov 6, say so in the student-written limitations. The optional demo is outside the declared suite and does not change its counts.
+The known-limitations section above records measured constraints. Human full-episode playthroughs and personal reflections remain separate; the automated agent recording is described in recordings/README.md. Peer notes status: to be filled by the student. If partner notes have not arrived by Nov 6, say so in the student-written limitations. The optional demo is outside the declared suite and does not change its counts.
 
 Historical validation for the evaluation documentation/evidence update at 13856cb: `npm test` (50 tests, 10 files), `npm run typecheck`, `npm run build`, and `npm run engine:test` (508 checks, 0 failures) passed. Build retains the existing `art/title.jpg` resolution warning. Sample gzip integrity, source-copy equality, manifest/artifact SHA-256s, cost calculations and reproduced Markdown tables were checked offline. No new evaluation runs, gameplay/controller changes or commits.
 
@@ -118,9 +118,9 @@ Historical validation for the evaluation documentation/evidence update at 13856c
 | Version | Revision |
 |---|---|
 | Game version evaluated | 8f0e4a9dc937904ec47b1fe00045315330a112ae |
-| Submitted version | Final commit pending Claude; codex-doom18 edits follow 2b18e48 |
+| Submitted version | To be filled at submission |
 
-Changes since evaluation are music/presentation, the startup fix, the watch page, documentation, trace reason retention and hint placement. The model prompt, action interface and simulation have not changed in this session. Raw SHA-256 checks against the primary JSON on 2026-11-02 give:
+Changes since evaluation are music/presentation, the startup fix, the watch page, documentation, trace reason retention and hint placement. The model prompt, action interface and simulation behavior are unchanged. Spectator audio is enabled only when a presentation audio bridge is supplied; the evaluated headless path retains -nosound. Raw SHA-256 checks against the primary JSON on 2026-11-02 give:
 
 | Artifact | Compared with evaluated bytes |
 |---|---|
@@ -133,4 +133,8 @@ The engine-headless WASM and both WAD hashes are unchanged. Browser music artifa
 
 ## Course CI evidence
 
-The course workflow runs npm ci, npm test, npm run typecheck and npm run build. tests/agent.test.ts invokes the C checks using shipped test WASM. The green pre-PR fork run is [41244931991](https://github.com/NICOH-YAY/game-dev-f26/actions/runs/41244931991) at c042ec0. Final PR Actions run URL + SHA: to be added after the final push. This earlier run is not final-version CI evidence.
+The course workflow runs npm ci, npm test, npm run typecheck and npm run build. tests/agent.test.ts invokes the C checks using shipped test WASM. Historical fork evidence only: [41244931991](https://github.com/NICOH-YAY/game-dev-f26/actions/runs/41244931991) at c042ec0. Final PR Actions run URL + SHA: to be added after the PR opens. This earlier run is not final-version CI evidence.
+
+For step/call/timeout endings, the recorded limit reason is applied to the replay; final tic, health and all other metrics are independently reproduced from the actions.
+
+Source-hash caveat: src/player_interface.ts changed by moving the unchanged action list to src/agent/actions.ts and re-exporting it; src/eval/runner.ts changed only to retain the model reason in traces. These two recorded source hashes differ. Model policy, prompt and action behavior remain unchanged.

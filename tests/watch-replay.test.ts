@@ -9,7 +9,7 @@ const manifest=JSON.parse(readFileSync('public/replays/manifest.json','utf8'));
 for(const sample of manifest)test(`committed replay is deterministic in headless AND browser spectator: ${sample.player}`,async()=>{
  const bytes=readFileSync(`public/replays/${sample.file}`);
  expect(createHash('sha256').update(bytes).digest('hex')).toBe(sample.sha256);
- expect(bytes.equals(readFileSync(`eval/traces-sample/${sample.file}`))).toBe(true);
+ expect(bytes.equals(readFileSync(sample.sample??`eval/traces-sample/${sample.file}`))).toBe(true);
  const decompressed=gunzipSync(bytes);
  expect(createHash('sha256').update(decompressed).digest('hex')).toBe(sample.sha256Decompressed);
  const rows=decompressed.toString().trim().split('\n').map(line=>JSON.parse(line));
@@ -34,4 +34,18 @@ for(const sample of manifest)test(`committed replay is deterministic in headless
  expect(sample.terminal).toEqual({status:terminal.status,reason:terminal.reason,score:terminal.score,metrics:terminal.metrics});
  expect(browser).toEqual(sample.terminal);
  expect({status:headless.status,reason:headless.reason,score:headless.score,metrics:headless.metrics}).toEqual(sample.terminal);
+},60000);
+
+test('spectator audio survives observations and music change at exit',async()=>{
+ const sample=manifest.find((x:any)=>x.player==='baseline_careful');
+ const m=await createWatch({noInitialRun:true,audio:{params(){},stop(){},play(){},playing(){return false;}},print(){},printErr(){}});
+ for(const name of ['freedoom1','tremor'])m.FS.writeFile(`/${name}.wad`,readFileSync(`public/wad/${name}.wad`));
+ m._tremor_agent_reset(sample.seed,1,1,sample.skill);m._tremor_music_rate(48000);
+ const rows=gunzipSync(readFileSync(`public/replays/${sample.file}`)).toString().trim().split('\n').map(line=>JSON.parse(line));
+ for(const row of rows){
+  m._tremor_agent_step(ACTION_IDS.indexOf(row.action));m._tremor_watch_frame();
+  JSON.parse(m.UTF8ToString(m._tremor_agent_observe()));
+  for(let i=0;i<3;i++)m._tremor_music_render(2048);
+ }
+ expect(JSON.parse(m.UTF8ToString(m._tremor_agent_outcome()))).toEqual(sample.terminal);
 },60000);

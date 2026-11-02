@@ -1,4 +1,4 @@
-import {readFile,writeFile,copyFile} from 'node:fs/promises';
+import {readFile,writeFile,copyFile,mkdir} from 'node:fs/promises';
 import {createHash} from 'node:crypto';
 import {gunzipSync} from 'node:zlib';
 const meta=JSON.parse(await readFile('eval/demo/replay.json','utf8'));
@@ -7,5 +7,10 @@ const bytes=await readFile('eval/demo/'+meta.file);
 meta.sha256=createHash('sha256').update(bytes).digest('hex');
 meta.sha256Decompressed=createHash('sha256').update(gunzipSync(bytes)).digest('hex');
 await copyFile('eval/demo/'+meta.file,'public/replays/'+meta.file);
+await mkdir('eval/traces-sample/demo',{recursive:true});
+meta.sample='eval/traces-sample/demo/'+meta.file;
+meta.report='eval/traces-sample/demo/report.json';
+await copyFile('eval/demo/'+meta.file,meta.sample);
+await writeFile(meta.report,JSON.stringify({label:meta.label,results:[meta.result]},null,2)+'\n');
 const path='public/replays/manifest.json',manifest=JSON.parse(await readFile(path,'utf8')).filter(row=>row.file!==meta.file);
 manifest.push(meta);await writeFile(path,JSON.stringify(manifest,null,2)+'\n');

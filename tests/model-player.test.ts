@@ -37,3 +37,12 @@ it('rejects oversized lossless prompts before contacting the model',async()=>{
  expect(await c.decide(o,ACTION_IDS)).toMatchObject({error:'lossless prompt exceeds character preflight budget',tokensIn:0,tokensOut:0,usageKnown:true});
  expect(generate).not.toHaveBeenCalled();
 });
+
+it('never feeds the model its own stated reason on the next call',async()=>{
+ const secret='UNIQUE_REASON_MUST_NOT_RETURN_8934';
+ const generate=vi.fn().mockResolvedValue({text:JSON.stringify({action:'wait',reason:secret})});
+ const c=modelPlayer('history',generate);
+ expect((await c.decide(observations[0],ACTION_IDS)).reason).toBe(secret);
+ await c.decide(observations[1],ACTION_IDS);
+ expect(JSON.stringify(generate.mock.calls[1][0])).not.toContain(secret);
+});

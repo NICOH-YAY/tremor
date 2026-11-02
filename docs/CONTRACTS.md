@@ -138,3 +138,5 @@ Preflight rejects prompts above 24,000 characters before any network request (no
 ## Trace reasons and optional demo
 
 New per-step traces retain a model's stated reason when it is a string, capped at 300 characters. The runner does not pass it back as validation feedback. Model history still contains only the existing observations and actions. Old suite traces have no reconstructed reasons. The watch overlay displays a reason when present. The one-episode human-run demo uses E1M1 seed 17 and the same limits; it is labelled demo, not part of the declared suite, and is excluded from evaluation tables.
+
+Recording presentation: watch.html?record=1&script=default composites the game and evidence captions into one 1920x1080 canvas. Spectator-only audio is enabled when Module.audio is provided at startup; the evaluation headless path retains -nosound. No model/controller receives audio, pixels, private WASM or the terminal report. Limit reasons are applied from the record; replay independently reproduces state metrics. The local demo is excluded from declared-suite counts.

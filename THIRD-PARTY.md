@@ -16,3 +16,5 @@ separate notices. BSD conditions/copyright retained. GPL corresponding source an
 LGPL relink inputs ship with binary. Proprietary Doom WADs excluded. Phobos/UAC
 used descriptively, no affiliation with id Software/ZeniMax. Original Halloran
 text/procedural audio code are Tremor creative content.
+
+Radio WAV readings: [generation provenance](public/radio/CREDITS.md); original Tremor lines synthesized with eSpeak-NG as an external generation tool.

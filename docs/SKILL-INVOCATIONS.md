@@ -1,6 +1,6 @@
 # Skill invocations
 
-## 2026-10-31 - Codex session codex-doom 12 - before changes
+## 2026-10-31 - Codex session codex-doom12 - before changes
 Invoked **tremor-level-check** (`skills/tremor-level-check/SKILL.md`). Read ownership,
 contracts, rubric, all three audits, playtest and independent review; inspected C,
 ABI, runner, browser, build and tests. Reviewed working tree diff (initially clean).

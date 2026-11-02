@@ -1,44 +1,46 @@
-# Engine build
-
-Node24+ suffices with committed artifacts. Source rebuild: Python and emsdk6.0.13.
-Activate emcc on PATH or set EMSDK to SDK root; EMSDK_PYTHON defaults to running
-Python. No machine-specific defaults. Run from project root (also works after
-copy to game-dev-f26/midterms/nicoh-yay/):
-
-```sh
-# cwd: midterms/nicoh-yay
-npm ci
-npm run engine:headless
-npm run engine:headless:test
-npm run engine:build
-python engine/build/headless.py --watch
-python engine/build/artifacts.py
-npm run engine:test
-npm test
-npm run typecheck
-npm run build
-```
-
-engine:test invokes tests.c compiled in committed doom-test.cjs/wasm: no emsdk.
-Production omits fixtures. Rebuild all three after C changes. Browser build also
-ships GPL source.zip/licenses. artifacts.py normalizes LF and hashes shipped bytes
-and C source snapshot (not a proof of byte-for-byte compiler reproducibility).
-
-The fourth target, `public/engine-watch/doom.js` + `.wasm`, is a browser ES module
-using the production headless simulation, `TR_HEADLESS` and the identical agent
-macro ABI. `TR_WATCH` adds only framebuffer presentation (`tremor_watch_frame`);
-there is no real-time engine loop or human input handler. Rebuild it with the
-`--watch` command above after C changes. It uses the same GPL source archive linked
-from the title page. The headless production/fixture ABI remains unchanged.
-`npm run build` bundles `src/agent/watch.ts` to `dist/watch-agent.js`; Vite dev
-serves that same entry through `/watch-agent.js`. Only the detached public
-observation, action IDs and feedback are passed to the baseline controller.
-
-Browser -O2, no Asyncify. Paused rAF returns and excludes elapsed pause time;
-intro gates by Promise. Direct frames replace blocking melt wipes. Headless is
-synchronous with no main/audio loop. Shared320x200 renderer. Tremor 3 saves in IDBFS
-/persist. Horror style disconnects OPL ScriptProcessor. engine:wad needs Pillow;
-its recoloured Freedoom sprites remain BSD. No proprietary WAD ships.
-
-Production smoke: node engine/build/browser-smoke.mjs, preview-smoke.mjs, smoke.mjs.
-These do not measure audible output or target Brave Canvas/DOM cost.
+# Engine build
+
+Node24+ suffices with committed artifacts. Source rebuild: Python and emsdk6.0.13.
+Activate emcc on PATH or set EMSDK to SDK root; EMSDK_PYTHON defaults to running
+Python. No machine-specific defaults. Run from project root (also works after
+copy to game-dev-f26/midterms/nicoh-yay/):
+
+```sh
+# cwd: midterms/nicoh-yay
+npm ci
+npm run engine:headless
+npm run engine:headless:test
+npm run engine:build
+python engine/build/headless.py --watch
+python engine/build/artifacts.py
+npm run engine:test
+npm test
+npm run typecheck
+npm run build
+```
+
+engine:test invokes tests.c compiled in committed doom-test.cjs/wasm: no emsdk.
+Production omits fixtures. Rebuild all three after C changes. Browser build also
+ships GPL source.zip/licenses. artifacts.py normalizes LF and hashes shipped bytes
+and C source snapshot (not a proof of byte-for-byte compiler reproducibility).
+
+The fourth target, `public/engine-watch/doom.js` + `.wasm`, is a browser ES module
+using the production headless simulation, `TR_HEADLESS` and the identical agent
+macro ABI. `TR_WATCH` adds only framebuffer presentation (`tremor_watch_frame`);
+there is no real-time engine loop or human input handler. Rebuild it with the
+`--watch` command above after C changes. It uses the same GPL source archive linked
+from the title page. The headless production/fixture ABI remains unchanged.
+`npm run build` bundles `src/agent/watch.ts` to `dist/watch-agent.js`; Vite dev
+serves that same entry through `/watch-agent.js`. Only the detached public
+observation, action IDs and feedback are passed to the baseline controller.
+
+Browser -O2, no Asyncify. Paused rAF returns and excludes elapsed pause time;
+intro gates by Promise. Direct frames replace blocking melt wipes. Headless is
+synchronous with no main/audio loop. Shared320x200 renderer. Tremor 3 saves in IDBFS
+/persist. Horror style disconnects OPL ScriptProcessor. engine:wad needs Pillow;
+its recoloured Freedoom sprites remain BSD. No proprietary WAD ships.
+
+Production smoke: node engine/build/browser-smoke.mjs, preview-smoke.mjs, smoke.mjs.
+These do not measure audible output or target Brave Canvas/DOM cost.
+
+The spectator (--watch) uses a 1 MiB stack because its observation automap has a 257?257-byte local grid; the smaller default stack corrupts music allocations during observation and exit playback. This presentation build setting does not change the evaluated headless build or its hashes. The fake-audio replay regression covers observation plus OPL rendering through the exit music change.
