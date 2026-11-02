@@ -43,6 +43,21 @@ optional; keyboard play works without it. Owner-supplied IWADs stay local.
 Settings, hints and saves stay in browser storage. Build outputs dist/ with
 relative assets, suitable for hosting under a subdirectory.
 
+**[Watch the agent](public/watch.html):** with the dev server running from the
+project root, open http://localhost:5191/watch.html (also linked from the title).
+Replay recorded LIVE model episodes or run the careful scripted baseline with
+no manual moves. Production builds serve `dist/watch.html`. Replays verify their
+terminal outcome, tic, health and all metrics against the committed reports.
+Original traces did not retain model reasons; the page labels that gap explicitly.
+The model recordings end by timeout, not success. This is replay evidence, not a
+new live model trial. Run `npm test` from the project root for the deterministic
+headless and browser-spectator replay checks.
+
+Recording link: **pending student recording/upload**. Follow the
+[3-5 minute recording guide](docs/RECORDING-GUIDE.md), then paste a CourseWorks-viewable
+URL here and in the submission PR. Link [AGENTS.md](AGENTS.md) and the
+[Codex session evidence](docs/agent-sessions/README.md) from that PR as well.
+
 Evaluation: `npm run eval -- --players baseline_aggressive,baseline_careful --cases all`.
 600 actions/calls, 7 tics/action, 20s/call, five minutes/episode. Failed calls count.
 Invalid actions idle for 7 tics; three invalid decisions trigger labelled wait.

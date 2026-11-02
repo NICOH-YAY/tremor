@@ -18,3 +18,11 @@ regression, episode limits. Fake/replay controllers labelled mocked. Real normal
 spawn and C rule checks use WASM. No compiler/paid API in CI. engine:test prints
 C check count as well. Hashes bind exact artifacts/source snapshot, not a compiler
 reproducibility proof. CI workflow is .github/workflows/midterm-nicoh-yay.yml.
+# Spectator checks
+
+`watch-replay.test.ts` executes all three unchanged committed recordings in both
+headless and browser-spectator WASM and compares status/reason/score and every
+metric with the original report. `watch-page.test.js` runs the page runner with
+the real spectator WASM in a DOM harness, checking replay selection, pause,
+verification and switching to the live careful baseline. These are deterministic
+replay/application checks, not new live model trials or visual browser QA.

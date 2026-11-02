@@ -23,8 +23,8 @@ import zipfile
 Path('public/engine/LICENSE.txt').write_bytes(Path('engine/doomgeneric/LICENSE').read_bytes().replace(b'\r\n',b'\n'))
 with zipfile.ZipFile('public/engine/source.zip','w',zipfile.ZIP_DEFLATED) as archive:
     for path in sorted(Path('engine').rglob('*')):
-        if path.is_file() and path.suffix not in ['.json', '.log', '.wasm'] and not path.name.startswith(('test-engine.', 'reference-engine.', 'previous-engine.')):
+        if path.is_file() and path.suffix not in ['.json', '.log', '.wasm', '.pyc'] and not path.name.startswith(('test-engine.', 'reference-engine.', 'previous-engine.')):
             archive.write(path,path.as_posix())
 
-    for name in ['LICENSE','THIRD-PARTY.md','public/wad/FREEDOOM-LICENSE.txt','public/art/CREDITS.md','scripts/build-tremor-wad.py','scripts/build-freedoom-strings.py','public/art/crew.png','public/engine-page.js','public/startup.js','public/horror.js','public/radio/lines.json','public/settings-store.js','public/settings-ui.js','index.html','package.json','vite.config.ts']:
+    for name in ['LICENSE','THIRD-PARTY.md','public/wad/FREEDOOM-LICENSE.txt','public/art/CREDITS.md','scripts/build-tremor-wad.py','scripts/build-freedoom-strings.py','public/art/crew.png','public/engine-page.js','public/startup.js','public/horror.js','public/radio/lines.json','public/settings-store.js','public/settings-ui.js','index.html','package.json','vite.config.ts','public/watch.html','public/watch.js','src/agent/actions.ts','src/agent/baselines.ts','src/agent/types.ts','src/agent/watch.ts','src/player_interface.ts']:
         archive.write(name,name)

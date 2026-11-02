@@ -10,6 +10,7 @@ npm ci
 npm run engine:headless
 npm run engine:headless:test
 npm run engine:build
+python engine/build/headless.py --watch
 python engine/build/artifacts.py
 npm run engine:test
 npm test
@@ -21,6 +22,16 @@ engine:test invokes tests.c compiled in committed doom-test.cjs/wasm: no emsdk.
 Production omits fixtures. Rebuild all three after C changes. Browser build also
 ships GPL source.zip/licenses. artifacts.py normalizes LF and hashes shipped bytes
 and C source snapshot (not a proof of byte-for-byte compiler reproducibility).
+
+The fourth target, `public/engine-watch/doom.js` + `.wasm`, is a browser ES module
+using the production headless simulation, `TR_HEADLESS` and the identical agent
+macro ABI. `TR_WATCH` adds only framebuffer presentation (`tremor_watch_frame`);
+there is no real-time engine loop or human input handler. Rebuild it with the
+`--watch` command above after C changes. It uses the same GPL source archive linked
+from the title page. The headless production/fixture ABI remains unchanged.
+`npm run build` bundles `src/agent/watch.ts` to `dist/watch-agent.js`; Vite dev
+serves that same entry through `/watch-agent.js`. Only the detached public
+observation, action IDs and feedback are passed to the baseline controller.
 
 Browser -O2, no Asyncify. Paused rAF returns and excludes elapsed pause time;
 intro gates by Promise. Direct frames replace blocking melt wipes. Headless is

@@ -1,0 +1,47 @@
+import {test,expect} from 'vitest';
+import {Window} from 'happy-dom';
+import {readFileSync} from 'node:fs';
+import {webcrypto} from 'node:crypto';
+import createDoom from '../public/engine-watch/doom.js';
+import {ACTION_IDS,baseline_careful} from '../src/agent/watch';
+
+test('watch page runs real replay, pauses, verifies, and starts a live baseline without input handlers',async()=>{
+ const window=new Window();
+ window.document.write(readFileSync('public/watch.html','utf8'));
+ let frames=0,next;
+ const canvas=window.document.querySelector('canvas');
+ canvas.getContext=()=>({createImageData:()=>({data:new Uint8ClampedArray(320*200*4)}),putImageData(){frames++;}});
+ const source=readFileSync('public/watch.js','utf8').replace(/^import .+;\r?\n/gm,'');
+ const run=new Function('document','Option','createDoom','ACTION_IDS','baseline_careful','fetch','crypto','requestAnimationFrame','DecompressionStream',source+'\nreturn {start,tick};');
+ const fetchLocal=async path=>{const p=String(path).replace(/^\.\//,'');return new Response(readFileSync(`public/${p}`));};
+ const ui=run(window.document,window.Option,createDoom,ACTION_IDS,baseline_careful,fetchLocal,webcrypto,fn=>{next=fn;},DecompressionStream);
+ const $=id=>window.document.getElementById(id);
+ $('mode').value='0';
+ await ui.start({preventDefault(){}});
+ expect($('identity').textContent).toContain('model-history');
+ expect($('badge').textContent).toContain('verification pending');
+ $('speed').value='2';
+ $('pause').click();
+ await ui.tick(performance.now()+1000);
+ expect($('counts').textContent).toContain('Step 0');
+ $('pause').click();
+ let now=performance.now();
+ for(let i=0;i<1000&&!$('pause').disabled;i++){now+=1000;await next(now);}
+ expect($('badge').textContent).toBe('Replay verified');
+ expect($('hud').textContent).toContain('tic 1603');
+ expect($('hud').textContent).toContain('health 100');
+ expect($('reason').textContent).toContain('Not retained');
+ expect($('ending').textContent).toContain('timeout');
+ expect($('counts').textContent).toContain('Step 229 / 600');
+ expect($('counts').textContent).toContain('calls 233 / 600');
+ expect(frames).toBeGreaterThan(200);
+ $('mode').value='live';
+ await ui.start({preventDefault(){}});
+ expect($('identity').textContent).toContain('baseline_careful');
+ now=performance.now()+1000;await next(now);
+ expect($('counts').textContent).toContain('Step 1 / 600');
+ const before=$('counts').textContent;
+ window.document.dispatchEvent(new window.KeyboardEvent('keydown',{key:'w'}));
+ canvas.dispatchEvent(new window.MouseEvent('mousemove',{movementX:100}));
+ expect($('counts').textContent).toBe(before);
+},60000);

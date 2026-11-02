@@ -1,0 +1,6 @@
+Claude's browser review of midterms/nicoh-yay (Vaulting Ambition, first-person) on branch nicoh-yay/vaulting-ambition found a blocker: web/src/main.ts only hides the start overlay inside the 'pointerlockchange' handler, so if requestPointerLock is denied (embedded browsers, some trackpads/permissions, iframes), clicking Start does nothing and the game is stuck on the title screen. You are the implementation agent. No commits/pushes/model calls. Stay in midterms/nicoh-yay/.
+Fix:
+1. Clicking Start always starts/resumes the game (hide overlay, unpause) immediately; pointer lock is requested as an enhancement. If lock fails or is unavailable, switch to a fallback look mode: hold RIGHT mouse button and drag to look (and also arrow keys / Q-E to turn, R/F or arrow up/down to pitch), while LEFT mouse still plants/bends/releases. Show a small HUD hint for the active look mode. Esc/pause still works in both modes.
+2. Expose a debug hook only in dev builds (import.meta.env.DEV): window.__va = { getState(), setView(yaw,pitch), plant(), release(), step(ms) } so automated QA can aim and vault deterministically. Not present in production builds.
+3. Add a unit test for any pure logic you change; keep all tests green.
+Run npm test, typecheck, web:build. Final message: changed files + how the fallback works.

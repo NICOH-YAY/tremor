@@ -1,5 +1,14 @@
 # Rules
 
+The **Watch the agent** title-page link opens an input-free spectator runner:
+recorded LIVE model actions or a live careful scripted baseline. Each submitted
+action uses the evaluation ABI's seven-tic macro; the agent episode ends at a
+single level exit, death, 600 steps/calls, or the five-minute evaluator deadline.
+Replay speed affects presentation timing only. Failed recorded calls advance no
+tics. The clock distinguishes simulation from recorded call latency, which omits
+runner overhead. Original sample traces did not retain model reasons; the view
+labels that absence and verifies against the matching report's terminal record.
+
 Reach each level exit; the browser episode ends at E1M8 (E1M9 is optional). Death lets you restart the level. Hold TAB for the shared geometry route arrow, which excludes secret passages. It is designed guidance through unseen geometry.
 
 WASD move; mouse/arrows turn; mouse Y or PgUp/PgDn look; End centers; Ctrl/click fires; E/Space uses; Shift runs; 1-7 weapons; R/right mouse READ; F STUN; Q PURGE; ? pauses for help. Settings rebind controls. Pitch clamps to +/-32 degrees; READ/STUN/PURGE follow pitch like shots. Fists deal 10x ordinary Doom fist damage.

@@ -89,8 +89,21 @@ Engine and Freedoom provenance/licenses remain in [UPSTREAM](engine/UPSTREAM.md)
 - Zero crew saves and uniformly steady final terror do not establish mercy effectiveness or fear-system behavior across other conditions. Final buckets do not describe the full episode trajectory.
 - Software-render benchmarks in historical records exclude Canvas/DOM/audio and are not target-browser measurements. A full human episode and visual/audible playtesting remain separate evidence.
 
+## Spectator replay verification
+
+Spectator evidence added 2026-11-02: [Watch the agent](public/watch.html) replays
+the two committed LIVE model samples and the aggressive baseline success through
+the real browser agent macros. It makes no new model calls. All three matched
+their original report terminal status/reason/score and every metric in both
+headless and browser-spectator modules: history timeout at tic 1603, health 100;
+observation-only timeout at tic 1876, health 104; baseline exit at tic 805, health 71.
+Original trace reasons were not retained and are labeled unavailable. These are
+deterministic replay checks, not additional trials. Current validation: 61 tests,
+typecheck, build, and 508 engine checks pass. See the
+[recording guide](docs/RECORDING-GUIDE.md) and [session result](docs/agent-sessions/codex-doom17-result.md).
+
 ## Limitations (in Nicoh's words)
 
 TODO: Nicoh to write his own limitations and reflection here.
 
-Validation for this documentation/evidence update: `npm test` (50 tests, 10 files), `npm run typecheck`, `npm run build`, and `npm run engine:test` (508 checks, 0 failures) passed. Build retains the existing `art/title.jpg` resolution warning. Sample gzip integrity, source-copy equality, manifest/artifact SHA-256s, cost calculations and reproduced Markdown tables were checked offline. No new evaluation runs, gameplay/controller changes or commits.
+Historical validation for the evaluation documentation/evidence update at 13856cb: `npm test` (50 tests, 10 files), `npm run typecheck`, `npm run build`, and `npm run engine:test` (508 checks, 0 failures) passed. Build retains the existing `art/title.jpg` resolution warning. Sample gzip integrity, source-copy equality, manifest/artifact SHA-256s, cost calculations and reproduced Markdown tables were checked offline. No new evaluation runs, gameplay/controller changes or commits.

@@ -113,3 +113,11 @@ All rows 7 tics;turns fine 2/small 10/medium 45/large 90 degrees. Compound holds
 | 37 | `turn_right_medium` | 7 |
 | 38 | `advance_left` | 7 |
 | 39 | `advance_right` | 7 |
+
+Spectator implementation (presentation, no rule change): `public/watch.js` runs
+the same `engine/tremor/agent_api.c` macros through the browser spectator build;
+`src/agent/actions.ts` owns the unchanged append-only vocabulary re-exported by
+`src/player_interface.ts`. `src/agent/watch.ts` bundles the existing careful
+baseline. No human input handlers feed this runner. Determinism evidence:
+`tests/watch-replay.test.ts` checks the three committed samples in headless and
+spectator modules, including report terminal records, tic, health and all metrics.

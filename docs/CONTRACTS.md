@@ -4,6 +4,14 @@ Node 24. src/player_interface.ts owns five operations. Each reset creates an
 independent synchronous WASM instance privately held in WeakMap. No handle is
 provided to controllers; in-process imports are not a security sandbox.
 
+The spectator runner at `public/watch.js` privately owns a separate browser agent
+module compiled with the same headless simulation/macro ABI. It passes only a
+detached public observation, copied action IDs and validation feedback to the
+bundled baseline. It installs no human game-input handlers. Replay failed calls
+consume call budget without tics; invalid submitted actions use seven idle tics;
+fallback waits remain labeled. Report terminal records accompany unchanged gzip
+traces because original per-call JSONL did not retain terminal records or reasons.
+
 - reset(seed,levelId='E1M1'): safe integer, E1M1-E1M9, seed&255 selects RNG start
   before spawn. Skill 2, bundled Freedoom and Tremor WADs.
 - observe(state,player_id='player'): detached JSON; unknown player throws. Fields:

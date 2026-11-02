@@ -1,0 +1,13 @@
+You are Codex, the sole code editor for "Tremor" in D:\Coding VS\tremor-wt\doom (branch feat/doom). The Doom engine runs in the browser (engine/platform, public/engine) with the Tremor mod (engine/tremor). Read engine/BUILD.md, engine/PATCHES.md. Emscripten: D:\Coding VS\tremor-tools\emsdk.
+
+Implement:
+A. SETTINGS MENU (HTML overlay, opened from the title screen and in-game with a dedicated key, default F10, and from a gear button; pauses the game while open; saved to localStorage; applied on load):
+ - Controls: rebind every action (forward, back, strafe left/right, turn left/right, fire, use, run, read, stun, purge, weapons 1-7, automap, menu/pause, settings) by clicking a row and pressing a key or mouse button; show conflicts; "Reset to defaults". Defaults: WASD move, mouse turn, LMB fire, E/Space use, Shift run, R/RMB read, F stun, Q purge (hold), 1-7 weapons, Tab automap, Esc menu.
+ - Mouse: sensitivity slider (fine-grained, applied live), invert Y not needed (no vertical look in Doom), mouse smoothing on/off.
+ - Audio: master, SFX, music volume sliders; gunshot intensity (normal/shocking).
+ - Video: screen scale (fit / integer), show FPS counter, screen shake on/off, gore (off/normal/hyper).
+ - Uses the exported tremor_* functions (add any missing ones in engine/tremor with EMSCRIPTEN_KEEPALIVE). Rebinding must feed the engine through the platform key-translation table, not by editing Doom's default.cfg at runtime only.
+B. MUSIC: play the WAD's music (MUS lumps; Freedoom ships MUS) with an OPL2/OPL3 FM synth so it sounds like real Doom. Preferred: port Chocolate Doom's MUS->MIDI + OPL music module (opl library + i_oplmusic.c, GPL-2.0, compatible) into the web build with an AudioWorklet or ScriptProcessor that pulls samples from WASM; or another GPL/MIT/BSD-compatible OPL emulator (e.g. Nuked OPL3 is LGPL-2.1 — compatible with GPL). Record sources/licenses in engine/UPSTREAM.md and PATCHES.md. Music must start on the title/demo and change per level like Doom; respects the music volume slider; audio unlock on first gesture.
+C. SAVES: persist Doom savegames across reloads via IDBFS (save/load from Doom's menu works after reload).
+D. Brave/CPU performance: ensure no per-frame allocations in the blit path; keep 35 Hz authoritative with smooth presentation; add the optional FPS counter.
+Tests: keep npm test/typecheck/build green; add tests for the settings store (defaults, rebind, conflict detection, persistence) and that the music module exports exist in the built artefacts. Rebuild public/engine. You cannot commit; leave uncommitted. Summarize what works and what doesn't.

@@ -7,6 +7,7 @@ public/engine-headless/** -text
 public/engine/*.js text eol=lf
 public/engine-headless/*.cjs text eol=lf
 public/engine-headless/artifacts.json text eol=lf
+public/engine-watch/*.js text eol=lf
 public/radio/*.json text eol=lf
 public/wad/** binary
 *.wasm binary
