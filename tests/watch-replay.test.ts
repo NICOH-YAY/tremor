@@ -10,7 +10,9 @@ for(const sample of manifest)test(`committed replay is deterministic in headless
  const bytes=readFileSync(`public/replays/${sample.file}`);
  expect(createHash('sha256').update(bytes).digest('hex')).toBe(sample.sha256);
  expect(bytes.equals(readFileSync(`eval/traces-sample/${sample.file}`))).toBe(true);
- const rows=gunzipSync(bytes).toString().trim().split('\n').map(line=>JSON.parse(line));
+ const decompressed=gunzipSync(bytes);
+ expect(createHash('sha256').update(decompressed).digest('hex')).toBe(sample.sha256Decompressed);
+ const rows=decompressed.toString().trim().split('\n').map(line=>JSON.parse(line));
  const state=reset(sample.seed,sample.level);
  const m=await createWatch({noInitialRun:true,print(){},printErr(){}});
  for(const name of ['freedoom1','tremor'])m.FS.writeFile(`/${name}.wad`,readFileSync(`public/wad/${name}.wad`));

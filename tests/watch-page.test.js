@@ -1,11 +1,12 @@
 import {test,expect} from 'vitest';
 import {Window} from 'happy-dom';
 import {readFileSync} from 'node:fs';
+import {gunzipSync} from 'node:zlib';
 import {webcrypto} from 'node:crypto';
 import createDoom from '../public/engine-watch/doom.js';
 import {ACTION_IDS,baseline_careful} from '../src/agent/watch';
 
-test('watch page runs real replay, pauses, verifies, and starts a live baseline without input handlers',async()=>{
+test.each([false,true])('watch page verifies replay (HTTP decompressed: %s), pauses, and starts a live baseline without input handlers',async(decompressed)=>{
  const window=new Window();
  window.document.write(readFileSync('public/watch.html','utf8'));
  let frames=0,next;
@@ -13,7 +14,7 @@ test('watch page runs real replay, pauses, verifies, and starts a live baseline 
  canvas.getContext=()=>({createImageData:()=>({data:new Uint8ClampedArray(320*200*4)}),putImageData(){frames++;}});
  const source=readFileSync('public/watch.js','utf8').replace(/^import .+;\r?\n/gm,'');
  const run=new Function('document','Option','createDoom','ACTION_IDS','baseline_careful','fetch','crypto','requestAnimationFrame','DecompressionStream',source+'\nreturn {start,tick,show};');
- const fetchLocal=async path=>{const p=String(path).replace(/^\.\//,'');return new Response(readFileSync(`public/${p}`));};
+ const fetchLocal=async path=>{const p=String(path).replace(/^\.\//,'');const bytes=readFileSync(`public/${p}`);return new Response(decompressed&&p.endsWith('.gz')?gunzipSync(bytes):bytes);};
  const ui=run(window.document,window.Option,createDoom,ACTION_IDS,baseline_careful,fetchLocal,webcrypto,fn=>{next=fn;},DecompressionStream);
  const $=id=>window.document.getElementById(id);
  $('mode').value='0';
@@ -36,6 +37,11 @@ test('watch page runs real replay, pauses, verifies, and starts a live baseline 
  expect($('counts').textContent).toContain('Step 229 / 600');
  expect($('counts').textContent).toContain('calls 233 / 600');
  expect(frames).toBeGreaterThan(200);
+ // Each representation must reject a bad hash before resetting or playing.
+ const badCrypto={subtle:{digest:async()=>new Uint8Array(32).buffer}};
+ const rejected=run(window.document,window.Option,createDoom,ACTION_IDS,baseline_careful,fetchLocal,badCrypto,()=>{},DecompressionStream);
+ await rejected.start({preventDefault(){}});
+ expect($('badge').textContent).toBe('Cannot start: Replay checksum mismatch');
  $('mode').value='live';
  await ui.start({preventDefault(){}});
  expect($('identity').textContent).toContain('baseline_careful');

@@ -1,6 +1,11 @@
 import {readFile,writeFile,copyFile} from 'node:fs/promises';
+import {createHash} from 'node:crypto';
+import {gunzipSync} from 'node:zlib';
 const meta=JSON.parse(await readFile('eval/demo/replay.json','utf8'));
 if(meta.label!=='demo, not part of the declared suite'||meta.file!=='demo-model-history-E1M1-17.jsonl.gz')throw Error('Unexpected demo metadata');
+const bytes=await readFile('eval/demo/'+meta.file);
+meta.sha256=createHash('sha256').update(bytes).digest('hex');
+meta.sha256Decompressed=createHash('sha256').update(gunzipSync(bytes)).digest('hex');
 await copyFile('eval/demo/'+meta.file,'public/replays/'+meta.file);
 const path='public/replays/manifest.json',manifest=JSON.parse(await readFile(path,'utf8')).filter(row=>row.file!==meta.file);
 manifest.push(meta);await writeFile(path,JSON.stringify(manifest,null,2)+'\n');

@@ -35,7 +35,8 @@
     "tokensOut": 7972,
     "estimatedCost": 0.25105869999999997,
     "unknownUsageCalls": 4,
-    "latencyMs": 299095.09150000004
+    "latencyMs": 299095.09150000004,
+    "sha256Decompressed": "cdee38174dc34236da6fd3cf579bde1a20fcb9c10261acd2d88bfb7d40693e95"
   },
   {
     "file": "model-obs-only-E1M1-17.jsonl.gz",
@@ -73,7 +74,8 @@
     "tokensOut": 9077,
     "estimatedCost": 0.2035229,
     "unknownUsageCalls": 1,
-    "latencyMs": 298904.99299999233
+    "latencyMs": 298904.99299999233,
+    "sha256Decompressed": "0c2d7b0a1bb077112fb9a234714df79caf51027c106b6a3c21ff8f92006d721e"
   },
   {
     "file": "baseline-success.jsonl.gz",
@@ -111,6 +113,7 @@
     "tokensOut": 0,
     "estimatedCost": 0,
     "unknownUsageCalls": 0,
-    "latencyMs": 12.775799999999663
+    "latencyMs": 12.775799999999663,
+    "sha256Decompressed": "db0a5ad71932fd6cdcabe84a841497ce7535e6cc20e0579899af761be866c3d3"
   }
 ]
