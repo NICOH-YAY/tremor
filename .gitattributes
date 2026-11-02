@@ -12,3 +12,7 @@ public/radio/*.json text eol=lf
 public/wad/** binary
 *.wasm binary
 *.wad binary
+
+# Upstream patch and snapshot are generated with LF line endings.
+engine/tremor-vs-upstream.patch text eol=lf
+engine/tremor-vs-upstream.json text eol=lf
