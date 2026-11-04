@@ -4,7 +4,7 @@
 
 - [Evaluation](EVALUATION.md).
 - [Agent team account](AGENT-TEAM.md).
-- Recording: RECORDING LINK — to be added.
+- [Recording](https://drive.google.com/file/d/1-gUtdHicrsxu483OgbBwNUdB4stBCUJH/view?usp=sharing), viewable by anyone signed in with a columbia.edu account.
 - [Peer notes](docs/peer-notes/README.md).
 - [Agent sessions](docs/agent-sessions/README.md).
 - [First independent review](docs/reviews/independent-review-2026-10-31.md) and [response](docs/reviews/review-response-2026-10-31.md); [second review](docs/reviews/review.md) and [response](docs/reviews/review-response.md); [final review](docs/reviews/review-final-2026-11-02.md) and [response](docs/reviews/review-final-response.md).
@@ -70,10 +70,12 @@ The model recordings end by timeout, not success. This is replay evidence, not a
 new live model trial. Run `npm test` (cwd: project root) for the deterministic
 headless and browser-spectator replay checks.
 
-Recording: [automated production and file details](recordings/README.md); upload link pending. Follow the
-[3-5 minute recording guide](docs/RECORDING-GUIDE.md), then paste a CourseWorks-viewable
-URL here and in the submission PR. Link [AGENTS.md](AGENTS.md) and the
-[Codex session evidence](docs/agent-sessions/README.md) from that PR as well.
+The [uploaded recording](https://drive.google.com/file/d/1-gUtdHicrsxu483OgbBwNUdB4stBCUJH/view?usp=sharing) is available to anyone signed in with a columbia.edu account.
+The video lasts about 4 minutes 8 seconds and shows the title and rules, a replay of the live Gemini model-history agent playing E1M1 with no manual input until its five-minute episode cap, the baseline_careful run reaching the exit, the results table and limitations.
+See [automated production and file details](recordings/README.md) and the
+[recording guide](docs/RECORDING-GUIDE.md). Include the recording URL,
+[AGENTS.md](AGENTS.md) and the [Codex session evidence](docs/agent-sessions/README.md)
+in the submission PR.
 
 Evaluation: `npm run eval -- --players baseline_aggressive,baseline_careful --cases all` (cwd: project root).
 600 actions/calls, 7 tics/action, 20s/call, five minutes/episode. Failed calls count.

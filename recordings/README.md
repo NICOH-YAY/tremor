@@ -33,4 +33,4 @@ Per-section captured bus levels:
 
 Frame delivery: 58645 animation frames, 6 gaps over 50 ms; largest gap 475.0 ms. Requested capture is 30 fps; these timing measurements report renderer stalls, not a guarantee of every encoded frame. Recording runs in real time.
 
-Upload the webm to a CourseWorks-viewable location and add its link to the submission. Human playtests remain separate.
+The [uploaded recording](https://drive.google.com/file/d/1-gUtdHicrsxu483OgbBwNUdB4stBCUJH/view?usp=sharing) is viewable by anyone signed in with a columbia.edu account. The uploaded file size was verified as 92298487 bytes, matching by size the local file with the SHA-256 listed above. The hash was not recomputed remotely. Human playtests remain separate.
