@@ -3,7 +3,7 @@
 ## Submission artifacts
 
 - [Evaluation](EVALUATION.md).
-- [Agent team account](AGENT-TEAM.md): student reflection pending.
+- [Agent team account](AGENT-TEAM.md).
 - Recording: RECORDING LINK — to be added.
 - [Peer notes](docs/peer-notes/README.md).
 - [Agent sessions](docs/agent-sessions/README.md).
@@ -42,7 +42,7 @@ Halloran gives one briefing per map and rare once-per-episode beats, at least 31
 
 ## Setup and commands
 
-Requires Node 24+ and npm. All commands run in the project root: D:\Coding VS\tremor locally, or midterms/nicoh-yay in the course checkout. PowerShell may require npm.cmd instead of npm.
+Requires Node 24+ and npm. All commands run in the project root: the Tremor root locally, or midterms/nicoh-yay in the course checkout. PowerShell may require npm.cmd instead of npm.
 
 ```sh
 # cwd: midterms/nicoh-yay

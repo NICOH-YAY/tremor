@@ -105,11 +105,19 @@ typecheck, build, and 508 engine checks pass. See the
 
 ## Limitations (in Nicoh's words)
 
-TODO: Nicoh to write his own limitations and reflection here.
+None of my agents were able to finish a lot of levels. Scripted bots were able to exit 2/14 runs and the Gemini player exited 0. This is because the Doom levels themselves have doors, keys and dead ends and with the fear mechanic (that makes them miss a shot on purpose when really scared) I watched the bot basically get bum rushed by enemies and miss everything (which was pretty entertaining), but it's a pretty hard game.
+
+Each of the tests I ran were only run twice, so the number of tests is relatively small and I can't make any statistical claims from them. The seed also only changes the random start, so two runs of the same level are pretty similar. But I think it's still enough to check the basics of how the game works and that the mechanic behaves the way I designed it, which was my main goal. The human playtests (me and friends I showed the game to) showed the mechanics worked, even if they weren't always clear, since players didn't notice the ammo limit until they ran out and guessed at what the fear effect was.
+
+The game is hard, my last playtester said that too. Especially on a laptop since I watched them on their little Mac trackpad trying to shoot the thing which was slow and clunky and they ended up dying a lot. It's a lot easier when there is a separate mouse to play and I can get through each level pretty quickly myself (but when I tried on their Mac I died so fast). I left it that hard because I think the core idea of what I was getting at was DONE successfully. The longer you take the more bodies you see/people you kill the harder the game gets naturally as the more scared you get and the more likely you are to miss a shot. That plus the music adds to a very cool atmosphere that feels rewarding when you finally beat the level.
+
+If I had more time though, I would probably change the rates of ammo and make fear come in slower. Perhaps only after seeing a bunch of bodies. OR maybe interestingly you start off scared but once you kill a bunch of monsters you get more confidence and like less fear which is an interesting idea to explore.
+
+The first thing I would fix is the spawns of some enemies. There's an enemy that spawns on top of the box which you can only kill if you have a gun so if you ran out of bullets you basically enter a room of you getting shot at and you can't do anything. But I tested with guns and it's possible to kill the enemy. I left it in originally since I thought it would incentivize after a couple runs of a player to be even more thoughtful with their bullets.
 
 ### Facts for the limitations paragraph
 
-The known-limitations section above records measured constraints. Human full-episode playthroughs and personal reflections remain separate; the automated agent recording is described in recordings/README.md. Peer notes status: to be filled by the student. If partner notes have not arrived by Nov 6, say so in the student-written limitations. The optional demo is outside the declared suite and does not change its counts.
+The known-limitations section above records measured constraints. The automated agent recording is described in [recordings/README.md](recordings/README.md). The instructor's Nov 4 2026 update allows human playtest notes from anyone (classmate, friend or family), and the notes are in [docs/playtests/README.md](docs/playtests/README.md). The optional demo is outside the declared suite and does not change its counts.
 
 Historical validation for the evaluation documentation/evidence update at 13856cb: `npm test` (50 tests, 10 files), `npm run typecheck`, `npm run build`, and `npm run engine:test` (508 checks, 0 failures) passed. Build retains the existing `art/title.jpg` resolution warning. Sample gzip integrity, source-copy equality, manifest/artifact SHA-256s, cost calculations and reproduced Markdown tables were checked offline. No new evaluation runs, gameplay/controller changes or commits.
 

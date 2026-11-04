@@ -1,0 +1,12 @@
+---
+name: tremor-submission-audit
+description: Read-only Tremor submission audit against the midterm brief with evidence and findings.
+---
+# Tremor submission audit
+
+1. Read AGENTS.md, README.md, EVALUATION.md, docs/RUBRIC-CHECKLIST.md and the current midterm brief supplied by the student. Apply the instructor's Nov 4 2026 update allowing any anonymous human playtester. Use the four Nov 2 audit areas below. Verify historical findings against the current tree.
+2. Check rubric and full-brief coverage. Verify required files and README links, bounded scope, reference citation, starting point and inspectable inherited patches, agent configuration and sessions, named skill invocations across sessions, independent reviews with response files, recording access, course-folder boundary and final CI evidence. Distinguish present artifacts from submission placeholders.
+3. Check sources and rule map. Trace every current rule to code, manual, observed, assumed or design evidence with exact locators. Check initial state, actions, transitions, score, termination, action ABI, hidden-information boundaries and declared limits. Verify licenses, asset credits, upstream notices, corresponding source and rebuild recipes.
+4. Check clarity and efficiency evidence. Compare README, RULES, contracts, rule map and in-game title/help text. Check goal, controls, READ/STUN/PURGE, ammo, terror, ending and sparse radio. Inspect existing regression and performance evidence. Flag missing or inconsistent evidence without modifying game code or launching paid trials.
+5. Check evaluation and human evidence. Verify declared suite, held-out cases, repeated live trials, baseline comparison, history comparison, failures, seeds, version, latency, tokens, dated prices, cost limitations and trace provenance. Check anonymous human notes for what players did, where they hesitated or guessed, and what changed or would change. Keep assistant observations separate. Scan submission prose for personal playtester data, secrets and absolute local paths. Check required CI commands and recorded outcomes without inventing results.
+6. Write a dated findings file under docs/reviews/ with scope, inputs, checked evidence, severity, evidence links, fixed or open status and limitations. This skill changes only its findings file and fixes nothing itself. Report documentation corrections separately for the authorized editor. Log the named invocation and findings link in docs/SKILL-INVOCATIONS.md. No commits, live evaluations or student-text edits.

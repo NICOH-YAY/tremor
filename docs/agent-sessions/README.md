@@ -2,7 +2,7 @@
 
 This is a factual evidence index, not the student-authored agent team log. Link this file and [AGENTS.md](../../AGENTS.md) from the submission PR. The 21 local rollouts dated October 30-31 were indexed from session metadata and the initial user prompt only. Raw rollout JSONL contains local machine details: it is retained locally and available on request, and is not copied into this repository. Timestamps below are UTC from metadata (filenames use local time). Working directories are historical facts.
 
-Prompt/result markdown is copied from the supplied scratchpad verbatim except absolute local temp paths replaced with `<scratchpad>` and secret redaction if necessary. A credential-pattern scan found no secrets. Missing result files are identified explicitly. Commit associations use the first subsequent matching `git log` author time and purpose; they are temporal evidence, not proof that Codex authored or committed a commit. Claude commits. Purpose matching excludes unrelated art commits that occurred during agent work. Shared commits and interrupted/repeated sessions are disclosed.
+Existing completion records are retained. Added prompt/result markdown is copied from the supplied scratchpad with absolute local paths replaced by `<scratchpad>` and secret redaction if necessary. A credential-pattern scan found no secrets. Missing result files are identified explicitly. Commit associations use the first subsequent matching `git log` author time and purpose; they are temporal evidence, not proof that Codex authored or committed a commit. Claude commits. Purpose matching excludes unrelated art commits that occurred during agent work. Shared commits and interrupted/repeated sessions are disclosed.
 
 | Date/time UTC | Session id | Working directory | Purpose | Prompt | Result | Resulting commit (time association) |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -28,7 +28,7 @@ Prompt/result markdown is copied from the supplied scratchpad verbatim except ab
 | 2026-10-31T21:21:24.976Z | `01a193d6-b1df-7b52-bb76-a5f620828fac` | `the Tremor repository root` | Layered music and fear response | [codex-doom15.md](codex-doom15.md) | [codex-doom15-result.md](codex-doom15-result.md) | [c042ec0](https://github.com/NICOH-YAY/tremor/commit/c042ec0) (shared commit) |
 | 2026-10-31T21:38:05.467Z | `01a193e5-f9e8-72b2-aa80-548c36eaed46` | `the Tremor repository root` | Fix startup freeze from music pass | [codex-doom16.md](codex-doom16.md) | [codex-doom16-result.md](codex-doom16-result.md) | [c042ec0](https://github.com/NICOH-YAY/tremor/commit/c042ec0) (shared commit) |
 
-| 2026-11-02T17:53:09.196Z | `01a19d64-be6f-79c3-9bae-4cb4d55288b7` | `the Tremor repository root` | Watch page, recording guide and session evidence (current task) | [codex-doom17.md](codex-doom17.md) | [codex-doom17-result.md](codex-doom17-result.md) | Uncommitted; Codex must not commit |
+| 2026-11-02T17:53:09.196Z | `01a19d64-be6f-79c3-9bae-4cb4d55288b7` | `the Tremor repository root` | Watch page, recording guide and session evidence | [codex-doom17.md](codex-doom17.md) | [codex-doom17-result.md](codex-doom17-result.md) | [2b18e48](https://github.com/NICOH-YAY/tremor/commit/2b18e48) |
 
 The two `codex-doom6.md` launches have identical initial prompts; the metadata does not establish which produced which changes. The supplied `codex-doom7.md` is an additional follow-up prompt, with no distinct matching rollout in these 21 metadata records. `codex-doom4.md` was superseded by `codex-doom4b.md`. The music and freeze fixes landed together in c042ec0. No commit is attributed to Codex as committer.
 
@@ -60,19 +60,33 @@ Earlier design and abandoned prototype files are retained as historical context;
 | [codex-vault3.md](codex-vault3.md) | [codex-vault3-result.md](codex-vault3-result.md) |
 | [codex-vault4.md](codex-vault4.md) | [codex-vault4-result.md](codex-vault4-result.md) |
 
-`codex-doom17.md` is the current watch-page/session-evidence task. Its result is recorded alongside this index; no resulting commit exists yet. No AGENT-TEAM.md has been generated.
+`codex-doom17.md` records the watch-page and session-evidence task associated with 2b18e48. The student account is in [AGENT-TEAM.md](../../AGENT-TEAM.md).
 
-## Other agents (roles and evidence only)
+## Additional Codex sessions
 
-| Agent | Role | Evidence |
-| --- | --- | --- |
-| Claude Code | Planner, reviewer, committer, playtester, evaluation runner | Prompt/result files above; git log; [evaluation](../../EVALUATION.md) |
-| Claude Sonnet read-only audit subagents | Rubric; sources/rule map; clarity/efficiency; full-brief audits | Supplied audit findings referenced in [doom12 prompt](codex-doom12.md) |
-| Independent reviewer, first pass | Read-only independent review | [2026-10-31 review](../reviews/independent-review-2026-10-31.md) |
-| Independent reviewer, second pass | Read-only independent review | [review.md](../reviews/review.md) |
-| Higgsfield | Art | [Art credits](../../public/art/CREDITS.md) |
-| Vertex Gemini 3.5 Flash-Lite | Game-playing agent | [Evaluation](../../EVALUATION.md); [live trace provenance](../../eval/traces-sample/manifest.json) |
+Session dates follow the supplied prompts and matching commit author dates. Associations describe purpose and time only. Codex does not commit. The interrupted codex-doom20 prompt has no supplied result, while codex-doom20b has a separate result.
 
-## codex-doom18
+| Date | Session | Purpose | Prompt | Result | Commit association |
+| --- | --- | --- | --- | --- | --- |
+| 2026-11-02 | codex-doom18 | Full-brief audit and trace/demo | [Prompt](codex-doom18.md) | [Result](codex-doom18-result.md) | [f7dc038](https://github.com/NICOH-YAY/tremor/commit/f7dc038) |
+| 2026-11-02 | codex-doom19 | Watch replay and responsive layout | [Prompt](codex-doom19.md) | [Result](codex-doom19-result.md) | [3be1eb5](https://github.com/NICOH-YAY/tremor/commit/3be1eb5) |
+| 2026-11-02 | codex-doom20 | Final review corrections, interrupted | [Prompt](codex-doom20.md) | No result supplied | No separate association |
+| 2026-11-02 | codex-doom20b | Final review corrections and recording | [Prompt](codex-doom20b.md) | [Result](codex-doom20b-result.md) | [3c47234](https://github.com/NICOH-YAY/tremor/commit/3c47234) |
+| 2026-11-02 | codex-doom21 | Recording follow-up | [Prompt](codex-doom21.md) | [Result](codex-doom21-result.md) | [3c47234](https://github.com/NICOH-YAY/tremor/commit/3c47234) |
+| 2026-11-02 | codex-doom22 | Cross-platform upstream patch check | [Prompt](codex-doom22.md) | [Result](codex-doom22-result.md) | [338dc14](https://github.com/NICOH-YAY/tremor/commit/338dc14) |
+| 2026-11-03 | codex-doom23 | Independent art terms evidence | [Prompt](codex-doom23.md) | [Result](codex-doom23-result.md) | [d803595](https://github.com/NICOH-YAY/tremor/commit/d803595) |
+| 2026-11-04 | codex-doom24 | Student docs, audit skill and evidence index | [Prompt](codex-doom24.md) | this session | to be associated by Claude |
 
-This new session on 2026-11-02 addressed the full-brief audit and trace/demo request. [Result](codex-doom18-result.md) and [before/after skill records](../SKILL-INVOCATIONS.md) record the work. No rollout identifier has been supplied for this session; no identifier or commit is invented.
+## Other agents (not Codex)
+
+| Date | Agent type or model | Role | What it produced | Evidence |
+| --- | --- | --- | --- | --- |
+| 2026-10-30 | Claude Sonnet research subagent | Doom rules and source research | Research notes | [Rules research](../research/doom-rules.md) |
+| 2026-10-30 | Three Claude Sonnet worker subagents in parallel | Renderer, mechanics and content for the retired TypeScript prototype | Worker branches and merges | [Renderer 14860bd](https://github.com/NICOH-YAY/tremor/commit/14860bd), [mechanics bd215b9](https://github.com/NICOH-YAY/tremor/commit/bd215b9), [content 2df3d79](https://github.com/NICOH-YAY/tremor/commit/2df3d79), [merge d1f17f6](https://github.com/NICOH-YAY/tremor/commit/d1f17f6), [merge 8aed0c7](https://github.com/NICOH-YAY/tremor/commit/8aed0c7), [merge 22b25f9](https://github.com/NICOH-YAY/tremor/commit/22b25f9) |
+| 2026-10-30 | Independent read-only reviewer | Prototype review | Findings including purge identity leakage | [Review](../reviews/independent-review-2026-10-30.md), [fix ac0e32b](https://github.com/NICOH-YAY/tremor/commit/ac0e32b) |
+| 2026-10-31 | Independent read-only reviewers, two passes | Real-engine review and second pass on 9927bfe | Findings and response records | [First pass](../reviews/independent-review-2026-10-31.md), [response](../reviews/review-response-2026-10-31.md), [second pass](../reviews/review.md), [response](../reviews/review-response.md) |
+| 2026-11-02 | Four read-only audit agents | Rubric, sources and rule map, clarity and speed, full brief | Checklists now captured in a reusable skill | [Submission audit skill](../../skills/tremor-submission-audit/SKILL.md) |
+| 2026-11-02 | Independent read-only final reviewer | Final review | Findings and response | [Final review](../reviews/review-final-2026-11-02.md), [response](../reviews/review-final-response.md) |
+| 2026-11-03 | Claude Haiku subagent | Independent Higgsfield terms check | Terms verification record | [Art credits](../../public/art/CREDITS.md) |
+| 2026-10-31 | Gemini 3.5 Flash-Lite on Vertex | Game-playing agent under evaluation | Live action traces and outcomes | [Evaluation](../../EVALUATION.md) |
+| 2026-10-30 through 2026-11-04 | Claude Code (Opus) | Planner, prompt writer, committer, browser playtester and evaluation runner | Task prompts, commits and evidence records | [Ownership](../../AGENTS.md), [evaluation](../../EVALUATION.md) |

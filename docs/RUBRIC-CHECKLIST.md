@@ -32,10 +32,10 @@ Five kinds, all green: rule invariants; legal and illegal actions; a terminal ou
 - Implementation agent: AGENTS.md + Codex sessions linked.
 - Reusable skill: skills/ or .codex/ prompt file, invoked by name in >=2 sessions (log them).
 - Independent review: fresh read-only session, did not write the code, no instruction to approve; findings committed as review.md.
-- AGENT-TEAM.md one page in NICOH'S VOICE (he writes it): agents, what each could see/do, recommendations, his decisions, evidence links.
+- AGENT-TEAM.md in the student's supplied words: agents, what each could see/do, recommendations, his decisions, evidence links.
 
 ## Submission
-- PR to columbia-university-ai-games/game-dev-f26 main; only midterms/nicoh-yay/ + the one workflow file. README (setup/play/test/eval commands from midterms/nicoh-yay/, scope, rule map, reuse terms), EVALUATION.md (suite, table, traces, CI evidence, limitations in his voice), AGENT-TEAM.md, peer notes (given + received, Nov 6), 3-5 min recording of the agent playing with limits stated, linked from README and PR.
+- PR to columbia-university-ai-games/game-dev-f26 main; only midterms/nicoh-yay/ + the one workflow file. README (setup/play/test/eval commands from midterms/nicoh-yay/, scope, rule map, reuse terms), EVALUATION.md (suite, table, traces, CI evidence, limitations in his voice), AGENT-TEAM.md, anonymous human playtest notes under the Nov 4 instructor update and given recording notes due Nov 16, 3-5 min recording of the agent playing with limits stated, linked from README and PR.
 - Update Week 3 thread + README scope statement since the game changed.
 
 2026-10-31 follow-up: 4b now has genuine E1M1 normal-spawn exits and a passing

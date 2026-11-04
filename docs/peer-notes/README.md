@@ -1,13 +1,15 @@
 # Peer playtest notes
 
-Status: TODO ? student to record given and received notes.
+No peer partners were assigned in class. The instructor's Nov 4 2026 update opened the human playtest requirement to anyone. Anonymous human playtest notes are in [docs/playtests/README.md](../playtests/README.md).
 
-Observations must be anonymous. Private feedback stays on CourseWorks. If partner notes have not arrived by Nov 6, say so in the student-written limitations paragraph.
+Observations must be anonymous. Private feedback stays on CourseWorks.
 
 ## Given
 
-Build: TODO. Date: TODO. What I would have to guess: TODO. The question: TODO. Observation after a 15-minute playtest: TODO.
+Notes on classmates' recordings are due by Nov 16.
 
-## Received
-
-Build: TODO. Date: TODO. What I would have to guess: TODO. The question: TODO. Anonymous observation: TODO.
+- Build or recording link pending
+- Date pending
+- What the player would have to guess pending
+- The question pending
+- Observation after a 15-minute playtest pending
