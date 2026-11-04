@@ -8,7 +8,7 @@ The layered-music startup freeze was included in the 2026-11-02 audit (the start
 
 ## Human playtests (anonymous)
 
-Four sessions involved friends and teammates, with names withheld and the student watching. The instructor's Nov 4 2026 update allows any human player to count.
+Four sessions are recorded in three blocks, with playtests 3 and 4 sharing one block. The sessions involved friends and teammates, with names withheld and the student watching. The instructor's Nov 4 2026 update allows any human player to count.
 
 ### Playtest 1
 
@@ -36,11 +36,11 @@ Build played was the first real-Doom build after [4afe400](https://github.com/NI
 
 #### What the player did
 
-No notes recorded.
+They sort of just wandered around the area and got hit, and said the game felt more mysterious if anything but it was still confusing.
 
 #### Where they hesitated or guessed
 
-They were confused as to what to do. They sort of just wandered around the area and got hit, and said the game felt more mysterious if anything but it was still confusing. I watched without helping.
+They were confused as to what to do. I watched without helping.
 
 #### What I changed or would change
 
@@ -50,7 +50,7 @@ In response I added the moral aspect, a limited bullet count and Tremor, then ad
 
 Nov 1 and Nov 2 2026
 
-Build played was the build live on each date, after radio voice and terror. The nearest main-history commit before Nov 1 by author time is [c042ec0](https://github.com/NICOH-YAY/tremor/commit/c042ec0), Oct 31 at 17.41.44 EDT. It is also the nearest commit before Nov 2 began. Nov 2 has several later commits through [338dc14](https://github.com/NICOH-YAY/tremor/commit/338dc14), authored at 14.14.08 EST. Session times and exact deployed revisions were not recorded.
+Build played was the build live on each date, after radio voice and terror. The nearest main-history commit before Nov 1 by author time is [c042ec0](https://github.com/NICOH-YAY/tremor/commit/c042ec0), Oct 31 at 17.41.44 EDT. It is also the nearest commit before Nov 2 began. Nov 2 has several later commits through [338dc14](https://github.com/NICOH-YAY/tremor/commit/338dc14), authored at 14.14.08 EST. Session times and exact deployed revisions were not recorded. Git diff from `338dc14` to HEAD shows no game-affecting engine, game logic or WAD changes; the submitted game matches that Nov 2 build, with later changes limited to documentation, recording support and npm recording commands.
 
 #### What the player did
 

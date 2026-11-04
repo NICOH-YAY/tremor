@@ -1,4 +1,4 @@
-Implemented the fixes and mapped every M1–M6/m1–m16 finding in [review-response.md](docs/reviews/review-response.md).
+Implemented the fixes and mapped every M1–M6/m1–m16 finding in [review-response.md](../reviews/review-response.md).
 
 - Lossless map RLE and reversible history deltas added.
 - Verified pricing, cost accounting, temperature/location, start-of-run provenance and separate timeout counters recorded.

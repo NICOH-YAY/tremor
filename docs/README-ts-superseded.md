@@ -6,7 +6,7 @@ Historical material only; links were relative to the original project root.
 
 The default page now runs the GPL Doom engine via doomgeneric, with freely redistributable Freedoom Phase 1 data. Select **Play (Freedoom)** or **Load your DOOM WAD** (local only). No proprietary id game data is shipped. Music is currently silent; DMX sound effects use Web Audio. No Tremor moral modifications have been applied to the engine yet.
 
-See [engine/BUILD.md](engine/BUILD.md) for build/deploy instructions, verification limits and TODOs; [engine/UPSTREAM.md](engine/UPSTREAM.md) and [engine/PATCHES.md](engine/PATCHES.md) for provenance and the isolated platform override. Source and license must accompany GPL binary distribution. The earlier design below describes the retained TypeScript evaluation sim, not the new default player.
+See [engine/BUILD.md](../engine/BUILD.md) for build/deploy instructions, verification limits and TODOs; [engine/UPSTREAM.md](../engine/UPSTREAM.md) and [engine/PATCHES.md](../engine/PATCHES.md) for provenance and the isolated platform override. Source and license must accompany GPL binary distribution. The earlier design below describes the retained TypeScript evaluation sim, not the new default player.
 
 ---
 
@@ -63,7 +63,7 @@ npm run eval
 npm run eval -- --players baseline_careful,baseline_aggressive --cases hangar,quarantine,s1_corridor,s2_collar,s3_triage,h1_dark,h2_door
 ```
 
-`npm run eval` runs baselines on the declared five-case suite, seeds 17/83, and explicitly skips live models. Reports go to `eval/results`, per-action traces to `eval/traces`. Limits: 400 actions, 400 controller calls, 20 seconds per call; each action advances seven 35-Hz tics. The five operations and constant action vocabulary are documented in [CONTRACTS](docs/CONTRACTS.md). Model players see observations and legal IDs only.
+`npm run eval` runs baselines on the declared five-case suite, seeds 17/83, and explicitly skips live models. Reports go to `eval/results`, per-action traces to `eval/traces`. Limits: 400 actions, 400 controller calls, 20 seconds per call; each action advances seven 35-Hz tics. The five operations and constant action vocabulary are documented in [CONTRACTS](CONTRACTS.md). Model players see observations and legal IDs only.
 
 For paid live trials, configure Application Default Credentials for Vertex AI first. PowerShell example:
 
@@ -75,9 +75,9 @@ $env:GOOGLE_APPLICATION_CREDENTIALS='C:\path\credentials.json'
 npm run eval:live
 ```
 
-Live model: `gemini-3.5-flash-lite`; global availability failures count toward the call budget before a subsequent regional attempt. History and observation-only variants are separate players. No live results are claimed by the integration checks. Prices remain unverified/null in reports. See [evaluation plan](docs/EVALUATION-PLAN.md) and [decisions](docs/DECISIONS.md).
+Live model: `gemini-3.5-flash-lite`; global availability failures count toward the call budget before a subsequent regional attempt. History and observation-only variants are separate players. No live results are claimed by the integration checks. Prices remain unverified/null in reports. See [evaluation plan](EVALUATION-PLAN.md) and [decisions](DECISIONS.md).
 
-`tests/baseline.test.ts` checks completion on both seeds across all seven levels. `tests/performance.test.ts` checks a 480x270 software raster frame plus simulation below 6 ms averaged per level, excluding browser canvas upload/DOM/audio. Recorded integration evidence is in [baseline results](eval/integration-baselines.json) and [performance results](eval/integration-performance.json). Browser smoke coverage mocks canvas; actual pointer lock, audio and visual quality require browser verification.
+`tests/baseline.test.ts` checks completion on both seeds across all seven levels. `tests/performance.test.ts` checks a 480x270 software raster frame plus simulation below 6 ms averaged per level, excluding browser canvas upload/DOM/audio. Recorded integration evidence is in [baseline results](../eval/integration-baselines.json) and [performance results](../eval/integration-performance.json). Browser smoke coverage mocks canvas; actual pointer lock, audio and visual quality require browser verification.
 
 ## Credits and reuse
 
@@ -85,4 +85,4 @@ Creative direction: Nicoh. Original TypeScript implementation integrated with Co
 
 Higgsfield-generated art provenance and the independent 2026-11-03 terms check are recorded in [public/art/CREDITS.md](../public/art/CREDITS.md). Procedural audio, layouts, fallback graphics and implementation are original. No general redistribution license for Tremor's own code/art is declared yet; obtain the author's permission for reuse. Do not infer that the upstream GPL licenses these independent files.
 
-See [design](docs/DESIGN.md), [rule/source map](docs/rule-source-map.md), [Doom research](docs/research/doom-rules.md), [contracts](docs/CONTRACTS.md), [decisions](docs/DECISIONS.md), and [rubric checklist](docs/RUBRIC-CHECKLIST.md). CI runs tests/typecheck; Pages builds on pushes to main with relative asset URLs. Enable GitHub Pages with GitHub Actions as its source to deploy.
+See [design](DESIGN.md), [rule/source map](rule-source-map.md), [Doom research](research/doom-rules.md), [contracts](CONTRACTS.md), [decisions](DECISIONS.md), and [rubric checklist](RUBRIC-CHECKLIST.md). CI runs tests/typecheck; Pages builds on pushes to main with relative asset URLs. Enable GitHub Pages with GitHub Actions as its source to deploy.

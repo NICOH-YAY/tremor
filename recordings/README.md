@@ -2,10 +2,10 @@
 
 Produced with installed Microsoft Edge (headless=new), puppeteer-core, a 1920x1080 canvas at requested 30 fps, VP9/Opus MediaRecorder at 7.5 Mbps video / 192 kbps audio. No human game input or new model calls.
 
-Run from the project root (D:\Coding VS\tremor locally; midterms/nicoh-yay in the course checkout):
+Run from midterms/nicoh-yay in the course checkout:
 
 ```sh
-# cwd: project root
+# cwd: midterms/nicoh-yay
 npm run demo:copy
 npm run record:video
 ```

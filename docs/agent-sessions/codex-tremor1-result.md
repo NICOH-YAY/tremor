@@ -1,4 +1,4 @@
-Scaffold completed with shared contracts, simulation, raycaster, controls, agent interface, ownership rules, and [worker contracts](docs/CONTRACTS.md).
+Scaffold completed with shared contracts, simulation, raycaster, controls, agent interface, ownership rules, and [worker contracts](../CONTRACTS.md).
 
 Validation passed: 6 tests, strict typecheck, production build. npm audit reports zero vulnerabilities.
 

@@ -1,3 +1,5 @@
+> Earlier entries are historical session records, superseded by the later validation and live evidence linked below.
+
 # Skill invocations
 
 ## 2026-10-31 - Codex session codex-doom12 - before changes
@@ -123,7 +125,7 @@ Failing tests first: `npx.cmd vitest run tests/hint.test.js tests/agent.test.ts`
 
 Ran `npm.cmd run eval -- --players baseline_aggressive,baseline_careful --cases all`. Result: eval/results/2026-11-02-2026-11-02T18-08-28-280Z-results.json; table has the same basename. Gzip trace paths are recorded per episode in that JSON under ignored eval/traces/. Compared all 28 episodes with the 2026-10-31T06-19-01-385Z report: reason, score, metrics, steps, illegalActions, fallbacks and objectivesReached are identical. Each baseline exits 2/14, dies 10/14 and reaches the step limit 2/14. No call/time limits or illegal actions. This offline run does not replace the declared live-suite tables.
 
-Changes: submission links and scope/citation/specification, upstream patch and freshness check, separate-session correction, review-version response, CI/version evidence, working directories and large-file provenance, prose privacy, playtest and peer templates, limitations facts, canvas-relative first-time hints, trace reason retention and optional live-demo/copy commands. The patch freshness test also works in the course folder without Tremor Git history; regeneration requires the Tremor history. The demo was not run. No paid calls, commits, invented testimony or changes to either protected review. Student AGENT-TEAM.md and the personal limitations TODO remain untouched. Final commit SHA, course PR Actions URL/SHA, recording and student peer notes remain human submission steps.
+Changes: submission links and scope/citation/specification, upstream patch and freshness check, separate-session correction, review-version response, CI/version evidence, working directories and large-file provenance, prose privacy, playtest and peer templates, limitations facts, canvas-relative first-time hints, trace reason retention and optional live-demo/copy commands. The patch freshness test also works in the course folder without Tremor Git history; regeneration requires the Tremor history. The demo was not run. No paid calls, commits, invented testimony or changes to either protected review. Student AGENT-TEAM.md and the personal limitations placeholders remained untouched in that session. They were later written by the student and assembled in codex-doom24. Final commit SHA, course PR Actions URL/SHA, recording and student peer notes remain human submission steps.
 
 ## 2026-11-04 - Codex session codex-doom24 - submission audit
 

@@ -34,31 +34,12 @@ The two `codex-doom6.md` launches have identical initial prompts; the metadata d
 
 ## Additional supplied prompt/result evidence
 
-Earlier design and abandoned prototype files are retained as historical context; their presence does not claim they implemented the active Doom engine or were sessions on October 30-31. `codex-design.md` is the supplied design response to `codex-design-prompt.md`.
 
 | Prompt / evidence file | Result file |
 | --- | --- |
-| [codex-audit.md](codex-audit.md) | [codex-audit-result.md](codex-audit-result.md) |
-| [codex-build1.md](codex-build1.md) | [codex-build1-result.md](codex-build1-result.md) |
-| [codex-design-prompt.md](codex-design-prompt.md) | [codex-design.md](codex-design.md) |
 | [codex-doom17.md](codex-doom17.md) | Not supplied |
 | [codex-doom4.md](codex-doom4.md) | [codex-doom4-result.md](codex-doom4-result.md) |
 | [codex-doom7.md](codex-doom7.md) | Not supplied |
-| [codex-fix1.md](codex-fix1.md) | [codex-fix1-result.md](codex-fix1-result.md) |
-| [codex-fix2.md](codex-fix2.md) | [codex-fix2-result.md](codex-fix2-result.md) |
-| [codex-fix3.md](codex-fix3.md) | [codex-fix3-result.md](codex-fix3-result.md) |
-| [codex-fix4.md](codex-fix4.md) | [codex-fix4-result.md](codex-fix4-result.md) |
-| [codex-fix5.md](codex-fix5.md) | [codex-fix5-result.md](codex-fix5-result.md) |
-| [codex-fix6.md](codex-fix6.md) | [codex-fix6-result.md](codex-fix6-result.md) |
-| [codex-plan2.md](codex-plan2.md) | [codex-plan2-result.md](codex-plan2-result.md) |
-| [codex-render-fix.md](codex-render-fix.md) | [codex-render-fix-result.md](codex-render-fix-result.md) |
-| [codex-render.md](codex-render.md) | [codex-render-result.md](codex-render-result.md) |
-| [codex-sc1.md](codex-sc1.md) | [codex-sc1-result.md](codex-sc1-result.md) |
-| [codex-sc2.md](codex-sc2.md) | [codex-sc2-result.md](codex-sc2-result.md) |
-| [codex-vault1.md](codex-vault1.md) | [codex-vault1-result.md](codex-vault1-result.md) |
-| [codex-vault2.md](codex-vault2.md) | [codex-vault2-result.md](codex-vault2-result.md) |
-| [codex-vault3.md](codex-vault3.md) | [codex-vault3-result.md](codex-vault3-result.md) |
-| [codex-vault4.md](codex-vault4.md) | [codex-vault4-result.md](codex-vault4-result.md) |
 
 `codex-doom17.md` records the watch-page and session-evidence task associated with 2b18e48. The student account is in [AGENT-TEAM.md](../../AGENT-TEAM.md).
 
@@ -75,18 +56,19 @@ Session dates follow the supplied prompts and matching commit author dates. Asso
 | 2026-11-02 | codex-doom21 | Recording follow-up | [Prompt](codex-doom21.md) | [Result](codex-doom21-result.md) | [3c47234](https://github.com/NICOH-YAY/tremor/commit/3c47234) |
 | 2026-11-02 | codex-doom22 | Cross-platform upstream patch check | [Prompt](codex-doom22.md) | [Result](codex-doom22-result.md) | [338dc14](https://github.com/NICOH-YAY/tremor/commit/338dc14) |
 | 2026-11-03 | codex-doom23 | Independent art terms evidence | [Prompt](codex-doom23.md) | [Result](codex-doom23-result.md) | [d803595](https://github.com/NICOH-YAY/tremor/commit/d803595) |
-| 2026-11-04 | codex-doom24 | Student docs, audit skill and evidence index | [Prompt](codex-doom24.md) | this session | to be associated by Claude |
+| 2026-11-04 | codex-doom24 | Student docs, audit skill and evidence index | [Prompt](codex-doom24.md) | [Result](codex-doom24-result.md) | [9e06475](https://github.com/NICOH-YAY/tremor/commit/9e06475) |
 
-## Other agents (not Codex)
+## Agent capabilities
 
-| Date | Agent type or model | Role | What it produced | Evidence |
-| --- | --- | --- | --- | --- |
-| 2026-10-30 | Claude Sonnet research subagent | Doom rules and source research | Research notes | [Rules research](../research/doom-rules.md) |
-| 2026-10-30 | Three Claude Sonnet worker subagents in parallel | Renderer, mechanics and content for the retired TypeScript prototype | Worker branches and merges | [Renderer 14860bd](https://github.com/NICOH-YAY/tremor/commit/14860bd), [mechanics bd215b9](https://github.com/NICOH-YAY/tremor/commit/bd215b9), [content 2df3d79](https://github.com/NICOH-YAY/tremor/commit/2df3d79), [merge d1f17f6](https://github.com/NICOH-YAY/tremor/commit/d1f17f6), [merge 8aed0c7](https://github.com/NICOH-YAY/tremor/commit/8aed0c7), [merge 22b25f9](https://github.com/NICOH-YAY/tremor/commit/22b25f9) |
-| 2026-10-30 | Independent read-only reviewer | Prototype review | Findings including purge identity leakage | [Review](../reviews/independent-review-2026-10-30.md), [fix ac0e32b](https://github.com/NICOH-YAY/tremor/commit/ac0e32b) |
-| 2026-10-31 | Independent read-only reviewers, two passes | Real-engine review and second pass on 9927bfe | Findings and response records | [First pass](../reviews/independent-review-2026-10-31.md), [response](../reviews/review-response-2026-10-31.md), [second pass](../reviews/review.md), [response](../reviews/review-response.md) |
-| 2026-11-02 | Four read-only audit agents | Rubric, sources and rule map, clarity and speed, full brief | Checklists now captured in a reusable skill | [Submission audit skill](../../skills/tremor-submission-audit/SKILL.md) |
-| 2026-11-02 | Independent read-only final reviewer | Final review | Findings and response | [Final review](../reviews/review-final-2026-11-02.md), [response](../reviews/review-final-response.md) |
-| 2026-11-03 | Claude Haiku subagent | Independent Higgsfield terms check | Terms verification record | [Art credits](../../public/art/CREDITS.md) |
-| 2026-10-31 | Gemini 3.5 Flash-Lite on Vertex | Game-playing agent under evaluation | Live action traces and outcomes | [Evaluation](../../EVALUATION.md) |
-| 2026-10-30 through 2026-11-04 | Claude Code (Opus) | Planner, prompt writer, committer, browser playtester and evaluation runner | Task prompts, commits and evidence records | [Ownership](../../AGENTS.md), [evaluation](../../EVALUATION.md) |
+| Date | Agent type or model | Role | What it produced | Evidence | Could see | Could do |
+| --- | --- | --- | --- | --- | --- | --- |
+| 2026-10-30 | Claude Sonnet research subagent | Doom rules and source research | Research notes | [Rules research](../research/doom-rules.md) | Doom source and research task | Read sources and write research notes |
+| 2026-10-30 | Three Claude Sonnet worker subagents in parallel | Renderer, mechanics and content for the retired TypeScript prototype | Worker branches and merges | [Renderer 14860bd](https://github.com/NICOH-YAY/tremor/commit/14860bd), [mechanics bd215b9](https://github.com/NICOH-YAY/tremor/commit/bd215b9), [content 2df3d79](https://github.com/NICOH-YAY/tremor/commit/2df3d79), [merge d1f17f6](https://github.com/NICOH-YAY/tremor/commit/d1f17f6), [merge 8aed0c7](https://github.com/NICOH-YAY/tremor/commit/8aed0c7), [merge 22b25f9](https://github.com/NICOH-YAY/tremor/commit/22b25f9) | Prototype repo and assigned task | Edit assigned prototype files |
+| 2026-10-30 | Independent read-only reviewer | Prototype review | Findings including purge identity leakage | [Review](../reviews/independent-review-2026-10-30.md), [fix ac0e32b](https://github.com/NICOH-YAY/tremor/commit/ac0e32b) | Read-only repo access | Report findings; no edits |
+| 2026-10-31 | Independent read-only reviewers, two passes | Real-engine review and second pass on 9927bfe | Findings and response records | [First pass](../reviews/independent-review-2026-10-31.md), [response](../reviews/review-response-2026-10-31.md), [second pass](../reviews/review.md), [response](../reviews/review-response.md) | Read-only repo access | Report findings; no edits |
+| 2026-11-02 | Four read-only audit agents | Rubric, sources and rule map, clarity and speed, full brief | Checklists now captured in a reusable skill | [Submission audit skill](../../skills/tremor-submission-audit/SKILL.md) | Read-only repo access | Report findings; no edits |
+| 2026-11-02 | Independent read-only final reviewer | Final review | Findings and response | [Final review](../reviews/review-final-2026-11-02.md), [response](../reviews/review-final-response.md) | Read-only repo access | Report findings; no edits |
+| 2026-11-03 | Claude Haiku subagent | Independent Higgsfield terms check | Terms verification record | [Art credits](../../public/art/CREDITS.md) | Higgsfield terms web pages only | Read terms and report findings |
+| 2026-10-31 | Gemini 3.5 Flash-Lite on Vertex | Game-playing agent under evaluation | Live action traces and outcomes | [Evaluation](../../EVALUATION.md) | Public text observation and legal action IDs only; no files, pixels or audio | Choose and submit legal action IDs |
+| 2026-10-30 through 2026-11-04 | Claude Code (Opus) | Planner, prompt writer, committer, browser playtester and evaluation runner | Task prompts, commits and evidence records | [Ownership](../../AGENTS.md), [evaluation](../../EVALUATION.md) | Repo, browser and terminal | Plan, commit and push; run evaluations and browser playtests |
+| 2026-11-04 | Codex | Documentation editor | Documentation and validation | [Ownership](../../AGENTS.md) | Prompt and repo in a workspace-write sandbox in the repo | Edit files, build and run tests; no commit or push |

@@ -80,6 +80,8 @@ If I had to do this again, I would probably systematize the mechanics. Which is 
 
 ## Evidence index
 
+- [What each agent could see and do](docs/agent-sessions/README.md#agent-capabilities).
+
 - [Ownership and boundaries](AGENTS.md)
 - [Agent sessions](docs/agent-sessions/README.md)
 - [Reviews and responses](docs/reviews/)

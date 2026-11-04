@@ -8,7 +8,7 @@
 - [Peer notes](docs/peer-notes/README.md).
 - [Agent sessions](docs/agent-sessions/README.md).
 - [First independent review](docs/reviews/independent-review-2026-10-31.md) and [response](docs/reviews/review-response-2026-10-31.md); [second review](docs/reviews/review.md) and [response](docs/reviews/review-response.md); [final review](docs/reviews/review-final-2026-11-02.md) and [response](docs/reviews/review-final-response.md).
-- All checks passed on course commit `95a2899`, synced from Tremor revision `9e06475`, in [course PR #67](https://github.com/columbia-university-ai-games/game-dev-f26/pull/67), including the [Midterm nicoh-yay verify run](https://github.com/columbia-university-ai-games/game-dev-f26/actions/runs/41889125996) and the [Minigame submission boundaries run](https://github.com/columbia-university-ai-games/game-dev-f26/actions/runs/41889126102).
+- Current evidence for the submitted head is the [course PR #67 checks page](https://github.com/columbia-university-ai-games/game-dev-f26/pull/67/checks). Earlier passing runs on this PR are [41889125996](https://github.com/columbia-university-ai-games/game-dev-f26/actions/runs/41889125996) on `95a2899` and [41892152754](https://github.com/columbia-university-ai-games/game-dev-f26/actions/runs/41892152754) on `8890302`.
 
 The open course PR uses branch `nicoh-yay/tremor-midterm` in the course repository. GitHub detached the student fork when the course repository became private, so the branch was pushed directly to the course repository.
 
@@ -28,7 +28,15 @@ The current rule map is [docs/rule-source-map.md](docs/rule-source-map.md). Supe
 
 ## Setup and commands
 
-Requires Node 24+ and npm. All commands run in the project root: the Tremor root locally, or midterms/nicoh-yay in the course checkout. PowerShell may require npm.cmd instead of npm.
+```sh
+# cwd: any
+git clone https://github.com/columbia-university-ai-games/game-dev-f26.git
+cd game-dev-f26
+git checkout nicoh-yay/tremor-midterm
+cd midterms/nicoh-yay
+```
+
+Requires Node 24+ and npm. All following commands run in midterms/nicoh-yay in the course checkout. PowerShell may require npm.cmd instead of npm.
 
 ```sh
 # cwd: midterms/nicoh-yay
@@ -47,23 +55,21 @@ Settings, hints and saves stay in browser storage. Build outputs dist/ with
 relative assets, suitable for hosting under a subdirectory.
 
 **[Watch the agent](public/watch.html):** with the dev server running from the
-project root, open http://localhost:5191/watch.html (also linked from the title).
+midterms/nicoh-yay, open http://localhost:5191/watch.html (also linked from the title).
 Replay recorded LIVE model episodes or run the careful scripted baseline with
 no manual moves. Production builds serve `dist/watch.html`. Replays verify their
 terminal outcome, tic, health and all metrics against the committed reports.
 The original suite traces did not retain model reasons; new traces retain up to 300 characters per step. The page labels that gap explicitly.
 The model recordings end by timeout, not success. This is replay evidence, not a
-new live model trial. Run `npm test` (cwd: project root) for the deterministic
+new live model trial. Run `npm test` (cwd: midterms/nicoh-yay) for the deterministic
 headless and browser-spectator replay checks.
 
 The [uploaded recording](https://drive.google.com/file/d/1-gUtdHicrsxu483OgbBwNUdB4stBCUJH/view?usp=sharing) is available to anyone signed in with a columbia.edu account.
 The video lasts about 4 minutes 8 seconds and shows the title and rules, a replay of the live Gemini model-history agent playing E1M1 with no manual input until its five-minute episode cap, the baseline_careful run reaching the exit, the results table and limitations.
 See [automated production and file details](recordings/README.md) and the
-[recording guide](docs/RECORDING-GUIDE.md). Include the recording URL,
-[AGENTS.md](AGENTS.md) and the [Codex session evidence](docs/agent-sessions/README.md)
-in the submission PR.
+[recording guide](docs/RECORDING-GUIDE.md).
 
-Evaluation: `npm run eval -- --players baseline_aggressive,baseline_careful --cases all` (cwd: project root).
+Evaluation: `npm run eval -- --players baseline_aggressive,baseline_careful --cases all` (cwd: midterms/nicoh-yay).
 600 actions/calls, 7 tics/action, 20s/call, five minutes/episode. Failed calls count.
 Invalid actions idle for 7 tics; three invalid decisions trigger labelled wait.
 Errors preserve that streak. Natural exit/death takes precedence over later limits.
@@ -73,7 +79,7 @@ Representative traces: eval/traces-sample/. Seeds choose only an 8-bit RNG start
 
 Live trials require ADC credentials and GOOGLE_CLOUD_PROJECT; optional
 GOOGLE_CLOUD_LOCATION defaults global. Run `npm run eval:live -- --players
-model-history,model-obs-only --cases all` (cwd: project root). Both use gemini-3.5-flash-lite, K=8
+model-history,model-obs-only --cases all` (cwd: midterms/nicoh-yay). Both use gemini-3.5-flash-lite, K=8
 versus observation-only. The full live suite ran from clean revision `8f0e4a9` on 2026-10-31.
 Aggressive/careful each exited 2/14; history/observation-only each exited 0/14.
 Model episode-cap timeouts: 8/7; call timeouts: 0/0; errors: 20/11.
@@ -212,7 +218,7 @@ Commits since 2026-11-04 carry `Co-authored-by` trailers for Codex and Claude. E
 
 ## CI evidence
 
-The course workflow `.github/workflows/midterm-nicoh-yay.yml` runs npm ci, npm test, npm run typecheck and npm run build. tests/agent.test.ts runs the C checks through the shipped doom-test WASM; CI needs no emsdk. Historical fork evidence is [41244931991](https://github.com/NICOH-YAY/game-dev-f26/actions/runs/41244931991), commit c042ec0. This earlier run is not final-version CI evidence. All checks passed on course commit `95a2899`, synced from Tremor revision `9e06475`, in [course PR #67](https://github.com/columbia-university-ai-games/game-dev-f26/pull/67), including the [Midterm nicoh-yay verify run](https://github.com/columbia-university-ai-games/game-dev-f26/actions/runs/41889125996) and the [Minigame submission boundaries run](https://github.com/columbia-university-ai-games/game-dev-f26/actions/runs/41889126102).
+The course workflow `.github/workflows/midterm-nicoh-yay.yml` runs npm ci, npm test, npm run typecheck and npm run build. tests/agent.test.ts runs the C checks through the shipped doom-test WASM; CI needs no emsdk. Historical fork evidence is [41244931991](https://github.com/NICOH-YAY/game-dev-f26/actions/runs/41244931991), commit c042ec0. This earlier run is not final-version CI evidence. Current evidence for the submitted head is the [course PR #67 checks page](https://github.com/columbia-university-ai-games/game-dev-f26/pull/67/checks). Earlier passing runs on this PR are [41889125996](https://github.com/columbia-university-ai-games/game-dev-f26/actions/runs/41889125996) on `95a2899` and [41892152754](https://github.com/columbia-university-ai-games/game-dev-f26/actions/runs/41892152754) on `8890302`.
 
 ## Upstream comparison and large files
 
@@ -223,7 +229,7 @@ The Tremor repository is https://github.com/NICOH-YAY/tremor. The pristine vendo
 npm run upstream:patch
 ```
 
-`public/wad/freedoom1.wad` is committed so a fresh checkout can play and test offline. It is Freedoom 0.13.0, BSD-3-Clause, from https://github.com/freedoom/freedoom/releases/download/v0.13.0/freedoom-0.13.0.zip; SHA-256: 7323bcc168c5a45ff10749b339960e98314740a734c30d4b9f3337001f9e703d. Retrieve the release and extract freedoom1.wad to restore it; it is upstream data, not built here. `npm run engine:wad` (cwd: project root) rebuilds the derived tremor.wad (Python and Pillow required). `public/engine/source.zip` supplies GPL corresponding source; `npm run engine:build` (cwd: project root) recreates it and the browser engine. Committed WASM lets TAs and CI run without emsdk. The rebuild commands above recreate browser, headless and test artifacts; see [BUILD](engine/BUILD.md) for the watch target. `python engine/build/artifacts.py` (cwd: project root) refreshes the LF artifact manifest after rebuilding. `engine/doomgeneric/screenshots/sdl.png` is retained to preserve the vendor tree.
+`public/wad/freedoom1.wad` is committed so a fresh checkout can play and test offline. It is Freedoom 0.13.0, BSD-3-Clause, from https://github.com/freedoom/freedoom/releases/download/v0.13.0/freedoom-0.13.0.zip; SHA-256: 7323bcc168c5a45ff10749b339960e98314740a734c30d4b9f3337001f9e703d. Retrieve the release and extract freedoom1.wad to restore it; it is upstream data, not built here. `npm run engine:wad` (cwd: midterms/nicoh-yay) rebuilds the derived tremor.wad (Python and Pillow required). `public/engine/source.zip` supplies GPL corresponding source; `npm run engine:build` (cwd: midterms/nicoh-yay) recreates it and the browser engine. Committed WASM lets TAs and CI run without emsdk. The rebuild commands above recreate browser, headless and test artifacts; see [BUILD](engine/BUILD.md) for the watch target. `python engine/build/artifacts.py` (cwd: midterms/nicoh-yay) refreshes the LF artifact manifest after rebuilding. `engine/doomgeneric/screenshots/sdl.png` is retained to preserve the vendor tree.
 
 ## Optional live demo
 

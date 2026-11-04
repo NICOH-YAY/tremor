@@ -1,3 +1,5 @@
+> Superseded historical status from codex-doom13. Current live evidence and validation are in [EVALUATION.md](../EVALUATION.md).
+
 # Horror implementation status - 2026-10-31
 
 Current mechanics and rationale are maintained in [DESIGN](DESIGN.md),

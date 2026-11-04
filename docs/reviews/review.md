@@ -2,7 +2,7 @@
 
 ## Scope
 
-- Repo `D:\Coding VS\tremor`, HEAD `9927bfe` ("A-proofing: fix review leaks ..."), working tree clean at review time.
+- Repo `the Tremor repository root`, HEAD `9927bfe` ("A-proofing: fix review leaks ..."), working tree clean at review time.
 - Reviewer: a fresh read-only agent session that did not write the code and was given no instruction to approve. The only file written is this one.
 - Reviewed against the prior review (`independent-review-2026-10-31.md`), the author response (`review-response-2026-10-31.md`) and `docs/RUBRIC-CHECKLIST.md`.
 - A live evaluation (`npm run eval:live`) was running in the folder; `eval/traces` and `eval/results` were only read, never modified.
@@ -41,7 +41,7 @@ None.
 - The author says this plainly (good). The gap remains a rubric cap risk. Fix: invoke `tremor-level-check` in a genuinely separate session (for example after the next rule or controller change) and log it.
 
 **M4. Design-rule rationale is boilerplate; `DESIGN.md` has no per-parameter justification.**
-- Evidence: `docs/rule-source-map.md` has about 40 rows `TR_*` labelled `design` that all point to "[rationale](DESIGN.md)". `DESIGN.md` is 32 lines of prose and never explains why 90/256 crew, 31/256 drops, 64/256 ammo keep, 70-tic stun, 179 hit loss, 6 trauma cap or 350-tic decay. `TR_READ`/`TR_STUN`/`TR_PURGE` (values 1, 2, 4) are internal button bitmasks, not rules. Rubric 1a wants design rules pointing to the spec with rationale.
+- Evidence: `docs/rule-source-map.md` has about 40 rows `TR_*` labelled `design` that all point to "rationale (historical reference)". `DESIGN.md` is 32 lines of prose and never explains why 90/256 crew, 31/256 drops, 64/256 ammo keep, 70-tic stun, 179 hit loss, 6 trauma cap or 350-tic decay. `TR_READ`/`TR_STUN`/`TR_PURGE` (values 1, 2, 4) are internal button bitmasks, not rules. Rubric 1a wants design rules pointing to the spec with rationale.
 - Fix: add a short parameter-rationale table to `DESIGN.md` (value, effect on play, why this number); delete bitmask and render-only rows or label them "implementation".
 
 **M5. The scripted baseline is only functional on E1M1.**

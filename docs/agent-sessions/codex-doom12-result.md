@@ -1,6 +1,6 @@
 Implemented the major fixes, but **not yet A-proof**. No commits made.
 
-Every finding is mapped in the [review response](</D:/Coding VS/tremor/docs/reviews/review-response-2026-10-31.md>):
+Every finding is mapped in the [review response](../reviews/review-response-2026-10-31.md):
 
 | Input | Status |
 |---|---|
@@ -10,7 +10,7 @@ Every finding is mapped in the [review response](</D:/Coding VS/tremor/docs/revi
 | Clarity/efficiency audit | Implemented except incremental spreading of route searches |
 | Human playtest | Fixes implemented; visual/audio verification unavailable because no browser was exposed |
 
-**Verification:** 43 tests passed, 508 C checks passed, typecheck/build green. Fresh installation and checks also pass from the copied `game-dev-f26/midterms/nicoh-yay/` folder. Two skill invocations are [logged](</D:/Coding VS/tremor/docs/SKILL-INVOCATIONS.md>).
+**Verification:** 43 tests passed, 508 C checks passed, typecheck/build green. Fresh installation and checks also pass from the copied `game-dev-f26/midterms/nicoh-yay/` folder. Two skill invocations are [logged](../SKILL-INVOCATIONS.md).
 
 Final evaluation:
 
@@ -21,7 +21,7 @@ Final evaluation:
 | Model-history | Pending live run | — | — | — |
 | Model-obs-only | Pending live run | — | — | — |
 
-[Full results and three hashed gzip traces](</D:/Coding VS/tremor/EVALUATION.md>) retain all failures.
+[Full results and three hashed gzip traces](../../EVALUATION.md) retain all failures.
 
 Measured software-render cost: **0.230 → 0.193 ms/frame**; 200 headless steps: **1290 → 771 ms**. Canvas/DOM/audio are excluded.
 

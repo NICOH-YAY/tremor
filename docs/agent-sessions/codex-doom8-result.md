@@ -10,7 +10,7 @@ Latest scripted evaluation:
 | Aggressive | 0/10 | 7 | 3 | 26/0 | 0 | 124 |
 | Careful | 0/10 | 9 | 1 | 3/3 | 33 | 0 |
 
-Zero illegal actions or controller errors. [Full results](<D:/Coding VS/tremor/eval/results/2026-10-31-table.md>) · [Horror verification](<D:/Coding VS/tremor/docs/HORROR-STATUS.md>)
+Zero illegal actions or controller errors. Full results (historical reference) · [Horror verification](../HORROR-STATUS.md)
 
 Checks: **120 tests pass, 1 completion TODO**; typecheck/build pass; **470 engine checks pass**. Browser/headless builds, source archive, and hashes regenerated. No commits created.
 

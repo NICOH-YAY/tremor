@@ -1,6 +1,6 @@
-Finished F1–F9; fixes are mapped in [review-final-response.md](<scratchpad>). Preserved the live demo and evaluated headless binaries. No commits made.
+Finished F1–F9; fixes are mapped in review-final-response.md (historical reference). Preserved the live demo and evaluated headless binaries. No commits made.
 
-Produced [tremor-agent-2026-11-02.webm](</<scratchpad>):
+Produced tremor-agent-2026-11-02.webm (historical reference):
 
 - Duration: **4:08.187**
 - Size: **82,780,135 bytes**
@@ -22,6 +22,6 @@ Captured bus levels:
 | Results | .193168 | .040402 |
 | Limits | .177424 | .043361 |
 
-Details are in [recordings/README.md](</<scratchpad>). The video is gitignored.
+Details are in recordings/README.md (historical reference). The video is gitignored.
 
 Validation passed: **70 tests**, typecheck, build, and **508 engine checks**.

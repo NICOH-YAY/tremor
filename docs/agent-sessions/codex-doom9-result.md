@@ -14,4 +14,4 @@ Added the trace/map script, shared TAB route guidance, revised policies and a pa
 
 **Validation:** 122 tests and 470 engine checks pass; typecheck/build pass. Browser/headless artifacts rebuilt and hashes verified. No commits created.
 
-[Updated evaluation](</D:/Coding VS/tremor/EVALUATION.md>) · [Diagnosis](</D:/Coding VS/tremor/docs/BASELINE-DIAGNOSIS.md>)
+[Updated evaluation](../../EVALUATION.md) · [Diagnosis](../BASELINE-DIAGNOSIS.md)

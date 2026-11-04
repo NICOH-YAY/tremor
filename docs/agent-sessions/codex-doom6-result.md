@@ -2,7 +2,7 @@ Implemented a substantial horror pass and left everything **uncommitted**. **The
 
 Implemented corpse-sight terror, fear-based misses/damage, scarce ammunition and mercy rewards, objectives and paused previews, radio events/subtitles, procedural horror audio, monster sprite transforms, freelook, partial interpolation, settings and direct E1M1 startup.
 
-Changed engine rules/rendering/save/demo hooks, browser presentation/settings/startup, agent observations, sprite generation, tests, documentation and generated artifacts. The complete file list, constants and limitations are in [HORROR-STATUS.md](</D:/Coding VS/tremor/docs/HORROR-STATUS.md>).
+Changed engine rules/rendering/save/demo hooks, browser presentation/settings/startup, agent observations, sprite generation, tests, documentation and generated artifacts. The complete file list, constants and limitations are in [HORROR-STATUS.md](../HORROR-STATUS.md).
 
 Validation:
 
@@ -25,7 +25,7 @@ Core constants: 1024-unit corpse range, eight candidates/tic, −1 terror/10 sec
 
 **Unfinished/approximated:** native 640×400 and resolution selection; sharp-bilinear presentation; immediate per-frame mouse turning and full view interpolation; dependency-aware objective routing and safe-vantage search; complete episode radio history; reversed monster layers. Audio uses procedural approximations and speech fallback without recorded MP3s. Brave pointer lock, painting cost, audible balance and full-episode play remain unverified because no browser was available.
 
-Radio lines in [lines.json](</D:/Coding VS/tremor/public/radio/lines.json>):
+Radio lines in [lines.json](../../public/radio/lines.json):
 
 | ID | Text |
 |---|---|

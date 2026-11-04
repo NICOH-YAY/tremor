@@ -1,4 +1,4 @@
-Updated [EVALUATION.md](EVALUATION.md), README, reproducible aggregation script, two live trace samples and their SHA-256 manifest. Fixed documentation typos and preserved Nicoh’s limitations TODO.
+Updated [EVALUATION.md](../../EVALUATION.md), README, reproducible aggregation script, two live trace samples and their SHA-256 manifest. Fixed documentation typos and preserved Nicoh’s limitations TODO.
 
 | Player | Exits | Deaths | Step limits | Episode timeouts | Errors | Est. USD |
 |---|---:|---:|---:|---:|---:|---:|

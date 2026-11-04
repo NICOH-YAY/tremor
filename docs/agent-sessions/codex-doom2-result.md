@@ -1,9 +1,9 @@
 Implemented Tremor inside the real Doom engine and rebuilt `public/engine/`. All changes remain **uncommitted**; the pristine upstream commit is preserved.
 
-- Core logic/constants: [tremor.c](engine/tremor/tremor.c), [tremor.h](engine/tremor/tremor.h).
-- Exact changed-file inventory and reasons: [PATCHES.md](engine/PATCHES.md).
-- Sprite generator/PWAD: [build-tremor-wad.py](scripts/build-tremor-wad.py), `public/wad/tremor.wad`.
-- Engine tests: [tests.c](engine/tremor/tests.c), [test.mjs](engine/build/test.mjs).
+- Core logic/constants: [tremor.c](../../engine/tremor/tremor.c), [tremor.h](../../engine/tremor/tremor.h).
+- Exact changed-file inventory and reasons: [PATCHES.md](../../engine/PATCHES.md).
+- Sprite generator/PWAD: [build-tremor-wad.py](../../scripts/build-tremor-wad.py), `public/wad/tremor.wad`.
+- Engine tests: [tests.c](../../engine/tremor/tests.c), [test.mjs](../../engine/build/test.mjs).
 
 Constants include 35.16% crew selection, 35-tic READ/PURGE, 70-tic stun, two purge charges, trauma cap six, healing +15/+10 capped at 100, enemies+1 rounds, x10 fists, and 8–16 hyper blood particles.
 

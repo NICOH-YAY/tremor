@@ -1,6 +1,6 @@
 # Recording Tremor automatically
 
-From the project root (D:\Coding VS\tremor locally; midterms/nicoh-yay in the course checkout):
+From midterms/nicoh-yay in the course checkout:
 
 ```sh
 # cwd: project root

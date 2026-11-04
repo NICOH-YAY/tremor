@@ -12,6 +12,6 @@ Added bounded retreat, repeated-cell recovery, ammunition pickups and finer READ
 
 Careful: 34 READs, two crew saved, one killed, zero fired-unread. Aggressive: zero READs, 20 crew killed, 19 fired-unread.
 
-Updated [evaluation and diagnosis](EVALUATION.md) and regenerated the dated reports at **600 actions**. All 126 tests, typecheck, build and 470 engine checks pass; artifact hashes match LF bytes.
+Updated [evaluation and diagnosis](../../EVALUATION.md) and regenerated the dated reports at **600 actions**. All 126 tests, typecheck, build and 470 engine checks pass; artifact hashes match LF bytes.
 
 No commits or pushes made.

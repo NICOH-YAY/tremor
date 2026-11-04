@@ -10,4 +10,4 @@ Verification: **106 tests pass**, typecheck passes, engine build and Vite build 
 
 Remaining TODOs: MUS/OPL music; browser verification of audio and pointer lock; CPU-only Brave performance measurement; full start-to-exit playtest. Saves currently disappear on reload.
 
-Details and file locations: [BUILD.md](engine/BUILD.md), [UPSTREAM.md](engine/UPSTREAM.md), [PATCHES.md](engine/PATCHES.md).
+Details and file locations: [BUILD.md](../../engine/BUILD.md), [UPSTREAM.md](../../engine/UPSTREAM.md), [PATCHES.md](../../engine/PATCHES.md).

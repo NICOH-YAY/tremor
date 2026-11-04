@@ -21,7 +21,7 @@ states attribution is not required and commercial rights do not depend on plan t
 Sections 5.5 and 6.4 require preserving applicable watermarks and AI provenance
 markings, including imperceptible signals and metadata. Visual inspection on
 2026-11-03 of all ten images in public/art and all twelve available raw images in
-D:/Coding VS/tremor-art/raw, including alternate weapons, found no visible watermark.
+a local raw-art folder, including alternate weapons, found no visible watermark.
 This visual check does not establish the absence of invisible provenance signals.
 Palette conversion into tremor.wad does not preserve file metadata, so this record
 makes no claim that embedded provenance metadata survives that conversion.

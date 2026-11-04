@@ -1,11 +1,11 @@
 # Evaluation - 2026-10-31 live declared suite
 
-Primary evidence: the human ran `npm run eval:live` from clean committed revision
+Primary evidence: the human ran `npm run eval:live` (cwd: midterms/nicoh-yay) from clean committed revision
 `8f0e4a9dc937904ec47b1fe00045315330a112ae` (`8f0e4a9`). Run ID: `2026-10-31T06-19-01-385Z`.
 [Full results JSON](eval/results/2026-10-31-2026-10-31T06-19-01-385Z-results.json) and [runner per-episode table](eval/results/2026-10-31-2026-10-31T06-19-01-385Z-table.md) record all 56 episodes, including failures; no players were skipped and model rows are live, not mocked.
 Earlier baseline-only reports are superseded as current evidence; their dated files remain in `eval/results/` and their work records in [SKILL-INVOCATIONS](docs/SKILL-INVOCATIONS.md).
 
-Configuration ID: `faebcbfb97da87f4e3953745bc163d276f15e2e22c506ee9a343582eb8d6a363`. Vertex `gemini-3.5-flash-lite`, project `<your-gcp-project>`, location `global`, standard tier, temperature 0.2; history K=8 versus observation-only, shared lossless prompt encoding. Skill index 2, 40 constant seven-tic actions. Limits: 600 actions, 600 controller calls, 20 seconds/call, 300 seconds/episode. Failed calls consume budget. Natural exit/death takes precedence over later limits.
+Configuration ID: `faebcbfb97da87f4e3953745bc163d276f15e2e22c506ee9a343582eb8d6a363`. Vertex `gemini-3.5-flash-lite`, the course Vertex project (id redacted), location `global`, standard tier, temperature 0.2; history K=8 versus observation-only, shared lossless prompt encoding. Skill index 2, 40 constant seven-tic actions. Limits: 600 actions, 600 controller calls, 20 seconds/call, 300 seconds/episode. Failed calls consume budget. Natural exit/death takes precedence over later limits.
 
 Tuning: E1M1-E1M3; seen: E1M4-E1M5; held-out: E1M6-E1M7, frozen before model trials. Each map/player has two trials, RNG starts 17/83. Starts are 8-bit: modulo-256 equivalent seeds are identical, not new independent trials. See the [declared hypotheses and amendment history](docs/EVALUATION-PLAN.md).
 
@@ -67,6 +67,8 @@ Both samples use E1M1/17 for a matched map/seed comparison, chosen to show the c
 
 [SHA-256 manifest](eval/traces-sample/manifest.json) records each source run/report; retained baseline samples and the served baseline-success replay are from revision 203810d, run 06-16-26-402Z, stamped workingTree: dirty. All 28 baseline outcomes and metrics match the clean 8f0e4a9 run (see codex-doom18 evidence). Raw full-run traces remain ignored in `eval/traces/`.
 
+For step/call/timeout endings, the recorded limit reason is applied to the replay; final tic, health and all other metrics are independently reproduced from the actions.
+
 ## Artifact provenance
 
 The primary JSON records controller/interface source hashes as well as these artifact SHA-256s:
@@ -115,7 +117,7 @@ If I had more time though, I would probably change the rates of ammo and make fe
 
 The first thing I would fix is the spawns of some enemies. There's an enemy that spawns on top of the box which you can only kill if you have a gun so if you ran out of bullets you basically enter a room of you getting shot at and you can't do anything. But I tested with guns and it's possible to kill the enemy. I left it in originally since I thought it would incentivize after a couple runs of a player to be even more thoughtful with their bullets.
 
-### Facts for the limitations paragraph
+## Supporting facts
 
 The known-limitations section above records measured constraints. The [uploaded agent recording](https://drive.google.com/file/d/1-gUtdHicrsxu483OgbBwNUdB4stBCUJH/view?usp=sharing) is viewable by anyone signed in with a columbia.edu account and is described in [recordings/README.md](recordings/README.md). The instructor's Nov 4 2026 update allows human playtest notes from anyone (classmate, friend or family), and the notes are in [docs/playtests/README.md](docs/playtests/README.md). The optional demo is outside the declared suite and does not change its counts.
 
@@ -126,7 +128,9 @@ Historical validation for the evaluation documentation/evidence update at 13856c
 | Version | Revision |
 |---|---|
 | Game version evaluated | 8f0e4a9dc937904ec47b1fe00045315330a112ae |
-| Submitted version | Tremor 9e06475 plus this documentation-only CI evidence update; course PR #67 head |
+| Submitted version | the head of [course PR #67](https://github.com/columbia-university-ai-games/game-dev-f26/pull/67/checks) (documentation changes only after Tremor 9e06475's game and evaluation code) |
+
+The diff from `9e06475` to HEAD contains documentation, recording support in `public/record-gemini.js` and `public/record-mode.js`, three recording/inspection scripts, and npm recording script entries in `package.json`. It changes no game or evaluation logic.
 
 Changes since evaluation are music/presentation, the startup fix, the watch page, documentation, trace reason retention and hint placement. The model prompt, action interface and simulation behavior are unchanged. Spectator audio is enabled only when a presentation audio bridge is supplied; the evaluated headless path retains -nosound. Raw SHA-256 checks against the primary JSON on 2026-11-02 give:
 
@@ -137,12 +141,10 @@ Changes since evaluation are music/presentation, the startup fix, the watch page
 | `public/wad/freedoom1.wad` | unchanged |
 | `public/wad/tremor.wad` | unchanged |
 
-The engine-headless WASM and both WAD hashes are unchanged. Browser music artifacts changed after evaluation. The offline summarize command above also works from the Tremor root.
+The engine-headless WASM and both WAD hashes are unchanged. Browser music artifacts changed after evaluation. All commands above use midterms/nicoh-yay in the course checkout.
 
 ## Course CI evidence
 
-The course workflow runs npm ci, npm test, npm run typecheck and npm run build. tests/agent.test.ts invokes the C checks using shipped test WASM. Historical fork evidence is [41244931991](https://github.com/NICOH-YAY/game-dev-f26/actions/runs/41244931991) at c042ec0. This earlier run is not final-version CI evidence. All checks passed on course commit `95a2899`, synced from Tremor revision `9e06475`, in [course PR #67](https://github.com/columbia-university-ai-games/game-dev-f26/pull/67), including the [Midterm nicoh-yay verify run](https://github.com/columbia-university-ai-games/game-dev-f26/actions/runs/41889125996) and the [Minigame submission boundaries run](https://github.com/columbia-university-ai-games/game-dev-f26/actions/runs/41889126102).
-
-For step/call/timeout endings, the recorded limit reason is applied to the replay; final tic, health and all other metrics are independently reproduced from the actions.
+The course workflow runs npm ci, npm test, npm run typecheck and npm run build. tests/agent.test.ts invokes the C checks using shipped test WASM. Historical fork evidence is [41244931991](https://github.com/NICOH-YAY/game-dev-f26/actions/runs/41244931991) at c042ec0. This earlier run is not final-version CI evidence. Current evidence for the submitted head is the [course PR #67 checks page](https://github.com/columbia-university-ai-games/game-dev-f26/pull/67/checks). Earlier passing runs on this PR are [41889125996](https://github.com/columbia-university-ai-games/game-dev-f26/actions/runs/41889125996) on `95a2899` and [41892152754](https://github.com/columbia-university-ai-games/game-dev-f26/actions/runs/41892152754) on `8890302`.
 
 Source-hash caveat: src/player_interface.ts changed by moving the unchanged action list to src/agent/actions.ts and re-exporting it; src/eval/runner.ts changed only to retain the model reason in traces. These two recorded source hashes differ. Model policy, prompt and action behavior remain unchanged.

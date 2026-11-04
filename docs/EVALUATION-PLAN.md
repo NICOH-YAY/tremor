@@ -9,7 +9,7 @@ All use public observations and 40 constant seven-tic actions, skill index 2.
 Limits: 600 actions, 600 calls, 20 seconds/call, five minutes/episode.
 Failed calls count; three invalid decisions (errors do not reset this streak)
 produce a labelled wait. Timeouts terminate. Exit=100, all other scores=0.
-Live model rows remain pending until --live is explicitly executed.
+The live suite ran on 2026-10-31 with --live. See [the evaluation](../EVALUATION.md).
 Report completion, limits, illegal actions, latency, tokens, dated cost, progress,
 objectives, final health, kills, crew killed/saved, reads, fired_unread and terror.
 Seeds are 8-bit RNG table starts; seeds congruent modulo 256 are identical.
