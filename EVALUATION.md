@@ -126,7 +126,7 @@ Historical validation for the evaluation documentation/evidence update at 13856c
 | Version | Revision |
 |---|---|
 | Game version evaluated | 8f0e4a9dc937904ec47b1fe00045315330a112ae |
-| Submitted version | To be filled at submission |
+| Submitted version | Tremor 9e06475 plus this documentation-only CI evidence update; course PR #67 head |
 
 Changes since evaluation are music/presentation, the startup fix, the watch page, documentation, trace reason retention and hint placement. The model prompt, action interface and simulation behavior are unchanged. Spectator audio is enabled only when a presentation audio bridge is supplied; the evaluated headless path retains -nosound. Raw SHA-256 checks against the primary JSON on 2026-11-02 give:
 
@@ -141,7 +141,7 @@ The engine-headless WASM and both WAD hashes are unchanged. Browser music artifa
 
 ## Course CI evidence
 
-The course workflow runs npm ci, npm test, npm run typecheck and npm run build. tests/agent.test.ts invokes the C checks using shipped test WASM. Historical fork evidence only: [41244931991](https://github.com/NICOH-YAY/game-dev-f26/actions/runs/41244931991) at c042ec0. Final PR Actions run URL + SHA: to be added after the PR opens. This earlier run is not final-version CI evidence.
+The course workflow runs npm ci, npm test, npm run typecheck and npm run build. tests/agent.test.ts invokes the C checks using shipped test WASM. Historical fork evidence is [41244931991](https://github.com/NICOH-YAY/game-dev-f26/actions/runs/41244931991) at c042ec0. This earlier run is not final-version CI evidence. All checks passed on course commit `95a2899`, synced from Tremor revision `9e06475`, in [course PR #67](https://github.com/columbia-university-ai-games/game-dev-f26/pull/67), including the [Midterm nicoh-yay verify run](https://github.com/columbia-university-ai-games/game-dev-f26/actions/runs/41889125996) and the [Minigame submission boundaries run](https://github.com/columbia-university-ai-games/game-dev-f26/actions/runs/41889126102).
 
 For step/call/timeout endings, the recorded limit reason is applied to the replay; final tic, health and all other metrics are independently reproduced from the actions.
 

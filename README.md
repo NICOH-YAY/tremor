@@ -8,7 +8,9 @@
 - [Peer notes](docs/peer-notes/README.md).
 - [Agent sessions](docs/agent-sessions/README.md).
 - [First independent review](docs/reviews/independent-review-2026-10-31.md) and [response](docs/reviews/review-response-2026-10-31.md); [second review](docs/reviews/review.md) and [response](docs/reviews/review-response.md); [final review](docs/reviews/review-final-2026-11-02.md) and [response](docs/reviews/review-final-response.md).
-- Course PR Actions run URL + SHA: to be added after the PR opens.
+- All checks passed on course commit `95a2899`, synced from Tremor revision `9e06475`, in [course PR #67](https://github.com/columbia-university-ai-games/game-dev-f26/pull/67), including the [Midterm nicoh-yay verify run](https://github.com/columbia-university-ai-games/game-dev-f26/actions/runs/41889125996) and the [Minigame submission boundaries run](https://github.com/columbia-university-ai-games/game-dev-f26/actions/runs/41889126102).
+
+The open course PR uses branch `nicoh-yay/tremor-midterm` in the course repository. GitHub detached the student fork when the course repository became private, so the branch was pushed directly to the course repository.
 
 ## Scope change
 
@@ -144,11 +146,11 @@ Model prompts preserve all public map information with lossless row RLE and reve
 
 ## CI evidence
 
-The course workflow `.github/workflows/midterm-nicoh-yay.yml` runs npm ci, npm test, npm run typecheck and npm run build. tests/agent.test.ts runs the C checks through the shipped doom-test WASM; CI needs no emsdk. Historical fork evidence only: [41244931991](https://github.com/NICOH-YAY/game-dev-f26/actions/runs/41244931991), commit c042ec0. Final course PR Actions run URL + SHA: to be added after the PR opens.
+The course workflow `.github/workflows/midterm-nicoh-yay.yml` runs npm ci, npm test, npm run typecheck and npm run build. tests/agent.test.ts runs the C checks through the shipped doom-test WASM; CI needs no emsdk. Historical fork evidence is [41244931991](https://github.com/NICOH-YAY/game-dev-f26/actions/runs/41244931991), commit c042ec0. This earlier run is not final-version CI evidence. All checks passed on course commit `95a2899`, synced from Tremor revision `9e06475`, in [course PR #67](https://github.com/columbia-university-ai-games/game-dev-f26/pull/67), including the [Midterm nicoh-yay verify run](https://github.com/columbia-university-ai-games/game-dev-f26/actions/runs/41889125996) and the [Minigame submission boundaries run](https://github.com/columbia-university-ai-games/game-dev-f26/actions/runs/41889126102).
 
 ## Upstream comparison and large files
 
-The Tremor repository is https://github.com/NICOH-YAY/tremor. Pristine vendor commit: 821957f. Final submission commit: to be filled at submission. [UPSTREAM](engine/UPSTREAM.md) gives the offline comparison recipe. [The patch](engine/tremor-vs-upstream.patch) contains changes to vendored files. Regenerate it with:
+The Tremor repository is https://github.com/NICOH-YAY/tremor. The pristine vendor commit is `821957f`. The submitted folder was synced from Tremor revision `9e06475` at course commit `95a2899` in [course PR #67](https://github.com/columbia-university-ai-games/game-dev-f26/pull/67). This documentation-only CI evidence update follows that revision. [UPSTREAM](engine/UPSTREAM.md) gives the offline comparison recipe. [The patch](engine/tremor-vs-upstream.patch) contains changes to vendored files. Regenerate it with:
 
 ```sh
 # cwd: midterms/nicoh-yay
