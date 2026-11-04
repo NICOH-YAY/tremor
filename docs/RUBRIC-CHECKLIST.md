@@ -9,7 +9,8 @@ Paraphrased requirements for COMS E6998 sec 014 midterm, "build a game and an ag
 
 ## Rules and sources
 - 1a: rule/source map: every rule labelled code / manual / observed / assumed / design, with a locator (file+function, manual page, or our spec section). Our own rules = design, pointing to docs/DESIGN.md with rationale.
-- 1c: credit originals; quote/link reuse terms; all assets original or licensed (Higgsfield art terms checked by Nicoh).
+- 1c: credit originals; quote/link reuse terms; all assets original or licensed (Higgsfield art terms independently re-checked 2026-11-03; see the
+[verification record](../public/art/CREDITS.md)).
 
 ## Interface (2b, 2c, 3b)
 - reset(seed) / observe(player_id) / legal_actions(player_id) / step(player_id, action) / outcome() -> ongoing|terminal + reason + score.

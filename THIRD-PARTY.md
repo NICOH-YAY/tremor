@@ -9,7 +9,7 @@
 | Vite/Vitest/TypeScript/happy-dom/tsx |package-lock.json exact versions | MIT | package-lock.json package repositories | Dev/test/build only |
 | @google/genai |package-lock.json | Apache-2.0 | https://github.com/googleapis/js-genai | Node eval only |
 | @types/node |package-lock.json | MIT | https://github.com/DefinitelyTyped/DefinitelyTyped | Types only |
-| Higgsfield generated art |z_image,2026-10-30 | Output terms;project creative files GPL to extent applicable | https://higgsfield.ai/terms-of-use-agreement | See public/art/CREDITS.md |
+| Higgsfield generated art |z_image,2026-10-30 | Output terms;project creative files GPL to extent applicable | https://higgsfield.ai/terms-of-use-agreement | See [independent 2026-11-03 terms check](public/art/CREDITS.md) |
 
 GPL applies to combined engine/application code; assets/dependencies retain their
 separate notices. BSD conditions/copyright retained. GPL corresponding source and
