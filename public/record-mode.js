@@ -1,6 +1,7 @@
 import {setupAudio} from './record-audio.js';
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
 export async function record(replay){
+ if(new URLSearchParams(location.search).get('script')==='gemini')return (await import('./record-gemini.js')).record(replay);
  const params=new URLSearchParams(location.search),diagnostic=params.get('diagnostic')==='1';if((params.get('script')||'default')!=='default')throw Error('Unknown recording script');
  const canvas=document.createElement('canvas');canvas.width=1920;canvas.height=1080;canvas.id='recording';canvas.style.cssText='position:fixed;inset:0;width:100vw;height:100vh;z-index:100;background:#080c11';document.body.append(canvas);
  const g=canvas.getContext('2d',{alpha:false});g.imageSmoothingEnabled=false;

@@ -26,22 +26,6 @@ The current rule map is [docs/rule-source-map.md](docs/rule-source-map.md). Supe
 
 
 
-## Rules
-
-Reach each level exit; the browser episode ends at E1M8 (E1M9 is optional). Death lets you restart the level. Hold TAB for the shared geometry route arrow, which excludes secret passages. It is designed guidance through unseen geometry.
-
-WASD move; mouse/arrows turn; mouse Y or PgUp/PgDn look; End centers; Ctrl/click fires; E/Space uses; Shift runs; 1-7 weapons; R/right mouse READ; F STUN; Q PURGE; ? pauses for help. Settings rebind controls. Pitch clamps to +/-32 degrees; READ/STUN/PURGE follow pitch like shots. Fists deal 10x ordinary Doom fist damage.
-
-Some humans are crew (spawn probability 90/256 for pistol/shotgun humans); crew never attack. Hold READ on an aimed human for 35 tics (1 second) to reveal identity. STUN works within 64 units for 70 tics (2 seconds), cooldown 35 tics. Hold PURGE within 64 units on a stunned human for 35 uninterrupted tics. Damage, loss of aim, release or stun expiry interrupts it. Completion consumes 1 of 2 charges per level and gives +3 rounds; both hidden identities become revealed crew. A possessed human is cured. Repeated crew purges still cost a charge.
-
-All firearms share rounds. Each level starts with hostile count +1 rounds and fists/pistol; that HUD budget intentionally reveals the starting hostile count. Weapon pickups add no rounds. Map ammo survives with probability 64/256 (25%); dropped ammo gives 1, small pickups 2, boxes 4 rounds; backpacks give 8 (four grants of 2). Every eligible human/demon death has the same 31/256 (12.11%) drop chance. Empty guns switch to fists.
-
-Player kills heal 15 for humans or 10 for demons, up to 100; health already above 100 stays untouched. Inherited health bonuses/spheres can reach 200. Killing any human adds aim trauma, capped at 6 for the episode, with random angular jitter proportional to trauma (TR_AIM_UNIT=16384 binary-angle units per random-byte delta per trauma). Trauma never decays. Crew cower 35 tics near visible demons within 192 units or gunfire within 512.
-
-Fear is 0-100. Each corpse seen within 1024 units, +/-45 degrees and line of sight counts once: +1, or +2 if less than 70 tics old and closer than 256 units, identically for crew and possessed. At most 8 sight tests/tic. Fear buckets: steady <25, shaken 25-49, terrified 50-79, breaking 80-100. Hit success declines from 100% to 77/256 (30.08%); incoming damage rises linearly to 1.6x (1.0x at fear 0). Fear loses 1 after every 350 tics without new exposure and halves on level entry. Do not stare at bodies.
-
-Halloran gives one briefing per map and rare once-per-episode beats, at least 3150 tics (90 seconds) apart. Read the Radio log for the 16KB transcript. First-time HUD hints are separate from radio. Gore, grain, weapon sway, brightness and autoaim are adjustable. Music defaults to Layered: original WAD OPL music over an audible horror score. Fear darkens and slightly lowers the OPL pitch while fear/pressure build the score. Settings offers Layered (default), Horror score, or Original; Music volume affects both layers live. Saves use Tremor 3 and browser storage; partial READ/PURGE resets on load. The inherited intermission kill percentage is combat bookkeeping, not a moral score.
-
 ## Setup and commands
 
 Requires Node 24+ and npm. All commands run in the project root: the Tremor root locally, or midterms/nicoh-yay in the course checkout. PowerShell may require npm.cmd instead of npm.
@@ -112,6 +96,76 @@ engine:wad requires Pillow. Keep corresponding GPL source with binaries.
 [Build](engine/BUILD.md), [contracts](docs/CONTRACTS.md), [source map](docs/rule-source-map.md),
 [decisions](docs/DECISIONS.md), [five CI kinds](tests/README.md).
 
+## How Tremor works
+
+The authoritative versions are [docs/RULES.md](docs/RULES.md) and [docs/rule-source-map.md](docs/rule-source-map.md). [Contracts](docs/CONTRACTS.md) define the public agent interface. Each technical paragraph names the relevant rule/source-map rows and classification labels.
+
+### The goal and the ending
+
+Find the exit and survive to continue through Episode 1. The human episode finishes at the final level, with an optional secret level along the way. If you die, you can restart the level.
+
+Technical. The browser episode ends at E1M8; E1M9 is optional. An agent episode resets a single E1M1-E1M9 map and ends on exit, death or an evaluator limit. Rule/source-map rows: **Keys/exits/hazards** (`code`), **Controls/player manual** and **Runner** (`design`). Locators: `engine/doomgeneric/doomgeneric/g_game.c` (`G_DoCompleted`), `p_switch.c` (`P_UseSpecialLine`), `p_spec.c` (`P_CrossSpecialLine`, `P_PlayerInSpecialSector`), and `engine/tremor/agent_api.c` (terminal detection).
+
+### Controls
+
+Move with WASD and turn with the mouse or arrow keys. Look up or down with mouse movement or PgUp/PgDn, fire with Ctrl or click, and use doors or switches with E or Space. Hold TAB for the route map and press ? to pause for help. Settings let you rebind controls.
+
+Technical. End centers the view; Shift runs; 1-7 select weapons; R/right mouse holds READ, F uses STUN, and Q holds PURGE. Pitch clamps to +/-32 degrees using Y-shear; aimed interactions follow pitch like shots. Fists apply `TR_MELEE_MULTIPLIER=10` to inherited fist damage. Rule/source-map rows: **Controls/player manual**, **Pitch**, **TR_MELEE_MULTIPLIER** (`design`), **Movement/collision** (`code`). Locators: `index.html` (`how-to-play`), `engine/tremor/tremor.h`, `tremor.c` (`TR_PlayerThink`, `TR_PitchSlope`, `tremor_bind_key`), and `engine/doomgeneric/doomgeneric/g_game.c` (`G_BuildTiccmd`).
+
+### Fear
+
+Seeing bodies raises your fear, especially when a death is recent and close. Keep moving and give yourself time away from new bodies to recover. Some fear follows you into the next level.
+
+Technical. Fear is clamped to 0-100. Each corpse counts once within 1024 units, +/-45 degrees and line of sight: +1, or +2 when its recorded death is less than 70 tics old and its distance is less than 256 units. Crew and possessed corpses use the same rule. `TR_TERROR_SCAN=8` caps sight tests per tic; `TR_TERROR_DECAY=350` removes 1 point after each such interval without new exposure; level entry halves fear with integer division. Timing is 35 tics/second. Rule/source-map rows: **Fear**, **Decay/carry**, **TR_TERROR_RANGE**, **TR_TERROR_CLOSE**, **TR_TERROR_SCAN**, **TR_TERROR_DECAY** (`design`), **Timing** (`code`). Locators: `engine/tremor/tremor.h`, `tremor.c` (`corpses`, `TR_LevelStart`), and `engine/doomgeneric/doomgeneric/doomdef.h` (`TICRATE`).
+
+### What fear does to you
+
+As fear rises, your shots become less reliable and attacks hurt more. Your weapon sways, the screen edges darken, and you hear a faster heartbeat. Moving away from new bodies helps you recover before the next fight.
+
+Technical. `TR_Hit` succeeds when a random byte is less than `256 - fear * 179 / 100`, using integer division (`TR_HIT_LOSS=179`): 100% at zero fear, 77/256 or 30.08% at maximum fear, approximately 30%. This is the fear hit roll; aim and trauma also affect final accuracy. `TR_Damage(d)` returns `d + (d * fear * 6) / 1000` (`TR_DAMAGE_EXTRA=6`), reaching x1.6 before integer rounding. Buckets are steady <25, shaken <50, terrified <80, otherwise breaking. Rule/source-map rows: **Fear effects**, **TR_HIT_LOSS**, **TR_DAMAGE_EXTRA**, **UI/effects** (`design`). Locators: `engine/tremor/tremor.c` (`TR_Hit`, `TR_Aim`, `TR_Damage`, `TR_TerrorBucket`, `TR_Sway`, `TR_ArmY`) and `public/horror.js` (`frame`, fear-driven shade and heartbeat). Sway, grain, brightness and autoaim are adjustable.
+
+### Ammo
+
+All guns draw from the same supply of rounds. You begin each level with only a little more ammunition than the number of hostiles, so avoid wasting shots. Pickups and death drops are scarce; completing a purge gives you more rounds. Empty guns switch to fists.
+
+Technical. `TR_LevelStart` sets rounds to `totalkills + 1` and resets weapons to fists/pistol; this public budget deliberately reveals the starting hostile count. Weapon pickups add no rounds. `TR_AMMO_KEEP=64` retains map ammo with probability 64/256; `TR_AMMO_DROP=31` gives every eligible human/demon death the same 31/256 chance of dropping 1 round. Small pickups grant 2, boxes 4, backpacks 8 through four grants of 2, and completed purges grant 3. Rule/source-map rows: **Ammo**, **TR_AMMO_KEEP**, **TR_AMMO_DROP**, **Purge** (`design`). Locators: `engine/tremor/tremor.h`, `tremor.c` (`TR_LevelStart`, `TR_Kill`, `TR_Ammo`, `TR_PlayerThink`, `TR_CheckAmmo`) and `engine/doomgeneric/doomgeneric/p_inter.c` (`P_GiveAmmo`, `P_GiveWeapon`, `P_TouchSpecialThing`).
+
+### The crew and the moral choice
+
+An unfamiliar human figure may be crew or possessed. Hold READ while aiming to learn who they are before deciding whether to shoot. Stun a figure and hold PURGE close to them to cure possession, but staying close takes time and leaves you exposed. Identity stays hidden so you must choose whether to spend that time before firing.
+
+Technical. `TR_CREW_THRESHOLD=90` gives pistol/shotgun humans a 90/256 crew spawn probability; crew never attack. READ needs 35 continuous tics. STUN reaches 64 units (`MELEERANGE`), lasts 70 tics and has a 35-tic cooldown. PURGE needs 35 uninterrupted tics within that range on a stunned human; damage, losing aim, release or stun expiry interrupts it. Completion spends 1 of 2 per-level charges, grants 3 rounds and reveals either identity as crew; only curing possession increments saved crew. Repeating a crew purge still costs a charge. Unread public figures have no identity IDs; stun and interrupted-purge feedback match identities. Killing any human adds permanent episode trauma, capped at 6, with jitter `(P_Random()-P_Random()) * trauma * TR_AIM_UNIT`, where `TR_AIM_UNIT=16384` binary-angle units. Player kills heal 15 for humans or 10 for demons up to 100, leaving health already above 100 untouched; inherited bonuses/spheres can reach 200. Crew cower for 35 tics near visible demons within 192 units or gunfire within 512 units. Rule/source-map rows: **Crew probability**, **TR_READ_TICS**, **TR_STUN_TICS**, **TR_STUN_COOLDOWN**, **TR_PURGE_TICS**, **TR_PURGE_CHARGES**, **Purge**, **Kill effects**, **TR_AIM_UNIT**, **TR_FEAR_RANGE**, **TR_GUN_FEAR_RANGE**, **TR_COWER_TICS** (`design`), **Health/armor** (`code`). Locators: `engine/tremor/tremor.h`, `tremor.c` (`TR_MapSpawn`, `TR_Think`, `TR_PlayerThink`, `TR_Damaged`, `TR_Kill`, `TR_Aim`, `TR_Noise`), `engine/tremor/agent_api.c` (entity serialization), and `engine/doomgeneric/doomgeneric/p_local.h` (`MELEERANGE`).
+
+### The radio voice
+
+Halloran briefs you when you enter a level and speaks occasionally as you play. Read the Radio log if you miss a line. First-time control hints appear separately so you can learn without waiting for the radio.
+
+Technical. Each map briefing is queued once per episode via `tr_briefing_bits`; rare Halloran beats are also once per episode, separated by at least `TR_RADIO_COOLDOWN=3150` tics (90 seconds), with level start resetting the cooldown clock. The transcript buffer is 16384 bytes. Purge completion also queues a separate crew ammunition acknowledgment. Rule/source-map rows: **Radio/save**, **TR_RADIO_COOLDOWN** (`design`). Locators: `engine/tremor/tremor.h`, `tremor.c` (`TR_StoryStart`, `TR_Radio`, `TR_QueueRadio`, `TR_PlayerThink`, `hint_once`). Music defaults to Layered, combining original WAD OPL music and the horror score; Settings also offers Horror score or Original, with live volume control for both layers. Fear darkens and slightly lowers the OPL pitch while fear and pressure build the score (`public/horror.js`, `public/music.js`; **UI/effects**, `design`). Tremor 3 browser saves preserve state but reset partial READ/PURGE channels (`engine/doomgeneric/doomgeneric/p_saveg.c`; **Radio/save**, `design`).
+
+### Objectives and the route map
+
+Follow the current objective toward a key, switch or exit. Hold TAB for the map and direction arrow when you need help finding the route. The guidance can show where to go before you have explored the area, but it does not solve every lift or teleporter.
+
+Technical. Human TAB and agents share full-geometry guidance, including unseen dependencies; secret lines block the route lattice. The lattice uses 16-unit cells and a smoothed waypoint up to 256 units ahead. Objective distance is near below 128 units, nearby below 512, otherwise far. The public north-up automap is 257x257 cells at 16 units/cell, with D/d doors, S switches, T crossings and b/y/r locks; no secret activation markers or actor identities leave the planner. Rule/source-map rows: **Map**, **Route** (`design`). Locators: `engine/tremor/tremor.c` (`TR_StoryTick`, `route_update`, `TR_ObjectiveBearing`, `TR_ObjectiveDistance`), `engine/tremor/agent_api.c` (`automap`, `discover`), and `engine/doomgeneric/doomgeneric/am_map.c` (`AM_drawWalls`).
+
+### Scoring and what is measured
+
+Reaching the exit is the scored goal. The evaluation also records how you treated the crew and how far you progressed, so a result can describe more than survival. These records do not turn crew deaths or rescues into extra score.
+
+Technical. Exit scores 100; every other ending scores 0. Outcomes record crew killed/saved, reads, fired-unread, kills, rounds left, trauma, terror bucket, tics and final health. Evaluator-only route progress is a sector-hop proxy clamped to 0-99 until exit gives 100; it ignores locks/heights and does not prove traversability. `objectivesReached` counts distinct key types collected plus completed exit, not switch-only subtasks. Moral metrics are descriptive; the inherited intermission kill percentage is combat bookkeeping. Rule/source-map row: **Runner** (`design`); contracts define outcome and progress fields. Locators: `engine/tremor/agent_api.c` (`route_progress`, `tremor_agent_outcome`) and `src/eval/runner.ts` (`runEpisode`).
+
+### The agent interface
+
+An agent receives a text description of what the player can know and chooses a short action. It can move, fight, read figures and follow the same route guidance as a human. It receives no game image or sound, and hidden identities remain hidden until revealed through play.
+
+Technical. The five operations are `reset`, `observe`, `legal_actions`, `step` and `outcome` in `src/player_interface.ts`. Controllers receive detached public Observation data, copied legal IDs and validation feedback, never the private WASM handle or evaluator outcome; imports are not a security sandbox. There are 40 constant actions, each advancing 7 tics (0.2 seconds); compound macros hold both controls. Reset uses skill index 2 and `seed & 255` for an 8-bit RNG start, not generated levels. Limits are 600 actions, 600 calls, 20 seconds/call and 300 seconds/episode. Invalid submissions idle for 7 tics; three invalid decisions trigger a labelled wait, with errors preserving that streak. Failed calls consume call budget without advancing gameplay. Natural exit/death takes precedence over later limits; terminal actions do not advance. Rule/source-map section: **40-action ABI**; row: **Runner** (`design`); contracts define public boundaries. Locators: `engine/tremor/agent_api.c` (`tremor_agent_step`), `src/agent/actions.ts` (`ACTION_IDS`), `src/player_interface.ts`, and `src/eval/runner.ts` (`runEpisode`).
+
+### How the evaluation works
+
+The declared suite compares aggressive and careful scripted players with Gemini playing from the same public information. One Gemini condition receives recent history and the other receives only the current observation. Read [EVALUATION.md](EVALUATION.md) for the results, failures and limitations; the recorded trials do not demonstrate model completion.
+
+Technical. The [declared plan](docs/EVALUATION-PLAN.md) separates tuning E1M1-E1M3, seen E1M4-E1M5 and held-out E1M6-E1M7, each with RNG starts 17 and 83. Four players produce 56 episodes: `baseline_aggressive`, `baseline_careful`, and `gemini-3.5-flash-lite` with K=8 history or observation-only. The declared live run dated 2026-10-31 reports 2/14 exits for each baseline and 0/14 for each Gemini condition; only scripted E1M1 runs exited. These are recorded observations, not guarantees. Rule/source-map rows: **Runner**, **Model encoding** (`design`); results are evidence in EVALUATION.md. Locators: `src/eval/runner.ts` (`runEpisode`), `src/eval/model_config.ts`, `src/agent/prompt.ts`, and the plan/result links in EVALUATION.md. Live evaluation requires `--live`; replay and the optional demo are excluded from declared-suite results.
+
 ## Scope and changes versus Doom
 
 Inherited: 35Hz physics, geometry, AI, keys, doors, weapons, pickups, infighting
@@ -143,6 +197,18 @@ with id Software or ZeniMax. Proprietary Doom WADs do not ship.
 Personal reflections, peer notes and the course submission PR are supplied by the student.
 
 Model prompts preserve all public map information with lossless row RLE and reverse history deltas; see [contracts](docs/CONTRACTS.md). Seen/held-out baseline comparisons concern route progress and survival; completion has only been demonstrated on E1M1.
+
+## Contributors
+
+Nicoh wrote AGENT-TEAM.md, the limitations paragraph and the playtest notes. At his request Claude reworded two passages (the skills paragraph and the second limitations point) to be more accurate. The README, rules docs and evaluation report were written by Codex and Claude from Nicoh's design, playtests and decisions, and he directed and reviewed them.
+
+- **Nicoh**: design, direction and playtesting. [AGENT-TEAM.md](AGENT-TEAM.md) and the [evaluation limitations](EVALUATION.md#limitations-in-nicohs-words) describe his decisions and limitations in his own words.
+- **Codex (OpenAI)**: the only code editor, responsible for all original Tremor game, engine patch, agent, evaluation and tooling code. The inherited engine and third-party assets retain their upstream authorship. See [ownership instructions](AGENTS.md) and [per-session evidence](docs/agent-sessions/README.md).
+- **Claude Code (Anthropic)**: planning, prompts, review coordination, browser playtests, commits and evaluation runs.
+- **Independent reviewer and audit agents**: reviews and checks recorded in [docs/reviews/](docs/reviews/).
+- **Gemini 3.5 Flash-Lite**: the evaluated player, not a builder.
+
+Commits since 2026-11-04 carry `Co-authored-by` trailers for Codex and Claude. Earlier Codex work is recorded per session in [docs/agent-sessions/README.md](docs/agent-sessions/README.md).
 
 ## CI evidence
 

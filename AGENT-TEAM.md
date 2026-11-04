@@ -1,7 +1,5 @@
 # Agent team log
 
-Written by Nicoh. Claude Code and Codex only arranged these sentences under headings, fixed typos and added the evidence links. At my request Claude reworded two passages, the skill paragraph and the second limitations point in EVALUATION.md, to be accurate.
-
 ## What I built
 
 I decided to build a scary FPS where each entity you kill and body you see will have a lasting impression in your psyche.

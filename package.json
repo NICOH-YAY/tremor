@@ -21,7 +21,8 @@
     "demo:live": "node --import ./scripts/typescript-loader.mjs scripts/demo-live.ts --live",
     "demo:copy": "node scripts/copy-demo.mjs",
     "upstream:patch": "node scripts/upstream-patch.mjs",
-    "record:video": "node scripts/record-video.mjs"
+    "record:video": "node scripts/record-video.mjs",
+    "record:gemini": "node scripts/record-gemini.mjs"
   },
   "devDependencies": {
     "happy-dom": "^21.0.4",
