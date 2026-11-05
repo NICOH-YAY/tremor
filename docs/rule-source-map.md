@@ -128,4 +128,4 @@ spectator modules, including report terminal records, tic, health and all metric
 | First-time hints remain in the 3D view above the status bar | design | public/hint-layout.js hintBounds; public/horror.js frame; tests/hint.test.js |
 | Model reasons are trace-only strings capped at 300 characters; validation feedback and K=8 observation/action history are unchanged | design | src/eval/runner.ts record; src/agent/model_player.ts history; tests/agent.test.ts bounded reasons regression |
 
-| Automated spectator recording (presentation; no simulation rule change) | design | public/record-mode.js record; public/record-audio.js setupAudio; scripts/record-video.mjs | Deterministic recorded actions, verified terminal metrics, labelled jump cut, captured master audio; no human game input |
+| Automated spectator recording (presentation; no simulation rule change) | design | public/record-mode.js record; public/record-audio.js setupAudio; scripts/record-video.mjs; Deterministic recorded actions, verified terminal metrics, labelled jump cut, captured master audio; no human game input |

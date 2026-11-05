@@ -135,16 +135,16 @@ The first thing I would fix is the spawns of some enemies. There's an enemy that
 
 The known-limitations section above records measured constraints. The [uploaded agent recording](https://drive.google.com/file/d/1-gUtdHicrsxu483OgbBwNUdB4stBCUJH/view?usp=sharing) is viewable by anyone signed in with a columbia.edu account and is described in [recordings/README.md](recordings/README.md). The instructor's Nov 4 2026 update allows human playtest notes from anyone (classmate, friend or family), and the notes are in [docs/playtests/README.md](docs/playtests/README.md). The optional demo is outside the declared suite and does not change its counts.
 
-Historical validation for the evaluation documentation/evidence update at 13856cb: `npm test` (50 tests, 10 files), `npm run typecheck`, `npm run build`, and `npm run engine:test` (508 checks, 0 failures) passed. Build retains the existing `art/title.jpg` resolution warning. Sample gzip integrity, source-copy equality, manifest/artifact SHA-256s, cost calculations and reproduced Markdown tables were checked offline. No new evaluation runs, gameplay/controller changes or commits.
+Historical validation for the evaluation documentation/evidence update at 13856cb: `npm test` (50 tests, 10 files; current suite: 80 tests in 20 files), `npm run typecheck`, `npm run build`, and `npm run engine:test` (508 checks, 0 failures) passed. Build retains the existing `art/title.jpg` resolution warning. Sample gzip integrity, source-copy equality, manifest/artifact SHA-256s, cost calculations and reproduced Markdown tables were checked offline. No new evaluation runs, gameplay/controller changes or commits.
 
 ## Evaluated and submitted versions
 
 | Version | Revision |
 |---|---|
 | Game version evaluated | 8f0e4a9dc937904ec47b1fe00045315330a112ae |
-| Submitted version | the head of [course PR #67](https://github.com/columbia-university-ai-games/game-dev-f26/pull/67/checks) (documentation changes only after Tremor 9e06475's game and evaluation code) |
+| Submitted version | The course folder is synced from the current Tremor main at each PR push. The [course PR #67 checks page](https://github.com/columbia-university-ai-games/game-dev-f26/pull/67/checks) is the CI evidence for the submitted head. Changes after `9e06475` include documentation, recording tooling and the supplementary solver. |
 
-The diff from `9e06475` to HEAD contains documentation, recording support in `public/record-gemini.js` and `public/record-mode.js`, three recording/inspection scripts, and npm recording script entries in `package.json`. It changes no game or evaluation logic.
+The diff from `9e06475` to HEAD contains documentation, recording support in `public/record-gemini.js` and `public/record-mode.js`, `scripts/inspect-recording.mjs`, `scripts/record-gemini-config.mjs`, `scripts/record-gemini.mjs` and the recording command in `package.json`. It also adds the supplementary `baseline_solver` in `src/agent/solver.ts`, solver registration, source hashing and report naming in `scripts/eval.ts`, `tests/solver.test.ts` and solver result files. The declared-suite controllers, `src/eval/runner.ts`, rules and engine code are unchanged. The only change under `engine/` is provenance documentation in `engine/UPSTREAM.md`.
 
 Changes since evaluation are music/presentation, the startup fix, the watch page, documentation, trace reason retention and hint placement. The model prompt, action interface and simulation behavior are unchanged. Spectator audio is enabled only when a presentation audio bridge is supplied; the evaluated headless path retains -nosound. Raw SHA-256 checks against the primary JSON on 2026-11-02 give:
 

@@ -292,7 +292,7 @@ The course workflow `.github/workflows/midterm-nicoh-yay.yml` runs npm ci, npm t
 
 ## Upstream comparison and large files
 
-The Tremor repository is https://github.com/NICOH-YAY/tremor. The pristine vendor commit is `821957f`. The submitted folder was synced from Tremor revision `9e06475` at course commit `95a2899` in [course PR #67](https://github.com/columbia-university-ai-games/game-dev-f26/pull/67). This documentation-only CI evidence update follows that revision. [UPSTREAM](engine/UPSTREAM.md) gives the offline comparison recipe. [The patch](engine/tremor-vs-upstream.patch) contains changes to vendored files. Regenerate it with:
+The Tremor repository is https://github.com/NICOH-YAY/tremor. The pristine vendor commit is `821957f`. The course folder is synced from the current Tremor main at each PR push. The [course PR #67 checks page](https://github.com/columbia-university-ai-games/game-dev-f26/pull/67/checks) is the CI evidence for the submitted head. Changes after `9e06475` include documentation, recording tooling and the supplementary solver. [UPSTREAM](engine/UPSTREAM.md) gives the offline comparison recipe. [The patch](engine/tremor-vs-upstream.patch) contains changes to vendored files. Regenerate it with:
 
 ```sh
 # cwd: midterms/nicoh-yay
