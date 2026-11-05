@@ -276,7 +276,7 @@ Model prompts preserve all public map information with lossless row RLE and reve
 
 ## Contributors
 
-Nicoh wrote AGENT-TEAM.md, the limitations paragraph and the playtest notes. At his request Claude reworded three passages (the skills paragraph, the second limitations point and one sentence about what the Gemini player sees) to be more accurate. The README, rules docs and evaluation report were written by Codex and Claude from Nicoh's design, playtests and decisions, and he directed and reviewed them.
+Nicoh wrote AGENT-TEAM.md, the limitations paragraph and the playtest notes. At his request Claude reworded four passages (the skills paragraph, the first two limitations points and one sentence about what the Gemini player sees) to be more accurate. The README, rules docs and evaluation report were written by Codex and Claude from Nicoh's design, playtests and decisions, and he directed and reviewed them.
 
 - **Nicoh**: design, direction and playtesting. [AGENT-TEAM.md](AGENT-TEAM.md) and the [evaluation limitations](EVALUATION.md#limitations-in-nicohs-words) describe his decisions and limitations in his own words.
 - **Codex (OpenAI)**: the only code editor, responsible for all original Tremor game, engine patch, agent, evaluation and tooling code. The inherited engine and third-party assets retain their upstream authorship. See [ownership instructions](AGENTS.md) and [per-session evidence](docs/agent-sessions/README.md).
