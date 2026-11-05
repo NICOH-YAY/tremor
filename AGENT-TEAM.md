@@ -64,7 +64,7 @@ Evidence: [public/art/CREDITS.md](public/art/CREDITS.md)
 
 ### The Gemini player
 
-The Gemini player only gets the info from the game screen since it's like a test. If we want to simulate how a player would behave it shouldn't be able to look at the map files or read the code since it would just cheat and the results wouldn't mean anything. Which is to say it would just look at the code on how to beat the game opposed to just experiencing the game.
+The Gemini player only gets the info the game shows a player since it's like a test. If we want to simulate how a player would behave it shouldn't be able to look at the map files or read the code since it would just cheat and the results wouldn't mean anything. Which is to say it would just look at the code on how to beat the game opposed to just experiencing the game.
 
 Evidence: [docs/CONTRACTS.md](docs/CONTRACTS.md), [EVALUATION.md](EVALUATION.md)
 
