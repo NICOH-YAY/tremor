@@ -9,6 +9,11 @@ Configuration ID: `faebcbfb97da87f4e3953745bc163d276f15e2e22c506ee9a343582eb8d6a
 
 Tuning: E1M1-E1M3; seen: E1M4-E1M5; held-out: E1M6-E1M7, frozen before model trials. Each map/player has two trials, RNG starts 17/83. Starts are 8-bit: modulo-256 equivalent seeds are identical, not new independent trials. See the [declared hypotheses and amendment history](docs/EVALUATION-PLAN.md).
 
+The [Summary for graders](docs/EVALUATION-PLAN.md#declaration-timeline-read-first) records the 2026-10-30 declaration, whose commit also contains the initial controller migration and baseline report, and baseline tuning confined to E1M1-E1M3.
+E1M6/E1M7 were added before any model trial and never used to change a controller: the baseline controllers were unchanged after their first run, and the final clean run reproduces all 28 baseline gameplay outcomes and metrics, with timing, trace-path and reporting-field differences detailed in the [comparison evidence](docs/EVALUATION-PLAN.md#baseline-reproduction-evidence).
+No model trial before the 2026-10-31 freeze was found; the one interrupted live attempt used E1M1 and led only to lossless prompt encoding, with associated configuration and accounting corrections.
+E1M4-E1M7 were unseen by the model players before the final suite, and E1M6/E1M7 are clean held-out maps for every player in the sense that no tuning used them.
+
 ## Current results
 
 All counts below are computed from the primary JSON. Reproduce both tables offline:
@@ -42,7 +47,7 @@ Pass a results JSON path to summarize another report; append `--json` for unroun
 | model-obs-only | seen | 4 | 0 | 3 | 0 | 1 | 574 | 7.25 | 0 | 0/0 | 0 | 4 |
 | model-obs-only | held-out | 4 | 0 | 3 | 0 | 1 | 884 | 3.00 | 0 | 0/0 | 1 | 4 |
 
-Mean latency is total controller-decision milliseconds divided by controller calls (including failed calls), not the average of episode averages or engine frame time. Baseline model calls are zero; their controller calls are nonzero. Counts are sums except the explicitly labelled means and final-terror bucket distribution. Split denominators are 6 tuning, 4 seen and 4 held-out per player.
+Mean latency is total controller-decision milliseconds divided by controller calls (including failed calls), not the average of episode averages or engine frame time. Baseline model calls are zero; their controller calls are nonzero. Counts are sums except the explicitly labelled means and final-terror bucket distribution. Split denominators are 6 tuning, 4 seen and 4 held-out per player. These are the recorded report labels: E1M4/E1M5 are "seen" for baselines only and were unseen by model players before this suite; E1M6/E1M7 were added as clean baseline holdouts and were also unseen by model players.
 
 Every model `timeout` terminal was the **five-minute episode wall-clock cap**: history 8, observation-only 7; **callTimeouts is 0** throughout. History recorded 20 errors and observation-only 11, separate from 3/0 illegal actions. Neither condition triggered fallback moves. These failures remain included.
 
@@ -98,7 +103,7 @@ Engine and Freedoom provenance/licenses remain in [UPSTREAM](engine/UPSTREAM.md)
 
 ## Known limitations (facts)
 
-- E1M4/E1M5 results were already inspected; only E1M6/E1M7 were fresh held-out model maps. Tuning and historical fixed-seed diagnostics are not additional independent trials.
+- Baseline E1M4/E1M5 results were already inspected; E1M6/E1M7 were fresh when selected for baselines. Model players had not run E1M4-E1M7 before the final suite. Tuning and historical fixed-seed diagnostics are not additional independent trials.
 - Two seeds per case, one model/configuration and one skill level limit generalization. Policies differ in action choices and wall-clock exposure; aggregates do not isolate reading or memory causally.
 - Model episodes are bounded by real elapsed time; 15 reached the five-minute cap before completion. Failed calls can have unknown billed usage; costs may undercount.
 - Route progress is an evaluator-only sector-hop distance proxy, ignoring locks/heights, not proof of traversability. Secondary objectives count distinct key types collected plus exit; switch-only subtasks are excluded.
