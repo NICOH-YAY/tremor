@@ -33,7 +33,7 @@ Per-section captured bus levels:
 
 Frame delivery: 58645 animation frames, 6 gaps over 50 ms; largest gap 475.0 ms. Requested capture is 30 fps; these timing measurements report renderer stalls, not a guarantee of every encoded frame. Recording runs in real time.
 
-The [uploaded recording](https://drive.google.com/file/d/1-gUtdHicrsxu483OgbBwNUdB4stBCUJH/view?usp=sharing) is viewable by anyone signed in with a columbia.edu account. The uploaded file size was verified as 92298487 bytes, matching by size the local file with the SHA-256 listed above. The hash was not recomputed remotely. Human playtests remain separate.
+The [Primary recording (4:08), the graded recording](https://drive.google.com/file/d/1-gUtdHicrsxu483OgbBwNUdB4stBCUJH/view?usp=sharing) is viewable by anyone signed in with a columbia.edu account. The uploaded file size was verified as 92298487 bytes, matching by size the local file with the SHA-256 listed above. The hash was not recomputed remotely. Human playtests remain separate.
 
 ## Gemini-only recording / 2026-11-04
 
@@ -59,4 +59,4 @@ Frame delivery: 67927 animation frames; 2 gaps over 50 ms; largest gap 1000.1 ms
 
 Independent final-file inspection with `node scripts/inspect-recording.mjs recordings/tremor-gemini-2026-11-04.webm` confirmed 1920x1080, 287.2827 s video duration, and readable title, gameplay/reason caption, verified terminal badge and results frames. Paused inspection and offline decoding remained muted. Encoded section RMS / peak: title effectively zero; gameplay (10-270 s) 0.043169 / 0.636288; skip and terminal (270-277 s) 0.038178 / 0.143660; results (277 s to end) 0.037655 / 0.202878.
 
-The [uploaded Gemini recording](https://drive.google.com/file/d/1rQqYeeg_dPlmrTy-UhMr5rVqtPPW869_/view?usp=sharing) is viewable by anyone signed in with a columbia.edu account. The uploaded file size was verified as 157526956 bytes, matching by size the local file with the SHA-256 listed above. The hash was not recomputed remotely.
+The [Supplementary Gemini player recording (4:47), a close-up of the model's choices and reasons](https://drive.google.com/file/d/1rQqYeeg_dPlmrTy-UhMr5rVqtPPW869_/view?usp=sharing) is viewable by anyone signed in with a columbia.edu account. The uploaded file size was verified as 157526956 bytes, matching by size the local file with the SHA-256 listed above. The hash was not recomputed remotely.

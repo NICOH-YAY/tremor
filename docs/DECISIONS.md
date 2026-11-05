@@ -2,6 +2,7 @@
 
 | Choice | Alternative beaten | Reason |
 |---|---|---|
+| Doom Episode 1, suite E1M1-E1M7 | the whole game, Doom II, or the original Week 3 choice Robotron 2084 waves 1-4 | one bounded episode as the brief asks; the GPL engine permits reuse while no license was found for Robotron's source |
 | Layered OPL + audible horror default | Score-only default | Player feedback reported missing music; midrange score supports laptop playback, original melody remains present and fear darkens it. Score-only remains selectable. |
 | GPL engine + Freedoom | Separate agent TS game | Same human/evaluated mechanics; licensed data |
 |40 constant macros | Contextual legality/continuous floats | Finite reproducibility, no legality oracle; append-only ABI |

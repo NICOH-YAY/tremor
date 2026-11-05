@@ -4,8 +4,8 @@
 
 - [Evaluation](EVALUATION.md).
 - [Agent team account](AGENT-TEAM.md).
-- [Recording](https://drive.google.com/file/d/1-gUtdHicrsxu483OgbBwNUdB4stBCUJH/view?usp=sharing), viewable by anyone signed in with a columbia.edu account.
-- [Gemini player recording](https://drive.google.com/file/d/1rQqYeeg_dPlmrTy-UhMr5rVqtPPW869_/view?usp=sharing), the live model player on E1M1 with its reasons shown, viewable by anyone signed in with a columbia.edu account.
+- [Primary recording (4:08), the graded recording](https://drive.google.com/file/d/1-gUtdHicrsxu483OgbBwNUdB4stBCUJH/view?usp=sharing), viewable by anyone signed in with a columbia.edu account.
+- [Supplementary Gemini player recording (4:47), a close-up of the model's choices and reasons](https://drive.google.com/file/d/1rQqYeeg_dPlmrTy-UhMr5rVqtPPW869_/view?usp=sharing), the live model player on E1M1 with its reasons shown, viewable by anyone signed in with a columbia.edu account.
 - [Peer notes](docs/peer-notes/README.md).
 - [Agent sessions](docs/agent-sessions/README.md).
 - [First independent review](docs/reviews/independent-review-2026-10-31.md) and [response](docs/reviews/review-response-2026-10-31.md); [second review](docs/reviews/review.md) and [response](docs/reviews/review-response.md); [final review](docs/reviews/review-final-2026-11-02.md) and [response](docs/reviews/review-final-response.md).
@@ -15,7 +15,7 @@ The open course PR uses branch `nicoh-yay/tremor-midterm` in the course reposito
 
 ## Scope change
 
-The Week 3 scope record was Robotron: 2084 (Williams, 1982), waves 1-4. No license was found for its source. On 2026-10-30 the project moved to Doom Episode 1 because the GPL engine permits reuse. The retired TypeScript prototype is in legacy/.
+The Week 3 scope record was Robotron: 2084 (Williams, 1982), waves 1-4. No license was found for its source. On 2026-10-30 the project moved to Doom Episode 1 because the GPL engine permits reuse. The retired TypeScript prototype is in legacy/. See [Original Doom rules, omissions and adaptations](#original-doom-rules-omissions-and-adaptations) for the included rules, exclusions, adaptations and what I would cut first.
 
 Reference game: Doom (id Software, 1993), Episode 1 'Knee-Deep in the Dead', played here on Freedoom Phase 1 v0.13.0 data; no proprietary IWAD shipped.
 
@@ -34,6 +34,7 @@ The current rule map is [docs/rule-source-map.md](docs/rule-source-map.md). Supe
 git clone https://github.com/columbia-university-ai-games/game-dev-f26.git
 cd game-dev-f26
 git checkout nicoh-yay/tremor-midterm
+# TA: confirm git rev-parse HEAD matches the head commit shown on PR #67.
 cd midterms/nicoh-yay
 ```
 
@@ -65,8 +66,8 @@ The model recordings end by timeout, not success. This is replay evidence, not a
 new live model trial. Run `npm test` (cwd: midterms/nicoh-yay) for the deterministic
 headless and browser-spectator replay checks.
 
-The [uploaded recording](https://drive.google.com/file/d/1-gUtdHicrsxu483OgbBwNUdB4stBCUJH/view?usp=sharing) is available to anyone signed in with a columbia.edu account.
-The [Gemini player recording](https://drive.google.com/file/d/1rQqYeeg_dPlmrTy-UhMr5rVqtPPW869_/view?usp=sharing) shows the evaluated model player and is available to the same accounts.
+The [Primary recording (4:08), the graded recording](https://drive.google.com/file/d/1-gUtdHicrsxu483OgbBwNUdB4stBCUJH/view?usp=sharing) is available to anyone signed in with a columbia.edu account.
+The [Supplementary Gemini player recording (4:47), a close-up of the model's choices and reasons](https://drive.google.com/file/d/1rQqYeeg_dPlmrTy-UhMr5rVqtPPW869_/view?usp=sharing) shows the evaluated model player and is available to the same accounts.
 The video lasts about 4 minutes 8 seconds and shows the title and rules, a replay of the live Gemini model-history agent playing E1M1 with no manual input until its five-minute episode cap, the baseline_careful run reaching the exit, the results table and limitations.
 See [automated production and file details](recordings/README.md) and the
 [recording guide](docs/RECORDING-GUIDE.md).
@@ -174,17 +175,73 @@ The declared suite compares aggressive and careful scripted players with Gemini 
 
 Technical. The [declared plan](docs/EVALUATION-PLAN.md) separates tuning E1M1-E1M3, seen E1M4-E1M5 and held-out E1M6-E1M7, each with RNG starts 17 and 83. Four players produce 56 episodes: `baseline_aggressive`, `baseline_careful`, and `gemini-3.5-flash-lite` with K=8 history or observation-only. The declared live run dated 2026-10-31 reports 2/14 exits for each baseline and 0/14 for each Gemini condition; only scripted E1M1 runs exited. These are recorded observations, not guarantees. Rule/source-map rows: **Runner**, **Model encoding** (`design`); results are evidence in EVALUATION.md. Locators: `src/eval/runner.ts` (`runEpisode`), `src/eval/model_config.ts`, `src/agent/prompt.ts`, and the plan/result links in EVALUATION.md. Live evaluation requires `--live`; replay and the optional demo are excluded from declared-suite results.
 
-## Scope and changes versus Doom
+## Original Doom rules, omissions and adaptations
 
-Inherited: 35Hz physics, geometry, AI, keys, doors, weapons, pickups, infighting
-and intermissions. Added: crew uncertainty, READ/STUN/PURGE, trauma, healing,
-scarce shared rounds, corpse fear, public route guidance, sparse radio, horror
-audio and clamped Y-shear freelook. This project reuses the GPL engine.
-Native 320x200 at 4:3. Route guidance is not a universal lift/teleporter solver.
-Excluded from evaluation: multiplayer, Doom II, other episodes, arbitrary PWADs,
-jumping and true 3D freelook. Agents use 40 macros and public descriptions, no
-pixels/audio/browser menus. Retired TS raycaster/levels/tests moved to legacy/;
-excluded from vitest, typecheck and build. Historical wins are not engine evidence.
+### What original Doom Episode 1 is
+
+Doom is a first-person shooter: you see through the player's eyes, navigate rooms, fight enemies and find an exit switch. Episode 1 is "Knee-Deep in the Dead". Keycards unlock doors; weapons, ammunition, health and armor are collected by walking over them. Monsters pursue and attack, and can fight each other after friendly fire. Intermissions separate maps. Death ends the current attempt; humans can restart.
+
+Technical. **Timing**, **Movement/collision**, **Weapons/missiles/AI**, **Health/armor**, **Keys/exits/hazards** are inherited (`code` in the [rule map](docs/rule-source-map.md)). Unchanged foundations include 35Hz movement/collision, door/key/exit logic, ordinary pickup benefits, monster state tables, infighting, intermissions and no jumping, as in the original; Tremor's combat changes follow below. In `engine/doomgeneric/doomgeneric/`: `p_enemy.c` (`A_Chase`), `p_inter.c` (`P_DamageMobj`, `P_TouchSpecialThing`), `p_doors.c` (`EV_DoLockedDoor`), `g_game.c` (`G_DoCompleted`); agent death: `engine/tremor/agent_api.c` (`check_terminal`, design).
+
+The shipped maps and art are Freedoom Phase 1's own levels and images standing in for id's, not reproductions of id's layouts.
+
+Technical. **Freedoom-for-Doom data** (`assumed`) means equivalent engine rules, not identical content: v0.13.0, BSD-3-Clause; [provenance](engine/UPSTREAM.md), [license](public/wad/FREEDOOM-LICENSE.txt).
+
+### What was left out, and why
+
+Other episodes and Doom II are outside the project scope. The brief asks for one bounded portion of the reference game, so the project reproduces Episode 1 only.
+
+Technical. **Runner** (`design`): `src/player_interface.ts` (`reset`) accepts E1M1-E1M9 only and loads bundled data; `engine/tremor/agent_api.c` (`tremor_agent_reset`) starts single-player with `freedoom1.wad` and `tremor.wad`. See [evaluation scope](docs/EVALUATION-PLAN.md).
+
+Multiplayer and deathmatch are outside the bounded Episode 1 scope. The course interface and evaluation are single-player.
+
+Technical. **Runner** (`design`): `engine/tremor/agent_api.c` (`tremor_agent_reset`, single-player startup); [evaluation scope](docs/EVALUATION-PLAN.md).
+
+Arbitrary add-on PWADs are outside evaluation to keep the scope bounded to Episode 1, as the brief asks.
+
+Technical. **Runner** (`design`): `src/player_interface.ts` (`reset`) loads bundled `freedoom1.wad` and `tremor.wad`; [evaluation scope](docs/EVALUATION-PLAN.md).
+
+The suite plays E1M1-E1M7. Humans can reach optional secret E1M9 and the E1M8 finale. Neither is human-only in the API. E1M8 is a short boss finale and E1M9 is a secret level reachable only through a secret exit. The seven regular maps give a comparable set of levels and keep the run count affordable.
+
+Technical. **Keys/exits/hazards** (inherited), **Runner** (`design`): `g_game.c` (`G_DoCompleted`) routes secret exits to E1M9 and ends at E1M8; `src/eval/suite.ts` (`SUITE`), `src/player_interface.ts` (`reset`); [rules](docs/RULES.md).
+
+Proprietary id IWAD data is omitted for licensing.
+
+Technical. **Freedoom-for-Doom data** (`assumed`): [provenance](engine/UPSTREAM.md).
+
+Original Doom has no vertical look. Tremor adds clamped vertical freelook using compatible vertical shearing in the software renderer. True 3D freelook is a limit of this addition.
+
+Technical. **Pitch** (`design`): [renderer decision](docs/DECISIONS.md), `engine/tremor/tremor.c` (`TR_PitchSlope`).
+
+Evaluation fixes difficulty at skill index 2 and gives agents text observations, including an automap, with no pixels or audio. This makes a fair comparison: every evaluated player gets the same difficulty and the same information. Save/load, cheats and browser menus are not in the 40-action set.
+
+Technical. **Runner**, **Map** (`design`): `src/player_interface.ts` (`reset`, fixed skill index 2), `src/agent/actions.ts` (`ACTION_IDS`), `engine/tremor/agent_api.c` (`automap`, `tremor_agent_observe`, headless `-nosound`); [contracts](docs/CONTRACTS.md).
+
+### What was changed or added, and why
+
+Crew uncertainty makes shooting a moral choice. READ trades exposure for knowledge; STUN and PURGE permit rescue but demand time and limited resources.
+
+Technical. **Crew probability**, **Purge** (`design`): `engine/tremor/tremor.h` and `tremor.c` (`TR_PlayerThink`): crew 90/256, READ/PURGE 35 tics, STUN 70, two purge charges; [rationale](docs/DESIGN.md).
+
+Scarce shared rounds reward exploration and mercy. Human kills cause lasting aim trauma but heal more, tempting violence. Corpse fear makes attention and retreat matter, reducing shot reliability and increasing damage received.
+
+Technical. **Ammo**, **Kill effects**, **Fear effects** (`design`): `tremor.c` (`TR_LevelStart`, `TR_Kill`, `TR_Aim`, `TR_Hit`, `TR_Damage`): hostile count+1 rounds; healing 15/10 capped at 100; trauma cap 6; fear 0-100; [rationale](docs/DESIGN.md).
+
+Sparse radio leaves combat audible. Layered horror audio adds tension while retaining the original music. Recoloured sprites give monsters a horror palette that matches the game's tone.
+
+Technical. **Radio/save**, **UI/effects** (`design`): `tremor.c` (`TR_Radio`, 3150-tic cooldown), `public/horror.js`, `public/music.js`; `scripts/build-tremor-wad.py` (`build`); [design](docs/DESIGN.md), [decisions](docs/DECISIONS.md).
+
+Clamped freelook supports vertical targets. Public route guidance helps humans and agents equally but is not a universal lift/teleporter solver. Native resolution preserves the classic image while limiting browser work.
+
+Technical. **Pitch**, **Route**, **UI/effects** (`design`): `tremor.c` (`TR_PitchSlope`, +/-32 degrees; `route_update`, 16-unit lattice), `public/engine-page.js` (320x200 displayed at 4:3); [rationale](docs/DESIGN.md).
+
+A turn-based wrapper lets an agent deliberate between short bursts of real-time play, preserving engine timing while bounding calls. The retired TS raycaster is in legacy/, excluded from tests/build; historical wins are not engine evidence.
+
+Technical. **Runner**, **40-action ABI** (`design`): `agent_api.c` (`STEP_TICS=7`), `src/agent/actions.ts` (`ACTION_IDS`, 40 constant macros), `src/eval/runner.ts` (`runEpisode`, 600 steps/calls, 20s/call, 300s total); text: `tremor_agent_observe`; [decisions](docs/DECISIONS.md), `vite.config.ts`, `tsconfig.json`.
+
+### What I would cut first
+
+If time ran out, the first things to cut would be the presentation extras: the layered horror audio, the recoloured sprites and the radio voice. The next cut would be fewer levels in the suite, down to the three-situation minimum. The crew uncertainty, scarce ammo, fear and trauma mechanics and the agent interface stay, because they are the core of the game and the experiment.
 
 ## Credits and reuse
 

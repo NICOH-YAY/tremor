@@ -36,7 +36,7 @@ Five kinds, all green: rule invariants; legal and illegal actions; a terminal ou
 
 ## Submission
 - PR to columbia-university-ai-games/game-dev-f26 main; only midterms/nicoh-yay/ + the one workflow file. README (setup/play/test/eval commands from midterms/nicoh-yay/, scope, rule map, reuse terms), EVALUATION.md (suite, table, traces, CI evidence, limitations in his voice), AGENT-TEAM.md, anonymous human playtest notes under the Nov 4 instructor update and given recording notes due Nov 16, 3-5 min recording of the agent playing with limits stated, linked from README and PR.
-- The [uploaded recording](https://drive.google.com/file/d/1-gUtdHicrsxu483OgbBwNUdB4stBCUJH/view?usp=sharing) is linked from README and viewable by anyone signed in with a columbia.edu account. The [Gemini player recording](https://drive.google.com/file/d/1rQqYeeg_dPlmrTy-UhMr5rVqtPPW869_/view?usp=sharing) is a second video, also viewable by anyone signed in with a columbia.edu account. Include the link in the submission PR.
+- The [Primary recording (4:08), the graded recording](https://drive.google.com/file/d/1-gUtdHicrsxu483OgbBwNUdB4stBCUJH/view?usp=sharing) is linked from README and viewable by anyone signed in with a columbia.edu account. The [Supplementary Gemini player recording (4:47), a close-up of the model's choices and reasons](https://drive.google.com/file/d/1rQqYeeg_dPlmrTy-UhMr5rVqtPPW869_/view?usp=sharing) is supplementary and viewable by anyone signed in with a columbia.edu account. Include the link in the submission PR.
 - Update Week 3 thread + README scope statement since the game changed.
 
 2026-10-31 follow-up: 4b now has genuine E1M1 normal-spawn exits and a passing

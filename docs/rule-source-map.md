@@ -1,8 +1,7 @@
-# Current rule/source map - 2026-10-31
+# Current rule/source map - 2026-11-05
 
 Legend: code=inherited executable rule; manual=player-facing manual;
 observed=measured evidence, not guarantee; assumed=declared equivalence/approximation;
-implementation detail=internal bitmask or cosmetic tuning;
 design=original adaptation, rationale DESIGN.md / DECISIONS.md. Locators file+symbol.
 Upstream engine locators below are in engine/doomgeneric/doomgeneric/.
 
@@ -29,20 +28,20 @@ Upstream engine locators below are in engine/doomgeneric/doomgeneric/.
 | TR_DEMON_HEAL | design | `10`  | `engine/tremor/tremor.h TR_DEMON_HEAL`; `tremor.c`; [rationale](DESIGN.md) |
 | TR_HEALTH_CAP | design | `100`  | `engine/tremor/tremor.h TR_HEALTH_CAP`; `tremor.c`; [rationale](DESIGN.md) |
 | TR_MELEE_MULTIPLIER | design | `10` Berserk-strength fists without a powerup. | `engine/tremor/tremor.h TR_MELEE_MULTIPLIER`; `tremor.c`; [rationale](DESIGN.md) |
-| TR_SHOTGUN_GIB_THRESHOLD | implementation detail | `192` 75% at close range in hyper mode. | `engine/tremor/tremor.h TR_SHOTGUN_GIB_THRESHOLD`; `tremor.c`; [rationale](DESIGN.md) |
-| TR_IMPACT_TICS | implementation detail | `6` Render-only melee shake duration. | `engine/tremor/tremor.h TR_IMPACT_TICS`; `tremor.c`; [rationale](DESIGN.md) |
-| TR_SHOT_KICK_TICS | implementation detail | `3` Render-only firearm kick duration. | `engine/tremor/tremor.h TR_SHOT_KICK_TICS`; `tremor.c`; [rationale](DESIGN.md) |
-| TR_KILL_FLASH_TICS | implementation detail | `8` Near kill red flash; not actual damage. | `engine/tremor/tremor.h TR_KILL_FLASH_TICS`; `tremor.c`; [rationale](DESIGN.md) |
+| TR_SHOTGUN_GIB_THRESHOLD | design | `192` 75% at close range in hyper mode. | `engine/tremor/tremor.h TR_SHOTGUN_GIB_THRESHOLD`; `tremor.c`; [rationale](DESIGN.md) |
+| TR_IMPACT_TICS | design | `6` Render-only melee shake duration. | `engine/tremor/tremor.h TR_IMPACT_TICS`; `tremor.c`; [rationale](DESIGN.md) |
+| TR_SHOT_KICK_TICS | design | `3` Render-only firearm kick duration. | `engine/tremor/tremor.h TR_SHOT_KICK_TICS`; `tremor.c`; [rationale](DESIGN.md) |
+| TR_KILL_FLASH_TICS | design | `8` Near kill red flash; not actual damage. | `engine/tremor/tremor.h TR_KILL_FLASH_TICS`; `tremor.c`; [rationale](DESIGN.md) |
 | TR_AIM_UNIT | design | `16384` Binary angle units per random-byte delta / trauma. | `engine/tremor/tremor.h TR_AIM_UNIT`; `tremor.c`; [rationale](DESIGN.md) |
 | TR_CLOSE_RANGE | design | `(128*FRACUNIT)` Kill flash / shotgun gib range. | `engine/tremor/tremor.h TR_CLOSE_RANGE`; `tremor.c`; [rationale](DESIGN.md) |
 | TR_FEAR_RANGE | design | `(192*FRACUNIT)` Visible demons cause cowering. | `engine/tremor/tremor.h TR_FEAR_RANGE`; `tremor.c`; [rationale](DESIGN.md) |
 | TR_GUN_FEAR_RANGE | design | `(512*FRACUNIT)` Nearby gunfire makes crew cower. | `engine/tremor/tremor.h TR_GUN_FEAR_RANGE`; `tremor.c`; [rationale](DESIGN.md) |
 | TR_COWER_TICS | design | `35`  | `engine/tremor/tremor.h TR_COWER_TICS`; `tremor.c`; [rationale](DESIGN.md) |
-| TR_BLOOD_MIN | implementation detail | `8`  | `engine/tremor/tremor.h TR_BLOOD_MIN`; `tremor.c`; [rationale](DESIGN.md) |
-| TR_BLOOD_VARIATION | implementation detail | `9` Inclusive burst range 8..16. | `engine/tremor/tremor.h TR_BLOOD_VARIATION`; `tremor.c`; [rationale](DESIGN.md) |
-| TR_READ | implementation detail | `1`  | `engine/tremor/tremor.h TR_READ`; `tremor.c`; [rationale](DESIGN.md) |
-| TR_STUN | implementation detail | `2`  | `engine/tremor/tremor.h TR_STUN`; `tremor.c`; [rationale](DESIGN.md) |
-| TR_PURGE | implementation detail | `4`  | `engine/tremor/tremor.h TR_PURGE`; `tremor.c`; [rationale](DESIGN.md) |
+| TR_BLOOD_MIN | design | `8`  | `engine/tremor/tremor.h TR_BLOOD_MIN`; `tremor.c`; [rationale](DESIGN.md) |
+| TR_BLOOD_VARIATION | design | `9` Inclusive burst range 8..16. | `engine/tremor/tremor.h TR_BLOOD_VARIATION`; `tremor.c`; [rationale](DESIGN.md) |
+| TR_READ | design | `1`  | `engine/tremor/tremor.h TR_READ`; `tremor.c`; [rationale](DESIGN.md) |
+| TR_STUN | design | `2`  | `engine/tremor/tremor.h TR_STUN`; `tremor.c`; [rationale](DESIGN.md) |
+| TR_PURGE | design | `4`  | `engine/tremor/tremor.h TR_PURGE`; `tremor.c`; [rationale](DESIGN.md) |
 | TR_TERROR_RANGE | design | `(1024*FRACUNIT)`  | `engine/tremor/tremor.h TR_TERROR_RANGE`; `tremor.c`; [rationale](DESIGN.md) |
 | TR_TERROR_CLOSE | design | `(256*FRACUNIT)`  | `engine/tremor/tremor.h TR_TERROR_CLOSE`; `tremor.c`; [rationale](DESIGN.md) |
 | TR_TERROR_SCAN | design | `8` At most eight LOS tests per player tic. | `engine/tremor/tremor.h TR_TERROR_SCAN`; `tremor.c`; [rationale](DESIGN.md) |

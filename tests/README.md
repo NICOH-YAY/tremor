@@ -18,6 +18,12 @@ regression, episode limits. Fake/replay controllers labelled mocked. Real normal
 spawn and C rule checks use WASM. No compiler/paid API in CI. engine:test prints
 C check count as well. Hashes bind exact artifacts/source snapshot, not a compiler
 reproducibility proof. CI workflow is .github/workflows/midterm-nicoh-yay.yml.
+## Observed-regression evidence
+
+The regressions failed before their fixes and pass afterward, as recorded in [docs/SKILL-INVOCATIONS.md](../docs/SKILL-INVOCATIONS.md). In codex-doom12, the level-check stun/purge regression FAILED at tic 42 before the identity fix: crew had 25 rounds, two charges and unknown identity, while possessed had 28 rounds, one charge and revealed crew identity. The full-channel regression passed after the fix in commit `9927bfee94a74b39a0e20fe029905ca4f139a47f`.
+
+In codex-doom13, `tests/model-player.test.ts` failed before `src/agent/prompt` existed. After its implementation in commit `8f0e4a9dc937904ec47b1fe00045315330a112ae`, the recorded suite passed 50/50 tests. Both fix commits were verified against local git history and their patches.
+
 # Spectator checks
 
 `watch-replay.test.ts` executes all three unchanged committed recordings in both
