@@ -58,3 +58,5 @@ Per-section captured bus levels:
 Frame delivery: 67927 animation frames; 2 gaps over 50 ms; largest gap 1000.1 ms. Requested 30 fps at 1920x1080, VP9/Opus, 7.5 Mbps video / 192 kbps audio; renderer timing is not a guarantee of every encoded frame. Captured in real time using installed Edge (headless=new).
 
 Independent final-file inspection with `node scripts/inspect-recording.mjs recordings/tremor-gemini-2026-11-04.webm` confirmed 1920x1080, 287.2827 s video duration, and readable title, gameplay/reason caption, verified terminal badge and results frames. Paused inspection and offline decoding remained muted. Encoded section RMS / peak: title effectively zero; gameplay (10-270 s) 0.043169 / 0.636288; skip and terminal (270-277 s) 0.038178 / 0.143660; results (277 s to end) 0.037655 / 0.202878.
+
+The [uploaded Gemini recording](https://drive.google.com/file/d/1rQqYeeg_dPlmrTy-UhMr5rVqtPPW869_/view?usp=sharing) is viewable by anyone signed in with a columbia.edu account. The uploaded file size was verified as 157526956 bytes, matching by size the local file with the SHA-256 listed above. The hash was not recomputed remotely.
