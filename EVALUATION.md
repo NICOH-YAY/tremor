@@ -58,6 +58,20 @@ The [declared plan](docs/EVALUATION-PLAN.md) states three hypotheses:
 
 Only scripted E1M1 episodes exited. No player completed a seen or held-out map. These are descriptive results, with no significance claims: two trials per map/player and 8-bit RNG starts do not support broad generalization. No controller or prompt changes were made from these outcomes.
 
+## Supplementary automated solver (added 2026-11-05)
+
+The search-based `baseline_solver` was added after the suite was declared and after the model trials. It is supplementary and is not part of the declared comparison. It ran E1M1-E1M7 with RNG starts 17 and 83, using the same 600-step, 600-call and timeout limits, without model API calls. The report records the uncommitted working tree and source/artifact hashes. Existing declared-suite files are unchanged.
+
+[Full solver results](eval/results/2026-11-05-2026-11-05T06-56-23-784Z-solver-results.json) and [per-episode table](eval/results/2026-11-05-2026-11-05T06-56-23-784Z-solver-table.md). Full normal gzip traces are in the ignored `eval/traces/` paths recorded in the report.
+
+| Player | Episodes | Exits | Deaths | Step limits | Call limits | Call timeouts | Episode timeouts | Illegal | Errors | Fallbacks | Model calls | Mean latency ms | Tokens in/out | Est. USD | Crew killed/saved | Reads | Fired unread | Objectives | Final terror |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| baseline_solver | 14 | 0 | 12 | 2 | 0 | 0 | 0 | 0 | 0 | 0 | 0 | 0.22 | 0/0 | 0.000000 | 0/0 | 29 | 1 | 0 | steady: 14 |
+
+Total steps: 2682; controller calls: 2682. No model tokens or API costs were incurred.
+
+The solver completed zero maps: twelve episodes ended in death and two reached the step limit. Its public-map route search and conservative reading policy did not produce successful completion in this run. It recorded zero crew kills, 29 reads and one fired-unread event. Targeting confirmed hostiles does not guarantee every shot avoids unread figures. These counts are not evidence that it solves the game. Map cells omit height and moving actors, and the public waypoint is only a local route target. These results do not amend the four-player comparison above.
+
 ## Representative live traces
 
 Both samples use E1M1/17 for a matched map/seed comparison, chosen to show the common episode-cap failure, not successful completion. They are complete public-observation/action JSONL streams copied without recompression from this run:

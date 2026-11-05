@@ -6,6 +6,7 @@ Existing completion records are retained. Added prompt/result markdown is copied
 
 | Date/time UTC | Session id | Working directory | Purpose | Prompt | Result | Resulting commit (time association) |
 | --- | --- | --- | --- | --- | --- | --- |
+| 2026-11-05 | codex-doom37 | `the Tremor repository root` | Added supplementary public-map BFS solver, 14-case results, tests and documentation | User request | [Supplementary results](../../EVALUATION.md#supplementary-automated-solver-added-2026-11-05) | pending commit |
 | 2026-10-30T06:42:22.950Z | `01a18b8b-901e-7720-9f78-c9f3c0e645ec` | `the Tremor repository root` | Initial Tremor scaffold | [codex-tremor1.md](codex-tremor1.md) | [codex-tremor1-result.md](codex-tremor1-result.md) | [747ae7c](https://github.com/NICOH-YAY/tremor/commit/747ae7c) |
 | 2026-10-30T06:51:03.548Z | `01a18b93-857c-7163-a927-d154c83638a9` | `the Tremor repository root-wt\agent` | Course interface, agents, runner | [codex-tremor-agent.md](codex-tremor-agent.md) | [codex-tremor-agent-result.md](codex-tremor-agent-result.md) | [645f597](https://github.com/NICOH-YAY/tremor/commit/645f597) |
 | 2026-10-30T06:59:47.312Z | `01a18b9b-83b0-7301-b7b4-30308408d9f8` | `the Tremor repository root` | Integrate renderer/mechanics/content/agent work | [codex-tremor-integrate.md](codex-tremor-integrate.md) | [codex-tremor-integrate-result.md](codex-tremor-integrate-result.md) | [9a17e08](https://github.com/NICOH-YAY/tremor/commit/9a17e08) |

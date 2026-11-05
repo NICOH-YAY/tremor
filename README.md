@@ -80,6 +80,17 @@ Date+run ID reports: eval/results/. Raw gzip traces: eval/traces/ (ignored).
 Representative traces: eval/traces-sample/. Seeds choose only an 8-bit RNG start:
 17 and 273 are identical, 17 and 83 distinct; no random level generation.
 
+Supplementary solver run:
+
+```sh
+# cwd: midterms/nicoh-yay
+npm run eval -- --players baseline_solver --cases all
+```
+
+For this single-player game the automated players are the two scripted baselines plus this search-based solver. A complete optimal solver for real-time 3D Doom with moving, random monsters is not feasible in this scope, so the solver plans routes over the public map and reacts to visible threats. It is supplementary to the declared comparison; its measured results are in [Evaluation](EVALUATION.md#supplementary-automated-solver-added-2026-11-05).
+
+Technical. `src/agent/solver.ts` rebuilds a grid from public automap rows each step and runs deterministic BFS with at most 4096 discovered/expanded cells toward the public route waypoint, including its key/door dependencies. It converts a short path segment to constant macro actions, uses doors, reads unknown figures before firing at confirmed hostiles, and backs away from nearby threats below 30 health. Unmapped targets fall back to public guidance. The unchanged runner passes only detached public Observation, copied legal IDs and validation feedback, never the private WASM handle, WAD files, evaluator outcome or hidden crew identity. This preserves check 2c's information boundary; in-process controller imports are not a security sandbox. The same limits and normal traces and terminal reasons apply.
+
 Live trials require ADC credentials and GOOGLE_CLOUD_PROJECT; optional
 GOOGLE_CLOUD_LOCATION defaults global. Run `npm run eval:live -- --players
 model-history,model-obs-only --cases all` (cwd: midterms/nicoh-yay). Both use gemini-3.5-flash-lite, K=8

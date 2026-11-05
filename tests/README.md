@@ -5,6 +5,7 @@ Only tests/**/*.test.ts/js run. legacy/ excluded from Vitest/TypeScript/build.
 | Test file | Five rubric kinds covered |
 |---|---|
 | agent.test.ts | Invariants: shipped tests.c fear thresholds/decay/once, ammo, healing, trauma, mercy, saves/radio; legal/illegal; successful terminal exit; observed purge/gore regressions; episode step/call/time/fallback limits |
+| solver.test.ts | Public-only observation access/import boundary, supplied legal actions, mapped BFS detour, READ/hostile/retreat behavior, deterministic fixed-seed real-engine traces and explicit terminal within 600 steps/calls |
 | baseline.test.ts | Legal public decisions; normal-spawn E1M1 seeds 17/83 successful terminal regression |
 | browser-engine.test.js | Observed double-init/intro and pause-preview regressions against production WASM |
 | browser-assets.test.js | Public JS syntax, title/help initialization and repeated malformed-WAD-before-audio regression |
