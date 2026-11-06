@@ -13,6 +13,35 @@
 
 The open course PR uses branch `nicoh-yay/tremor-midterm` in the course repository. GitHub detached the student fork when the course repository became private, so the branch was pushed directly to the course repository.
 
+## Links to each part
+
+| Part | Links |
+|---|---|
+| Rule sources | [Rule map](docs/rule-source-map.md#current-rulesource-map---2026-11-05), [design rationale](docs/DESIGN.md#current-design---2026-10-31) |
+| Scope, omissions and adaptations | [Scope change](#scope-change), [omissions and adaptations](#original-doom-rules-omissions-and-adaptations), [first cuts](#what-i-would-cut-first) |
+| Credits and licenses | [Credits and terms](#credits-and-reuse), [third-party provenance](THIRD-PARTY.md#third-party-provenance), [upstream comparison](engine/UPSTREAM.md#inspecting-the-tremor-changes) |
+| Playing the game | [Goal and ending](#the-goal-and-the-ending) |
+| Model player and traces | [Live traces](EVALUATION.md#representative-live-traces), [trace reasons](docs/CONTRACTS.md#trace-reasons-and-optional-demo), [replay verification](EVALUATION.md#spectator-replay-verification) |
+| Hidden information and observations | [Interface contracts](docs/CONTRACTS.md#current-real-engine-contracts---2026-10-31), [information-boundary review](docs/reviews/independent-review-2026-10-30.md#1-information-boundary), [CI coverage](tests/README.md#active-ci-coverage) |
+| Setup and commands | [Setup and commands](#setup-and-commands) |
+| Limits and terminal reasons | [Interface and runner contracts](docs/CONTRACTS.md#current-real-engine-contracts---2026-10-31), [results and limit counts](EVALUATION.md#current-results) |
+| Tests and CI | [Five check kinds](tests/README.md#active-ci-coverage), [observed regressions](tests/README.md#observed-regression-evidence), [submitted-head CI evidence](#ci-evidence) |
+| Agent team and sessions | [Student team log](AGENT-TEAM.md#agent-team-log), [session evidence](docs/agent-sessions/README.md#codex-session-evidence), [independent review](docs/reviews/review.md#method) |
+| Design decisions | [Decision table](docs/DECISIONS.md#current-decisions---2026-11-05), [design rationale](docs/DESIGN.md#current-design---2026-10-31) |
+| Baselines and comparison | [Declared plan](docs/EVALUATION-PLAN.md#declaration-timeline-read-first), [player decisions](docs/DECISIONS.md#current-decisions---2026-11-05), [interpretation](EVALUATION.md#what-the-experiment-shows) |
+| Results | [Results table](EVALUATION.md#current-results), [version identifiers](EVALUATION.md#evaluated-and-submitted-versions) |
+| Evaluation plan and timeline | [Declaration timeline](docs/EVALUATION-PLAN.md#declaration-timeline-read-first), [baseline reproduction](docs/EVALUATION-PLAN.md#baseline-reproduction-evidence), [results](EVALUATION.md#current-results) |
+| Held-out cases | [Declaration timeline](docs/EVALUATION-PLAN.md#declaration-timeline-read-first), [split results](EVALUATION.md#current-results), [limitations](EVALUATION.md#known-limitations-facts) |
+| Search-based solver | [Supplementary solver and measured limits](EVALUATION.md#supplementary-automated-solver-added-2026-11-05), [solver command and approach](#setup-and-commands) |
+| Costs and failures | [Cost and failure accounting](EVALUATION.md#current-results), [accounting limitations](EVALUATION.md#known-limitations-facts) |
+| Limitations | [Student limitations](EVALUATION.md#limitations-in-nicohs-words), [known limitations](EVALUATION.md#known-limitations-facts) |
+| Human playtests | [Human playtest notes](docs/playtests/README.md#human-playtests-anonymous) |
+| Recordings | [Primary recording](https://drive.google.com/file/d/1-gUtdHicrsxu483OgbBwNUdB4stBCUJH/view?usp=sharing), [supplementary recording](https://drive.google.com/file/d/1rQqYeeg_dPlmrTy-UhMr5rVqtPPW869_/view?usp=sharing), [primary recording details](recordings/README.md#automated-tremor-recording), [supplementary recording details](recordings/README.md#gemini-only-recording--2026-11-04) |
+| Peer notes | [Peer requirements and status](docs/peer-notes/README.md#peer-playtest-notes), [reply template](docs/peer-notes/README.md#given-blank-template-for-nov-16-notes) |
+| Codex instructions | [Codex instructions](AGENTS.md#tremor-ownership) |
+| Reusable skill | [Skill account](AGENT-TEAM.md#reusable-skills), [invocation records](docs/SKILL-INVOCATIONS.md#skill-invocations) |
+| Independent reviews | [Review method](docs/reviews/review.md#method), [findings](docs/reviews/review.md#findings), [final review](docs/reviews/review-final-2026-11-02.md#method) |
+
 ## Scope change
 
 The Week 3 scope record was Robotron: 2084 (Williams, 1982), waves 1-4. No license was found for its source. On 2026-10-30 the project moved to Doom Episode 1 because the GPL engine permits reuse. The retired TypeScript prototype is in legacy/. See [Original Doom rules, omissions and adaptations](#original-doom-rules-omissions-and-adaptations) for the included rules, exclusions, adaptations and what I would cut first.
