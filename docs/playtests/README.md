@@ -50,7 +50,7 @@ In response I added the moral aspect, a limited bullet count and Tremor, then ad
 
 Nov 1 and Nov 2 2026
 
-Build played was the build live on each date, after radio voice and terror. The nearest main-history commit before Nov 1 by author time is [c042ec0](https://github.com/NICOH-YAY/tremor/commit/c042ec0), Oct 31 at 17.41.44 EDT. It is also the nearest commit before Nov 2 began. Nov 2 has several later commits through [338dc14](https://github.com/NICOH-YAY/tremor/commit/338dc14), authored at 14.14.08 EST. Session times and exact deployed revisions were not recorded. Git diff from `338dc14` to HEAD shows no game-affecting engine, game logic or WAD changes; the submitted game matches that Nov 2 build, with later changes limited to documentation, recording support and npm recording commands.
+Build played was the build live on each date, after radio voice and terror. The nearest main-history commit before Nov 1 by author time is [c042ec0](https://github.com/NICOH-YAY/tremor/commit/c042ec0), Oct 31 at 17.41.44 EDT. It is also the nearest commit before Nov 2 began. Nov 2 has several later commits through [338dc14](https://github.com/NICOH-YAY/tremor/commit/338dc14), authored at 14.14.08 EST. Session times and exact deployed revisions were not recorded. The human game is unchanged since Nov 2; the only later code is the separate solver. Git diff from `338dc14` to HEAD shows no engine, game rule or WAD changes. The later changes are documentation, recording support, npm recording commands and the supplementary search-based solver (`src/agent/solver.ts`), which the human game does not use.
 
 #### What the player did
 
