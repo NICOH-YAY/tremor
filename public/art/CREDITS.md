@@ -5,29 +5,36 @@ model `z_image`. Files: `crew.png`, `door.png`, `ember.png`, `floor.png`, `hound
 Postprocessing used external `tremor-art/scripts/process.py`, not shipped here
 and not required to play/build/test. No reproducible generation-tool claim.
 
-Terms re-checked 2026-11-03 by an independent read-only agent, not the
-student's own assertion, against two pages:
-https://higgsfield.ai/terms-of-use-agreement (page states last updated 2026-10-23)
-and https://higgsfield.ai/creator-hub/help-center/account/who-owns-my-generations-and-can-i-use-them-commercially.
-The supplied record dates the help page's modification to 2026-09-12; the agent
-could verify its contents but not that modification date (the visible publication
-date is 2026-08-02).
+## Terms of use (cited)
 
-Section 4.4, paraphrased: Higgsfield does not claim ownership of Inputs or Outputs
-and does not restrict commercial use of Outputs; rights in exported Outputs
-survive cancellation. Check the live page for exact wording. The help article
-states attribution is not required and commercial rights do not depend on plan tier.
+The independent read-only check on 2026-11-03 is retained as history, not the
+student's own assertion. Re-checked 2026-11-05 against the live pages.
 
-Sections 5.5 and 6.4 require preserving applicable watermarks and AI provenance
-markings, including imperceptible signals and metadata. Visual inspection on
+Higgsfield, [Terms of Use Agreement](https://higgsfield.ai/terms-of-use-agreement),
+last updated October 23, 2026, accessed 2026-11-05.
+
+"Company does not claim ownership of any of your Inputs or Outputs, nor does it restrict your commercial use of Outputs." (Section 4.4)
+"Company does not guarantee the uniqueness, originality, or exclusivity of any Output." (Section 4.4)
+
+Higgsfield Help Center, [Who owns my generations, and can I use them commercially?](https://higgsfield.ai/creator-hub/help-center/account/who-owns-my-generations-and-can-i-use-them-commercially),
+published 2026-08-02, last modified 2026-09-12, accessed 2026-11-05.
+
+"You own your outputs." (Help Center page)
+"There is no separate commercial license to purchase: commercial use rights follow from the Terms of Use for all users." (Help Center page)
+"No. The Terms of Use do not require attribution for outputs." (Help Center page)
+"No. The Terms of Use do not tie commercial use rights to a specific plan." (Help Center page)
+
+"you will not remove, alter, or obscure any provenance signals or markings Company applies under Section 6.4." (Terms of Use Agreement, Section 5.5)
+"Company does not warrant that any marking will be applied to, or persist in, every Output." (Terms of Use Agreement, Section 6.4)
+Visual inspection on
 2026-11-03 of all ten images in public/art and all twelve available raw images in
 a local raw-art folder, including alternate weapons, found no visible watermark.
 This visual check does not establish the absence of invisible provenance signals.
 Palette conversion into tremor.wad does not preserve file metadata, so this record
 makes no claim that embedded provenance metadata survives that conversion.
-Images must not depict real people without consent; these images depict no real
-people, and the prompts were original text. Outputs may not be used to train other
-AI models; Tremor has not used them for that purpose. The art is disclosed as
+Under Sections 4.2(b) and 5.1(ii)(b), images must not depict real people without consent; these images depict no real
+people, and the prompts were original text. Under Section 5.2(iv), Outputs may not be used to train
+machine-learning models; Tremor has not used them for that purpose. The art is disclosed as
 AI-generated in this file.
 
 This is a reading of the terms, not legal advice.
