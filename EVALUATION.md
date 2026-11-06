@@ -63,6 +63,18 @@ The [declared plan](docs/EVALUATION-PLAN.md) states three hypotheses:
 
 Only scripted E1M1 episodes exited. No player completed a seen or held-out map. These are descriptive results, with no significance claims: two trials per map/player and 8-bit RNG starts do not support broad generalization. No controller or prompt changes were made from these outcomes.
 
+### One model failure, step by step
+
+Observed in the declared Gemini model-history trial, E1M1, seed 17: [complete trace](eval/traces-sample/model-history-E1M1-17.jsonl.gz).
+
+| Records | Public observation and submitted action |
+|---|---|
+| Step 105, tic 728 | Health 100, `motion: still`, `heading_deg: 48.07`, `objective_bearing: -4`, `objective_distance: far`; action `turn_left_fine`. |
+| Steps 106-109, tics 735-756 | Each action is `turn_left_fine`, with `valid: true`. Heading rises from 50.06 to 56.06 degrees; objective bearing changes from -6 to -12. Health stays 100, motion stays `still`, and the exit remains `far`. |
+
+No stated model reason is retained. The episode later ended at the five-minute episode timeout, as recorded in the declared results.
+Hypothesis: these repeated turns may reflect a mistaken interpretation of the bearing sign; the trace does not establish the model's reasoning.
+
 ## Supplementary automated solver (added 2026-11-05)
 
 The search-based solver `baseline_solver`, offered for the brief's solver line, was added after the suite was declared and after the model trials. It is supplementary and is not part of the declared comparison. It ran E1M1-E1M7 with RNG starts 17 and 83, using the same 600-step, 600-call and timeout limits, without model API calls. The report records the uncommitted working tree and source/artifact hashes. Existing declared-suite files are unchanged.
@@ -79,7 +91,7 @@ The search-based solver finished 0 of 14 maps: twelve episodes ended in death an
 
 ## Representative live traces
 
-Both samples use E1M1/17 for a matched map/seed comparison, chosen to show the common episode-cap failure, not successful completion. They are complete public-observation/action JSONL streams copied without recompression from this run:
+Both samples use E1M1/17 for a matched map/seed comparison, chosen to show the common episode-cap failure, not successful completion. They are complete public-observation/action JSONL streams copied without recompression from this run. See the [trace reading command and field legend](eval/traces-sample/README.md) for gzip inspection:
 
 - [model-history, E1M1/17, timeout](eval/traces-sample/model-history-E1M1-17.jsonl.gz); SHA-256 `d8ef5acf3bc513604d2722639b9a5deda2bdd31ca0c4e3d38e9456873f8d1c0d`.
 - [model-obs-only, E1M1/17, timeout](eval/traces-sample/model-obs-only-E1M1-17.jsonl.gz); SHA-256 `04dd986103a68dfc2b0a1e30c38dc02cdd0178592be77c7237471145b8979847`.

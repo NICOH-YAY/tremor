@@ -69,10 +69,22 @@ cd midterms/nicoh-yay
 
 Requires Node 24+ and npm. All following commands run in midterms/nicoh-yay in the course checkout. PowerShell may require npm.cmd instead of npm.
 
+### Play
+
+Leave the dev server running in its own terminal and open the printed localhost URL.
+
 ```sh
 # cwd: midterms/nicoh-yay
 npm ci
 npm run dev
+```
+
+### Verify
+
+Run these commands in a second terminal.
+
+```sh
+# cwd: midterms/nicoh-yay
 npm test
 npm run typecheck
 npm run build

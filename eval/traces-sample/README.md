@@ -7,3 +7,22 @@ Live model suite samples are `model-history-E1M1-17.jsonl.gz` and `model-obs-onl
 The separate live model demo is `demo/demo-model-history-E1M1-17.jsonl.gz`, with its outcome in `demo/report.json`. It retains model reasons and is not part of the declared suite.
 
 These seven gzip traces, the two JSON manifests/reports and this README are the tracked inventory. No credentials or hidden-state handles are in controller observations.
+
+## Read a trace
+
+From the repository root, this one-line command prints the first three JSONL records to stdout without writing files. It works in Git Bash and PowerShell:
+
+```sh
+node -e "console.log(require('zlib').gunzipSync(require('fs').readFileSync('eval/traces-sample/model-history-E1M1-17.jsonl.gz')).toString('utf8').trimEnd().split(String.fromCharCode(10)).slice(0,3).join(String.fromCharCode(10)))"
+```
+
+Top-level fields in the declared suite samples:
+
+| Fields | Meaning |
+|---|---|
+| `step`, `observation` | Step index and public observation encoded as a JSON string. |
+| `action`, `source`, `valid`, `feedback` | Submitted action (or null), decision source, validation flag and optional validation feedback. |
+| `latencyMs`, `tokensIn`, `tokensOut`, `estimatedCost` | Decision latency, recorded token counts and estimated cost (which can be null). |
+| `error` | Optional controller error text, present in the model samples. |
+
+The separate demo also contains `reason`, the retained model reason. The declared model suite samples do not contain this field.
