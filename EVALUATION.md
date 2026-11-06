@@ -65,7 +65,7 @@ Only scripted E1M1 episodes exited. No player completed a seen or held-out map. 
 
 ## Supplementary automated solver (added 2026-11-05)
 
-The search-based `baseline_solver` was added after the suite was declared and after the model trials. It is supplementary and is not part of the declared comparison. It ran E1M1-E1M7 with RNG starts 17 and 83, using the same 600-step, 600-call and timeout limits, without model API calls. The report records the uncommitted working tree and source/artifact hashes. Existing declared-suite files are unchanged.
+The search-based solver `baseline_solver`, offered for the brief's solver line, was added after the suite was declared and after the model trials. It is supplementary and is not part of the declared comparison. It ran E1M1-E1M7 with RNG starts 17 and 83, using the same 600-step, 600-call and timeout limits, without model API calls. The report records the uncommitted working tree and source/artifact hashes. Existing declared-suite files are unchanged.
 
 [Full solver results](eval/results/2026-11-05-2026-11-05T06-56-23-784Z-solver-results.json) and [per-episode table](eval/results/2026-11-05-2026-11-05T06-56-23-784Z-solver-table.md). Full normal gzip traces are in the ignored `eval/traces/` paths recorded in the report.
 
@@ -75,7 +75,7 @@ The search-based `baseline_solver` was added after the suite was declared and af
 
 Total steps: 2682; controller calls: 2682. No model tokens or API costs were incurred.
 
-The solver completed zero maps: twelve episodes ended in death and two reached the step limit. Its public-map route search and conservative reading policy did not produce successful completion in this run. It recorded zero crew kills, 29 reads and one fired-unread event. Targeting confirmed hostiles does not guarantee every shot avoids unread figures. These counts are not evidence that it solves the game. Map cells omit height and moving actors, and the public waypoint is only a local route target. These results do not amend the four-player comparison above.
+The search-based solver finished 0 of 14 maps: twelve episodes ended in death and two reached the step limit. Its public-map route search and conservative reading policy did not produce successful completion in this run. It recorded zero crew kills, 29 reads and one fired-unread event. Targeting confirmed hostiles does not guarantee every shot avoids unread figures. These counts are not evidence that it solves the game. Map cells omit height and moving actors, and the public waypoint is only a local route target. These results do not amend the four-player comparison above.
 
 ## Representative live traces
 

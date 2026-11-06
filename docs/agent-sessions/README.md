@@ -38,7 +38,7 @@ The two `codex-doom6.md` launches have identical initial prompts; the metadata d
 
 | Prompt / evidence file | Result file |
 | --- | --- |
-| [codex-doom17.md](codex-doom17.md) | Not supplied |
+| [codex-doom17.md](codex-doom17.md) | [codex-doom17-result.md](codex-doom17-result.md) |
 | [codex-doom4.md](codex-doom4.md) | [codex-doom4-result.md](codex-doom4-result.md) |
 | [codex-doom7.md](codex-doom7.md) | Not supplied |
 

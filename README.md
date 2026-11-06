@@ -87,7 +87,7 @@ Supplementary solver run:
 npm run eval -- --players baseline_solver --cases all
 ```
 
-For this single-player game the automated players are the two scripted baselines plus this search-based solver. A complete optimal solver for real-time 3D Doom with moving, random monsters is not feasible in this scope, so the solver plans routes over the public map and reacts to visible threats. It is supplementary to the declared comparison; its measured results are in [Evaluation](EVALUATION.md#supplementary-automated-solver-added-2026-11-05).
+For this single-player game the automated players are the two scripted baselines plus this search-based solver, offered for the brief's solver line. It finished 0 of 14 maps. A complete optimal solver for real-time 3D Doom with moving, random monsters is not feasible in this scope, so the solver plans routes over the public map and reacts to visible threats. It is supplementary to the declared comparison; its measured results are in [Evaluation](EVALUATION.md#supplementary-automated-solver-added-2026-11-05).
 
 Technical. `src/agent/solver.ts` rebuilds a grid from public automap rows each step and runs deterministic BFS with at most 4096 discovered/expanded cells toward the public route waypoint, including its key/door dependencies. It converts a short path segment to constant macro actions, uses doors, reads unknown figures before firing at confirmed hostiles, and backs away from nearby threats below 30 health. Unmapped targets fall back to public guidance. The unchanged runner passes only detached public Observation, copied legal IDs and validation feedback, never the private WASM handle, WAD files, evaluator outcome or hidden crew identity. This preserves check 2c's information boundary; in-process controller imports are not a security sandbox. The same limits and normal traces and terminal reasons apply.
 
@@ -276,10 +276,10 @@ Model prompts preserve all public map information with lossless row RLE and reve
 
 ## Contributors
 
-Nicoh wrote AGENT-TEAM.md, the limitations paragraph and the playtest notes. The README, rules docs and evaluation report were written by Codex and Claude from Nicoh's design, playtests and decisions, and he directed and reviewed them.
+Nicoh wrote AGENT-TEAM.md, the limitations paragraph and the playtest notes. Claude made small accuracy edits to four passages at Nicoh's request (the skills paragraph, the first two limitations points and one sentence about what the Gemini player sees). The README, rules docs and evaluation report were written by Codex and Claude from Nicoh's design, playtests and decisions, and he directed and reviewed them.
 
 - **Nicoh**: design, direction and playtesting. [AGENT-TEAM.md](AGENT-TEAM.md) and the [evaluation limitations](EVALUATION.md#limitations-in-nicohs-words) describe his decisions and limitations in his own words.
-- **Codex (OpenAI)**: the only code editor, responsible for all original Tremor game, engine patch, agent, evaluation and tooling code. The inherited engine and third-party assets retain their upstream authorship. See [ownership instructions](AGENTS.md) and [per-session evidence](docs/agent-sessions/README.md).
+- **Codex (OpenAI)**: the only code editor, responsible for all original game, engine patch, agent, evaluation and tooling code in the current engine-based Tremor. The retired TypeScript prototype in legacy/ was partly built by Claude worker agents, as recorded in the 2026-10-30 "Three Claude Sonnet worker subagents in parallel" row of the [agent capability table](docs/agent-sessions/README.md#agent-capabilities), including renderer commit `14860bd`. The inherited engine and third-party assets retain their upstream authorship. See [ownership instructions](AGENTS.md) and [per-session evidence](docs/agent-sessions/README.md).
 - **Claude Code (Anthropic)**: planning, prompts, review coordination, browser playtests, commits and evaluation runs.
 - **Independent reviewer and audit agents**: reviews and checks recorded in [docs/reviews/](docs/reviews/).
 - **Gemini 3.5 Flash-Lite**: the evaluated player, not a builder.

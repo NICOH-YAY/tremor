@@ -1,4 +1,4 @@
-# Current decisions - 2026-10-31
+# Current decisions - 2026-11-05
 
 | Choice | Alternative beaten | Reason |
 |---|---|---|

@@ -27,8 +27,9 @@ Static lattice sector IDs/wall marks cache per level/cards; dynamic heights upda
 Quest planning replans on sector/cards/geometry signature changes. Requested
 agent/TAB cue remains responsive; browser cue with TAB closed recomputes at most every 35 advancing game tics. Observe is pure.
 
-Limitations: true 3D pitch/640x400 absent; target Brave Canvas/audio profiling,
-full human episode playthrough and live model comparisons require separate evidence.
+Limitations: true 3D pitch/640x400 absent; target Brave Canvas/audio profiling
+remains separate work. A full human E1M1 to E1M8 playthrough is not documented.
+The live model comparison is complete; see [Evaluation](../EVALUATION.md).
 Legacy TS is excluded and supplies no current design or test claims.
 
 ## Parameter rationale
