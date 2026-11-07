@@ -44,7 +44,7 @@ The open course PR uses branch `nicoh-yay/tremor-midterm` in the course reposito
 
 ## Scope change
 
-The Week 3 scope record was Robotron: 2084 (Williams, 1982), waves 1-4. No license was found for its source. On 2026-10-30 the project moved to Doom Episode 1 because the GPL engine permits reuse. The retired TypeScript prototype is in legacy/. See [Original Doom rules, omissions and adaptations](#original-doom-rules-omissions-and-adaptations) for the included rules, exclusions, adaptations and what I would cut first.
+The Week 3 scope record was Robotron: 2084 (Williams, 1982), waves 1-4. No license was found for its source. On 2026-10-30 the project moved to Doom Episode 1 because the GPL engine permits reuse. The change is posted as a reply under my original post in the [Week 3 thread](https://courseworks2.columbia.edu/courses/258228/discussion_topics/1669984?entry_id=5282461) on 2026-11-07 (CourseWorks, class members only). The retired TypeScript prototype is in legacy/. See [Original Doom rules, omissions and adaptations](#original-doom-rules-omissions-and-adaptations) for the included rules, exclusions, adaptations and what I would cut first.
 
 Reference game: Doom (id Software, 1993), Episode 1 'Knee-Deep in the Dead', played here on Freedoom Phase 1 v0.13.0 data; no proprietary IWAD shipped.
 
