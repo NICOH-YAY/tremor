@@ -6,7 +6,7 @@ Live model suite samples are `model-history-E1M1-17.jsonl.gz` and `model-obs-onl
 
 The separate live model demo is `demo/demo-model-history-E1M1-17.jsonl.gz`, with its outcome in `demo/report.json`. It retains model reasons and is not part of the declared suite.
 
-These seven gzip traces, the two JSON manifests/reports and this README are the tracked inventory. No credentials or hidden-state handles are in controller observations.
+These seven gzip traces, the two JSON manifests/reports and this README are the tracked inventory in this sample folder. The [complete declared-suite set](../traces-full/2026-10-31-declared-suite/) contains all 56 traces with a manifest of hashes and outcomes. No credentials or hidden-state handles are in controller observations.
 
 ## Read a trace
 

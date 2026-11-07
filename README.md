@@ -5,7 +5,7 @@
 - [Evaluation](EVALUATION.md).
 - [Agent team account](AGENT-TEAM.md).
 - [Primary recording (4:08), the graded recording](https://drive.google.com/file/d/1-gUtdHicrsxu483OgbBwNUdB4stBCUJH/view?usp=sharing), viewable by anyone signed in with a columbia.edu account.
-- [Supplementary Gemini player recording (4:47), a close-up of the model's choices and reasons](https://drive.google.com/file/d/1rQqYeeg_dPlmrTy-UhMr5rVqtPPW869_/view?usp=sharing), the live model player on E1M1 with its reasons shown, viewable by anyone signed in with a columbia.edu account.
+- [Supplementary Gemini player recording (4:47), a close-up of the model's choices and reasons](https://drive.google.com/file/d/1rQqYeeg_dPlmrTy-UhMr5rVqtPPW869_/view?usp=sharing), a verified replay of a live Gemini run on E1M1 in which every move was chosen by the model, with its reasons shown, viewable by anyone signed in with a columbia.edu account.
 - [Peer notes](docs/peer-notes/README.md).
 - [Agent sessions](docs/agent-sessions/README.md).
 - [First independent review](docs/reviews/independent-review-2026-10-31.md) and [response](docs/reviews/review-response-2026-10-31.md); [second review](docs/reviews/review.md) and [response](docs/reviews/review-response.md); [final review](docs/reviews/review-final-2026-11-02.md) and [response](docs/reviews/review-final-response.md).
@@ -21,7 +21,7 @@ The open course PR uses branch `nicoh-yay/tremor-midterm` in the course reposito
 | Scope, omissions and adaptations | [Scope change](#scope-change), [omissions and adaptations](#original-doom-rules-omissions-and-adaptations), [first cuts](#what-i-would-cut-first) |
 | Credits and licenses | [Credits and terms](#credits-and-reuse), [third-party provenance](THIRD-PARTY.md#third-party-provenance), [upstream comparison](engine/UPSTREAM.md#inspecting-the-tremor-changes) |
 | Playing the game | [Goal and ending](#the-goal-and-the-ending) |
-| Model player and traces | [Live traces](EVALUATION.md#representative-live-traces), [trace reasons](docs/CONTRACTS.md#trace-reasons-and-optional-demo), [replay verification](EVALUATION.md#spectator-replay-verification) |
+| Model player and traces | [All 56 declared-suite traces](eval/traces-full/2026-10-31-declared-suite/), [Live traces](EVALUATION.md#representative-live-traces), [trace reasons](docs/CONTRACTS.md#trace-reasons-and-optional-demo), [replay verification](EVALUATION.md#spectator-replay-verification) |
 | Hidden information and observations | [Interface contracts](docs/CONTRACTS.md#current-real-engine-contracts---2026-10-31), [information-boundary review](docs/reviews/independent-review-2026-10-30.md#1-information-boundary), [CI coverage](tests/README.md#active-ci-coverage) |
 | Setup and commands | [Setup and commands](#setup-and-commands) |
 | Limits and terminal reasons | [Interface and runner contracts](docs/CONTRACTS.md#current-real-engine-contracts---2026-10-31), [results and limit counts](EVALUATION.md#current-results) |
@@ -117,7 +117,7 @@ Evaluation: `npm run eval -- --players baseline_aggressive,baseline_careful --ca
 600 actions/calls, 7 tics/action, 20s/call, five minutes/episode. Failed calls count.
 Invalid actions idle for 7 tics; three invalid decisions trigger labelled wait.
 Errors preserve that streak. Natural exit/death takes precedence over later limits.
-Date+run ID reports: eval/results/. Raw gzip traces: eval/traces/ (ignored).
+Date+run ID reports: eval/results/. Original gzip traces: eval/traces/ (ignored). The [complete declared-suite traces](eval/traces-full/2026-10-31-declared-suite/) are retained separately.
 Representative traces: eval/traces-sample/. Seeds choose only an 8-bit RNG start:
 17 and 273 are identical, 17 and 83 distinct; no random level generation.
 
